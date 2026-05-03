@@ -10,7 +10,7 @@ namespace EntegrefKrediOnay
     {
         /// <summary>
         /// Uygulamanın ana girdi noktası.
-        /// </summary>
+        /// </summary> 
         [STAThread]
         static void Main()
         {
