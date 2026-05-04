@@ -49,25 +49,8 @@ namespace EntegrefKrediOnay
         //            token.ThrowIfCancellationRequested();
         //            progress.Report((0, $"Yükleniyor... "));
         //        });
-        //public static string userID;
-        //public static string userPass;
-        //public static string userName;
-        //public static string userCHVAL;
-        //public static string userDIVVAL;
-        //public static string userDEPART;
-        //public static string userREGION;
-        //public static string NKOLAYUSER;
-        //public static string NKOLAYPASS;
-
-        public static string pcİsmi;
-        public static string pcModeli;
-        public static string Cpuid;
-        public static string Motherboardid;
-        public static string ComputerUUID;
-        public static string ComputerLisansingID;
         private static string mimariGec;
         private static int mimari;
-        public static string CompanyName;
         public frmLogin()
         {
             try
@@ -95,21 +78,23 @@ namespace EntegrefKrediOnay
                 }
                 if (!string.IsNullOrEmpty(key.GetValue("ApplicationVKN").ToString()))
                 {
-                    VKN = key.GetValue("ApplicationVKN").ToString();
-                    pcİsmi = key.GetValue("ComputerName").ToString();
-                    pcModeli = key.GetValue("ComputerID").ToString();
-                    Cpuid = key.GetValue("CPU").ToString();
-                    Motherboardid = key.GetValue("motherboardid").ToString();
-                    ComputerUUID = key.GetValue("ComputerUUID").ToString();
+                    Program.configProvider.VKN = key.GetValue("ApplicationVKN").ToString();
+                    Program.configProvider.ComputerName = key.GetValue("ComputerName").ToString();
+                    Program.configProvider.ComputerModeli = key.GetValue("ComputerID").ToString();
+                    Program.configProvider.ComputerCpuID = key.GetValue("CPU").ToString();
+                    Program.configProvider.ComputerMboardID = key.GetValue("motherboardid").ToString();
+                    Program.configProvider.ComputerUUID = key.GetValue("ComputerUUID").ToString();
+                    Program.configProvider.ComputerVersion = key.GetValue("ApplicationVersion").ToString();
+
                 }
                 else
                 {
-                    VKN = Properties.Settings.Default.VKN;
-                    pcİsmi = key.GetValue("ComputerName").ToString();
-                    pcModeli = key.GetValue("ComputerID").ToString();
-                    Cpuid = key.GetValue("CPU").ToString();
-                    Motherboardid = key.GetValue("motherboardid").ToString();
-                    ComputerUUID = key.GetValue("ComputerUUID").ToString();
+                    Program.configProvider.VKN = Properties.Settings.Default.VKN;
+                    Program.configProvider.ComputerName = key.GetValue("ComputerName").ToString();
+                    Program.configProvider.ComputerModeli = key.GetValue("ComputerID").ToString();
+                    Program.configProvider.ComputerCpuID = key.GetValue("CPU").ToString();
+                    Program.configProvider.ComputerMboardID = key.GetValue("motherboardid").ToString();
+                    Program.configProvider.ComputerUUID = key.GetValue("ComputerUUID").ToString();
                 }
                 
        
@@ -136,8 +121,6 @@ namespace EntegrefKrediOnay
         private List<eDatabase> lDatabase;
         List<Firma> firmas = new List<Firma>();
         public static string version = "";
-        public static string ProductName = "";
-        public static string VKN = null;
         public static int lisansKalan = 0;
         private readonly HttpClient httpClient;
         List<VKNSettings> VKNSettings = new List<VKNSettings>();
@@ -173,17 +156,8 @@ namespace EntegrefKrediOnay
 
         }
         string servisAdi = "VOLANT SERVER Zamanı güncelle";
-        public static EntegreFConfigProvider configProvider = new EntegreFConfigProvider();
         private async void frmLogin_LoadAsync(object sender, EventArgs e)
-        {
-
-                configProvider.VKN = VKN;
-                configProvider.CompanyName = pcİsmi;
-                configProvider.ComputerModeli = pcModeli.ToString();
-                configProvider.ComputerUUID = ComputerUUID;
-                configProvider.ComputerVersion = version;
-                configProvider.ProductName = ProductName;
-            
+        {            
             await SplashScrenn.RunWithSplashAsync(this, false, 0, this.Text,
             async (progress, token) =>
             {
@@ -200,16 +174,16 @@ namespace EntegrefKrediOnay
                 //});
                 VolXml();
                 this.Enabled = false;
-                ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı            
+                Program.configProvider.ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı            
                 if (Properties.Settings.Default.EntegreFProductName != "")
                 {
-                    ProductName = Properties.Settings.Default.EntegreFProductName;
+                    Program.configProvider.ProductName = Properties.Settings.Default.EntegreFProductName;
                 }
                 else
                 {
-                    ProductName = "EntegrefKrediOnay";
+                    Program.configProvider.ProductName = "EntegrefKrediOnay";
                 }
-                configProvider.ProductName = ProductName;
+                Program.configProvider.ProductName = ProductName;
                 RegistryKey key = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\{ProductName}");
                 //System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
 
@@ -217,43 +191,43 @@ namespace EntegrefKrediOnay
                 //var sdf = Properties.Settings.Default.connectionstring;
                 if (string.IsNullOrWhiteSpace(Properties.Settings.Default.connectionstring))
                 {
-                    var result = await entegreF.GetCompanySettings(configProvider);
+                    var result = await entegreF.GetCompanySettings(Program.configProvider);
                     VKNSettings = JsonConvert.DeserializeObject<List<VKNSettings>>(result);
                     Properties.Settings.Default.connectionstring = VKNSettings[0].VolantConnectionLocal;
                     Properties.Settings.Default.Save();
                 }
                 CheckAndRemoveTask_FirstRunOnly();
                 string[] valueNames2 = key.GetValueNames();
-                try
-                {
-                    // Proje dizini içindeki .bat dosyanızın tam yolunu oluşturun
-                    string exeYolu = Path.Combine(@"C:\EdevletServis", "VolantZaman.exe");
-                    if (!File.Exists(exeYolu))
-                    {
-                        MessageBox.Show("Servis dosyası bulunamadı:\n" + exeYolu);
-                    }
-                    if (!ServisYukluMu(servisAdi))
-                    {
-                        ServisiYukle(exeYolu);
-                    }
-                    var ServisStatus = ServisDurumunuGoster(servisAdi);
-                    if (ServisStatus != "Running")
-                    {
-                        ServisiBaslat(servisAdi);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                    CustomMessageBox.ShowMessage("Servis Hatası", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                //try
+                //{
+                //    // Proje dizini içindeki .bat dosyanızın tam yolunu oluşturun
+                //    string exeYolu = Path.Combine(@"C:\EdevletServis", "VolantZaman.exe");
+                //    if (!File.Exists(exeYolu))
+                //    {
+                //        MessageBox.Show("Servis dosyası bulunamadı:\n" + exeYolu);
+                //    }
+                //    if (!ServisYukluMu(servisAdi))
+                //    {
+                //        ServisiYukle(exeYolu);
+                //    }
+                //    var ServisStatus = ServisDurumunuGoster(servisAdi);
+                //    if (ServisStatus != "Running")
+                //    {
+                //        ServisiBaslat(servisAdi);
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+                //    string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
+                //    CustomMessageBox.ShowMessage("Servis Hatası", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //}
                 if (!valueNames2.Contains("ComputerUUID"))
                 {
                     await Task.Run(() =>
                     {
-                        ComputerUUID = ComputerInfo.GetComputerId();
+                        Program.configProvider.ComputerUUID = ComputerInfo.GetComputerId();
                     });
-                    key.SetValue("ComputerUUID", ComputerUUID);
+                    key.SetValue("ComputerUUID", Program.configProvider.ComputerUUID);
                 }
                 else
                 {
@@ -261,10 +235,10 @@ namespace EntegrefKrediOnay
                     {
                         await Task.Run(() =>
                         {
-                            ComputerUUID = ComputerInfo.GetComputerId();
+                            Program.configProvider.ComputerUUID = ComputerInfo.GetComputerId();
                         });
                     }
-                    key.SetValue("ComputerUUID", ComputerUUID);
+                    key.SetValue("ComputerUUID", Program.configProvider.ComputerUUID);
                 }
                 if (!valueNames2.Contains("ComputerLisansingID"))
                 {
@@ -272,29 +246,36 @@ namespace EntegrefKrediOnay
                 }
                 if (key.GetValue("ComputerLisansingID").ToString() != "")
                 {
-                    ComputerLisansingID = key.GetValue("ComputerLisansingID").ToString();
+                    Program.configProvider.ComputerLisansingID = key.GetValue("ComputerLisansingID").ToString();
                     lblProID.Text = key.GetValue("ComputerLisansingID").ToString();
                 }
                 else
                 {
-                    if (ComputerLisansingID != "" && ComputerLisansingID != null)
+                    if (Program.configProvider.ComputerLisansingID != "" && Program.configProvider.ComputerLisansingID != null)
                     {
-                        lblProID.Text = ComputerLisansingID;
+                        lblProID.Text = Program.configProvider.ComputerLisansingID;
                     }
                     else
-                    {                        
-                        string response = await entegreF.UpdateLicensingUser(configProvider);
+                    {
+                        Program.configProvider.baseUrl = "http://localhost:24853";
+                        string response = await entegreF.UpdateLicensingUser(Program.configProvider);
                         List<Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Sonuc>>(response);
-                        ComputerLisansingID = myDeserializedClass[0].message;
-                        key.SetValue("ComputerLisansingID", myDeserializedClass[0].message);
-                        lblProID.Text = myDeserializedClass[0].message;
+                        if (myDeserializedClass[0].status)
+                        {
+                            Program.configProvider.ComputerLisansingID = myDeserializedClass[0].message;
+                            key.SetValue("ComputerLisansingID", myDeserializedClass[0].message);
+                            lblProID.Text = myDeserializedClass[0].message;
+                        }
+                        else
+                        {
+                            CustomMessageBox.ShowMessage(myDeserializedClass[0].message, "", this, "", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            Application.Exit();
+                        }
                     }
                 }
-                configProvider.ComputerLisansingID = ComputerLisansingID;
-                configProvider.ComputerUUID = ComputerUUID;
                 if (!valueNames2.Contains("ApplicationSecretPhase"))
                 {
-                    var newkey = await entegreF.Newkey(configProvider);
+                    var newkey = await entegreF.Newkey(Program.configProvider);
                     key.SetValue("ApplicationSecretPhase", newkey);
 
                 }
@@ -302,7 +283,7 @@ namespace EntegrefKrediOnay
                 {
                     if (key.GetValue("ApplicationSecretPhase").ToString() == "")
                     {
-                        var newkey = await entegreF.Newkey(configProvider);
+                        var newkey = await entegreF.Newkey(Program.configProvider);
                         key.SetValue("ApplicationSecretPhase", newkey);
                         Properties.Settings.Default.EntegrefSecretPhase = newkey.ToString();
                         Properties.Settings.Default.Save();
@@ -340,14 +321,6 @@ namespace EntegrefKrediOnay
                         version = _s1;
                         lblversion.Text = version;
                     }
-                    if (pcİsmi.Contains("00-BM"))
-                    {
-                        configProvider.baseUrl = @"http://192.168.4.8:99";
-                    }
-                    else
-                    {
-                        configProvider.baseUrl = @"http://lisans.entegref.com.tr";
-                    }
                     //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(responseData);
                     //List<Sonuc> Guncellemesonuc = JsonConvert.DeserializeObject<List<Sonuc>>(guncelleme);
                     //await entegreF.UpdateLicensingUser(VKN, pcİsmi.ToString(), pcModeli.ToString(), ComputerUUID, version, ProductName);
@@ -362,14 +335,14 @@ namespace EntegrefKrediOnay
                         version = key2.GetValue("ApplicationVersion").ToString();
                     }
                     SKGL.Validate validate = new SKGL.Validate();
-                    validate.secretPhase = VKN;
+                    validate.secretPhase = Program.configProvider.VKN;
                     if (key2.GetValue("ApplicationSecretPhase").ToString() != "")
                     {
                         validate.Key = key2.GetValue("ApplicationSecretPhase").ToString();
                     }
                     else
                     {
-                        var newkey = await entegreF.Newkey(configProvider);
+                        var newkey = await entegreF.Newkey(Program.configProvider);
                         key2.SetValue("ApplicationSecretPhase", newkey);
                         validate.Key = newkey;
                     }
@@ -377,9 +350,9 @@ namespace EntegrefKrediOnay
                     {
                         await Task.Run(() =>
                         {
-                            ComputerUUID = ComputerInfo.GetComputerId();
+                            Program.configProvider.ComputerUUID = ComputerInfo.GetComputerId();
                         });
-                        key2.SetValue("ComputerUUID", ComputerUUID);
+                        key2.SetValue("ComputerUUID", Program.configProvider.ComputerUUID);
                     }
                     else
                     {
@@ -387,37 +360,35 @@ namespace EntegrefKrediOnay
                         {
                             await Task.Run(() =>
                             {
-                                ComputerUUID = ComputerInfo.GetComputerId();
+                                Program.configProvider.ComputerUUID = ComputerInfo.GetComputerId();
                             });
                         }
-                        key2.SetValue("ComputerUUID", ComputerUUID);
+                        key2.SetValue("ComputerUUID", Program.configProvider.ComputerUUID);
                     }
-                    configProvider.ComputerUUID = ComputerUUID;
                     if (!valueNames.Contains("ComputerLisansingID"))
                     {
                         key2.SetValue("ComputerLisansingID", "");
                     }
                     if (key2.GetValue("ComputerLisansingID").ToString() != "")
                     {
-                        ComputerLisansingID = key2.GetValue("ComputerLisansingID").ToString();
+                        Program.configProvider.ComputerLisansingID = key2.GetValue("ComputerLisansingID").ToString();
                         lblProID.Text = key2.GetValue("ComputerLisansingID").ToString();
                     }
                     else
                     {
-                        if (ComputerLisansingID != "" && ComputerLisansingID != null)
+                        if (Program.configProvider.ComputerLisansingID != "" && Program.configProvider.ComputerLisansingID != null)
                         {
-                            lblProID.Text = ComputerLisansingID;
+                            lblProID.Text = Program.configProvider.ComputerLisansingID;
                         }
                         else
                         {
-                            string response = await entegreF.UpdateLicensingUser(configProvider);
+                            string response = await entegreF.UpdateLicensingUser(Program.configProvider);
                             List<Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Sonuc>>(response);
-                            ComputerLisansingID = myDeserializedClass[0].message;
+                            Program.configProvider.ComputerLisansingID = myDeserializedClass[0].message;
                             key2.SetValue("ComputerLisansingID", myDeserializedClass[0].message);
                             lblProID.Text = myDeserializedClass[0].message;
                         }
                     }
-                    configProvider.ComputerLisansingID = ComputerLisansingID;
                     if (Properties.Settings.Default.EntegrefSecretPhase == "")
                     {
                         Properties.Settings.Default.EntegrefSecretPhase = key2.GetValue("ApplicationSecretPhase").ToString();
@@ -438,16 +409,16 @@ namespace EntegrefKrediOnay
                         try
                         {
                             var ApplicationSecretPhase = key2.GetValue("ApplicationSecretPhase").ToString();
-                            var newkey = await entegreF.Newkey(configProvider);
+                            var newkey = await entegreF.Newkey(Program.configProvider);
                             if (ApplicationSecretPhase != newkey)
                             {
                                 key2.SetValue("ApplicationSecretPhase", newkey);
-                                key2.SetValue("ComputerUUID", ComputerUUID);
+                                key2.SetValue("ComputerUUID", Program.configProvider.ComputerUUID);
                                 Properties.Settings.Default.EntegrefSecretPhase = newkey;
                                 Properties.Settings.Default.Save();
                                 CustomMessageBox.ShowMessage("Entegref Lisans Anahtarınız Güncellendi...!", "Kullanım süreniz dolan lisans anahtarı otomatik güncellendi.", this, "Dikkat", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 SKGL.Validate validate2 = new SKGL.Validate();
-                                validate2.secretPhase = VKN;
+                                validate2.secretPhase = Program.configProvider.VKN;
                                 validate2.Key = newkey.ToString();
                                 txtLisansing2.Text = "Başlangıç Tarihi : \r\n " + validate2.CreationDate.ToShortDateString();
                                 txtLisansing3.Text = "Sona Erme Tarihi : \r\n " + validate2.ExpireDate.ToShortDateString();
@@ -480,14 +451,14 @@ namespace EntegrefKrediOnay
                     key2.Close();
                     try
                     {
-                        ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı            
+                        Program.configProvider.ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı            
                         if (Properties.Settings.Default.EntegreFProductName != "")
                         {
-                            ProductName = Properties.Settings.Default.EntegreFProductName;
+                            Program.configProvider.ProductName = Properties.Settings.Default.EntegreFProductName;
                         }
                         else
                         {
-                            ProductName = "EntegrefKrediOnay";
+                            Program.configProvider.ProductName = "EntegrefKrediOnay";
                         }
                         // Kayıt defteri alt anahtarının yolunu tanımlayın
                         string registryPath = $@"HKEY_CURRENT_USER\SOFTWARE\{ProductName}";
@@ -514,8 +485,8 @@ namespace EntegrefKrediOnay
                         string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
                         System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
                     }
-                    configProvider.ProductName = ProductName;
-                    var checkSonuc = await entegreF.Versiyon(configProvider);
+                    Program.configProvider.ProductName = ProductName;
+                    var checkSonuc = await entegreF.Versiyon(Program.configProvider);
                     List<Sonuc> myDeserializedClass3 = JsonConvert.DeserializeObject<List<Sonuc>>(checkSonuc);
                     int newVersion = int.Parse(myDeserializedClass3[0].message.Replace(".", ""));
                     int lastVersion = int.Parse(version.Replace(".", ""));
@@ -542,45 +513,6 @@ namespace EntegrefKrediOnay
                                     Process.Start(psi2);
                                     Application.Exit();
                                 }
-                                //string exePath = @"EntegreFToolsUpdater.exe";
-                                // Eğer exe yoksa indir
-                                //if (!File.Exists(exePath))
-                                //{
-                                //    frmNewVersion vv = new frmNewVersion(exePath, AppDomain.CurrentDomain.BaseDirectory);
-                                //    DialogResult result = vv.ShowDialog();
-
-                                //    if (result != DialogResult.OK)
-                                //    {
-                                //        throw new Exception("Entegref Güncelleyici Açılmadı");
-                                //    }
-
-                                //    //using (System.Net.WebClient client = new System.Net.WebClient())
-                                //    //{
-                                //    //    Console.WriteLine("Dosya bulunamadı, indiriliyor...");
-                                //    //    client.DownloadFile(downloadLink, exePath);
-                                //    //    Console.WriteLine("İndirme tamamlandı.");
-                                //    //}
-                                //}
-
-                                //ProcessStartInfo psi = new ProcessStartInfo();
-                                //psi.FileName = exePath;
-                                //psi.WindowStyle = ProcessWindowStyle.Normal;
-                                //// Ortam değişkeni eklemek için UseShellExecute false olmalı
-                                //psi.UseShellExecute = false;
-                                //psi.RedirectStandardOutput = true;
-
-                                //// Ortam değişkeni ekle
-                                //psi.EnvironmentVariables["MY_VAR"] = "Entegref Güncelleme";
-
-                                //using (Process proc = Process.Start(psi))
-                                //{
-                                //    string output = proc.StandardOutput.ReadToEnd();
-                                //    proc.WaitForExit();
-                                //    Console.WriteLine(output);
-                                //}
-
-                                ////var psi = new ProcessStartInfo { FileName = @"EntegreFToolsUpdater.exe", WindowStyle = ProcessWindowStyle.Normal };
-                                //Process.Start(psi);
                             }
                             Application.Exit();
                         }
@@ -1005,7 +937,7 @@ namespace EntegrefKrediOnay
                         if (item.status)
                         {
                             SKGL.Validate validate = new SKGL.Validate();
-                            validate.secretPhase = VKN;
+                            validate.secretPhase = Program.configProvider.VKN;
                             validate.Key = item.message;
                             Properties.Settings.Default.EntegrefSecretPhase = item.message;
                             Properties.Settings.Default.Save();
@@ -1041,11 +973,11 @@ namespace EntegrefKrediOnay
             try
             {
                 clientName = SystemInformation.ComputerName;
-                if (!File.Exists("C:\\Program Files (x86)\\Volant Yazılım\\Volant Erp Setup\\VolErpConnection.xml"))
+                if (!File.Exists("C:\\Program Files (x86)\\Volant Yazılım\\Volant Erp Setup\\VolErpConnectio_junmed.xml"))
                 {
                     throw new Exception("VolErpConnection Dosyası Eksik!");
                 }
-                XmlTextReader reader = new XmlTextReader("C:\\Program Files (x86)\\Volant Yazılım\\Volant Erp Setup\\VolErpConnection.xml");
+                XmlTextReader reader = new XmlTextReader("C:\\Program Files (x86)\\Volant Yazılım\\Volant Erp Setup\\VolErpConnectio_junmed.xml");
                 while (reader.Read())
                 {
                     if ((reader.NodeType == XmlNodeType.Element && reader.Name == "PARAMS") || reader.NodeType != XmlNodeType.Element || !(reader.Name == "DB"))
@@ -1188,7 +1120,7 @@ namespace EntegrefKrediOnay
                 Properties.Settings.Default.VolFtpUser = ftp.Rows[0]["MTFTPUSER"].ToString();
                 Properties.Settings.Default.VolFtpPass = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
                 var Vrk = Sorgu("select COMPANYWATNO from COMPANY", Properties.Settings.Default.connectionstring);
-                VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
+                Program.configProvider.VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
             }
             else
             {
@@ -1197,7 +1129,7 @@ namespace EntegrefKrediOnay
                 Properties.Settings.Default.VolFtpUser = ftp.Rows[0]["MTFTPUSER"].ToString();
                 Properties.Settings.Default.VolFtpPass = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
                 var Vrk = Sorgu("select COMPANYWATNO from COMPANY", Properties.Settings.Default.connectionstring);
-                VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
+                Program.configProvider.VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
             }
             Properties.Settings.Default.Save();
         }
@@ -1407,14 +1339,6 @@ namespace EntegrefKrediOnay
         Form formInstance;
         private async void simpleButton2_Click(object sender, EventArgs e)
         {
-            if (txtVolantUser.Text.Contains("00-BM") || txtVolantUser.Text.Contains("00-bm"))
-            {
-                if (!pcİsmi.Contains("00-BM"))
-                {
-                    CustomMessageBox.ShowMessage("Lütfen Sadece Kendi Bilgisayarınız Üzerinden İşlem Yapınız", "", this, "Uyarı", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-            }
             // UI'de tekrar tıklamayı engelle
             simpleButton2.Enabled = false;
             this.Enabled = false;
@@ -1453,24 +1377,6 @@ namespace EntegrefKrediOnay
                     {
                         return (ekranAc: false, formToOpen: new frmEntegrefSettings(), msg: "");
                     }
-                    // ——— Bağlantı string normalizasyonu ———
-                    if (Properties.Settings.Default.connectionstring == "Server=192.168.4.24;Database=VDB_YON02;User Id=sa;Password=MagicUser2023!;Connect Timeout=0;")
-                    {
-                        Properties.Settings.Default.connectionstring = "Server=192.168.4.24;Database=VDB_YON01;User Id=sa;Password=MagicUser2023!;Connect Timeout=0;";
-                    }
-
-                    if (Properties.Settings.Default.connectionstring2 == Properties.Settings.Default.connectionstring)
-                    {
-                        Properties.Settings.Default.connectionstring2 = "Server=192.168.4.24;Database=EntegreF;User Id=sa;Password=MagicUser2023!;";
-                    }
-
-                    if (!Properties.Settings.Default.connectionstring2.Contains($"{Properties.Settings.Default.DbName}"))
-                    {
-                        Properties.Settings.Default.connectionstring2 =
-                            Properties.Settings.Default.connectionstring.Replace(Properties.Settings.Default.Company, Properties.Settings.Default.DbName);
-                    }
-                    Properties.Settings.Default.Save();
-
                     var yetki = Sorgu(
                         string.Format(@"select * from SOCIAL  
                                 left outer join SOCIALCONNECT on SOCOSOCODE = SOCODE 
@@ -1542,7 +1448,7 @@ namespace EntegrefKrediOnay
                     }
 
                     // Versiyon kontrol
-                    var checkSonuc = await entegreF.GetNewCheck(configProvider);
+                    var checkSonuc = await entegreF.GetNewCheck(Program.configProvider);
                     if (checkSonuc == null || checkSonuc.Count != 1)
                         return (ekranAc: false, formToOpen: (Form)null, msg: "Versiyon kontrol verisi alınamadı.");
 

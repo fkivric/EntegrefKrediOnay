@@ -52,6 +52,15 @@
     <Reference Include="FoxLearn.License">
       <HintPath>..\Entegref\Lisansing\FoxLearn.License.dll</HintPath>
     </Reference>
+    <Reference Include="MetroFramework, Version=1.4.0.0, Culture=neutral, PublicKeyToken=5f91a84759bf584a, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\MetroModernUI.1.4.0.0\lib\net\MetroFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="MetroFramework.Design, Version=1.4.0.0, Culture=neutral, PublicKeyToken=5f91a84759bf584a, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\MetroModernUI.1.4.0.0\lib\net\MetroFramework.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="MetroFramework.Fonts, Version=1.4.0.0, Culture=neutral, PublicKeyToken=5f91a84759bf584a, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\MetroModernUI.1.4.0.0\lib\net\MetroFramework.Fonts.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EntegreFDLL\EntegreFDLL\bin\Debug\Newtonsoft.Json.dll</HintPath>
@@ -64,6 +73,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -118,6 +128,12 @@
     <Compile Include="frmNewMessageBox.Designer.cs">
       <DependentUpon>frmNewMessageBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmVKN.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmVKN.Designer.cs">
+      <DependentUpon>frmVKN.cs</DependentUpon>
+    </Compile>
     <Compile Include="ListtoDataTableConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgressBarFrm.cs">
@@ -148,6 +164,9 @@
     <EmbeddedResource Include="frmNewMessageBox.resx">
       <DependentUpon>frmNewMessageBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmVKN.resx">
+      <DependentUpon>frmVKN.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProgressBarFrm.resx">
       <DependentUpon>ProgressBarFrm.cs</DependentUpon>
     </EmbeddedResource>
@@ -165,6 +184,7 @@
     <EmbeddedResource Include="XtraForm1.resx">
       <DependentUpon>XtraForm1.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -423,6 +443,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\viewsetting_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\saveas.svg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -200,10 +200,10 @@ namespace EntegrefKrediOnay
                 tablePanel2.Columns[2].Visible = false;
             }
             Detaynetini = rchtxt.Text;
-            pcİsmi = frmLogin.pcİsmi;
-            pcModeli = frmLogin.pcModeli;
-            ComputerUUID = frmLogin.ComputerUUID;
-            ComputerLisansingID = frmLogin.ComputerLisansingID;
+            pcİsmi = Program.configProvider.CompanyName;
+            pcModeli = Program.configProvider.ComputerModeli;
+            ComputerUUID = Program.configProvider.ComputerUUID;
+            ComputerLisansingID = Program.configProvider.ComputerLisansingID;
         }
         int totalHeight = 0;
         private void btnDetay_Click(object sender, EventArgs e)

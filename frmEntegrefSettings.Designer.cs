@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DevExpress.XtraEditors.TileItemElement tileItemElement1 = new DevExpress.XtraEditors.TileItemElement();
-            DevExpress.XtraEditors.TileItemElement tileItemElement2 = new DevExpress.XtraEditors.TileItemElement();
-            DevExpress.XtraEditors.TileItemElement tileItemElement3 = new DevExpress.XtraEditors.TileItemElement();
-            DevExpress.XtraEditors.TileItemElement tileItemElement4 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement9 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement10 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement11 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement12 = new DevExpress.XtraEditors.TileItemElement();
             this.tileBar1 = new DevExpress.XtraBars.Navigation.TileBar();
             this.tileBarGroup2 = new DevExpress.XtraBars.Navigation.TileBarGroup();
             this.tileBarItem2 = new DevExpress.XtraBars.Navigation.TileBarItem();
@@ -50,17 +50,22 @@
             this.tileBarItem3 = new DevExpress.XtraBars.Navigation.TileBarItem();
             this.tileBarItem4 = new DevExpress.XtraBars.Navigation.TileBarItem();
             this.navigationPage2 = new DevExpress.XtraBars.Navigation.NavigationPage();
-            this.pictureEdit3 = new DevExpress.XtraEditors.PictureEdit();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.tablePanel4 = new DevExpress.Utils.Layout.TablePanel();
-            this.txtKreidPuanPass = new DevExpress.XtraEditors.TextEdit();
+            this.chkSrcWinAuth = new DevExpress.XtraEditors.CheckEdit();
+            this.txtEntegreFServer = new DevExpress.XtraEditors.TextEdit();
+            this.txtEntegreFUser = new DevExpress.XtraEditors.TextEdit();
+            this.txtEntegreFPass = new DevExpress.XtraEditors.TextEdit();
             this.cmbDatabase = new DevExpress.XtraEditors.SearchLookUpEdit();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.txtKreidPuanUser = new DevExpress.XtraEditors.TextEdit();
             this.lblnewdatabase = new DevExpress.XtraEditors.LabelControl();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
-            this.txtKrediPuanDbName = new DevExpress.XtraEditors.TextEdit();
-            this.btnKrediPuanGiris = new DevExpress.XtraEditors.SimpleButton();
-            this.btnNewDatabase = new DevExpress.XtraEditors.SimpleButton();
+            this.txtEntegreFDbName = new DevExpress.XtraEditors.TextEdit();
+            this.btnTest = new DevExpress.XtraEditors.SimpleButton();
+            this.btnMigrate = new DevExpress.XtraEditors.SimpleButton();
+            this.btnCancel = new DevExpress.XtraEditors.SimpleButton();
+            this.lstLog = new System.Windows.Forms.ListBox();
+            this.tablePanel1 = new DevExpress.Utils.Layout.TablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.navigationFrame1)).BeginInit();
             this.navigationFrame1.SuspendLayout();
             this.navigationPage1.SuspendLayout();
@@ -71,14 +76,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.srcFilitre.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).BeginInit();
             this.navigationPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureEdit3.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tablePanel4)).BeginInit();
             this.tablePanel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtKreidPuanPass.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chkSrcWinAuth.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFServer.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFUser.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFPass.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbDatabase.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtKreidPuanUser.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtKrediPuanDbName.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFDbName.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tablePanel1)).BeginInit();
+            this.tablePanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tileBar1
@@ -93,7 +101,7 @@
             this.tileBar1.Name = "tileBar1";
             this.tileBar1.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
             this.tileBar1.ScrollMode = DevExpress.XtraEditors.TileControlScrollMode.ScrollButtons;
-            this.tileBar1.Size = new System.Drawing.Size(983, 75);
+            this.tileBar1.Size = new System.Drawing.Size(509, 75);
             this.tileBar1.TabIndex = 0;
             this.tileBar1.Text = "tileBar1";
             // 
@@ -109,8 +117,8 @@
             this.tileBarItem2.AppearanceItem.Normal.BackColor2 = System.Drawing.Color.Blue;
             this.tileBarItem2.AppearanceItem.Normal.Options.UseBackColor = true;
             this.tileBarItem2.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement1.Text = "EntegreF Veritabanı Oluştur";
-            this.tileBarItem2.Elements.Add(tileItemElement1);
+            tileItemElement9.Text = "EntegreF Veritabanı Oluştur";
+            this.tileBarItem2.Elements.Add(tileItemElement9);
             this.tileBarItem2.Id = 1;
             this.tileBarItem2.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.tileBarItem2.Name = "tileBarItem2";
@@ -122,8 +130,8 @@
             this.tileBarItem1.AppearanceItem.Normal.BackColor2 = System.Drawing.Color.Blue;
             this.tileBarItem1.AppearanceItem.Normal.Options.UseBackColor = true;
             this.tileBarItem1.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement2.Text = "Yetki Parametleri";
-            this.tileBarItem1.Elements.Add(tileItemElement2);
+            tileItemElement10.Text = "Yetki Parametleri";
+            this.tileBarItem1.Elements.Add(tileItemElement10);
             this.tileBarItem1.Id = 0;
             this.tileBarItem1.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.tileBarItem1.Name = "tileBarItem1";
@@ -140,7 +148,7 @@
             this.navigationPage2,
             this.navigationPage1});
             this.navigationFrame1.SelectedPage = this.navigationPage2;
-            this.navigationFrame1.Size = new System.Drawing.Size(983, 659);
+            this.navigationFrame1.Size = new System.Drawing.Size(509, 650);
             this.navigationFrame1.TabIndex = 1;
             this.navigationFrame1.Text = "navigationFrame1";
             // 
@@ -151,7 +159,7 @@
             this.navigationPage1.Controls.Add(this.groupControl1);
             this.navigationPage1.Controls.Add(this.tileBar2);
             this.navigationPage1.Name = "navigationPage1";
-            this.navigationPage1.Size = new System.Drawing.Size(983, 659);
+            this.navigationPage1.Size = new System.Drawing.Size(509, 650);
             // 
             // gridDepartment
             // 
@@ -159,7 +167,7 @@
             this.gridDepartment.Location = new System.Drawing.Point(271, 102);
             this.gridDepartment.MainView = this.ViewDepartment;
             this.gridDepartment.Name = "gridDepartment";
-            this.gridDepartment.Size = new System.Drawing.Size(712, 557);
+            this.gridDepartment.Size = new System.Drawing.Size(238, 548);
             this.gridDepartment.TabIndex = 1;
             this.gridDepartment.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.ViewDepartment});
@@ -197,7 +205,7 @@
             this.groupControl1.GroupStyle = DevExpress.Utils.GroupStyle.Light;
             this.groupControl1.Location = new System.Drawing.Point(0, 102);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(271, 557);
+            this.groupControl1.Size = new System.Drawing.Size(271, 548);
             this.groupControl1.TabIndex = 0;
             this.groupControl1.Text = "Entegref Kullanıcı Yetkileri";
             // 
@@ -232,7 +240,7 @@
             this.tileBar2.MaxId = 3;
             this.tileBar2.Name = "tileBar2";
             this.tileBar2.ScrollMode = DevExpress.XtraEditors.TileControlScrollMode.ScrollButtons;
-            this.tileBar2.Size = new System.Drawing.Size(983, 102);
+            this.tileBar2.Size = new System.Drawing.Size(509, 102);
             this.tileBar2.TabIndex = 2;
             this.tileBar2.Text = "tileBar2";
             // 
@@ -248,8 +256,8 @@
             this.tileBarItem3.AppearanceItem.Normal.BackColor2 = System.Drawing.Color.Black;
             this.tileBarItem3.AppearanceItem.Normal.Options.UseBackColor = true;
             this.tileBarItem3.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement3.Text = "Kaydet";
-            this.tileBarItem3.Elements.Add(tileItemElement3);
+            tileItemElement11.Text = "Kaydet";
+            this.tileBarItem3.Elements.Add(tileItemElement11);
             this.tileBarItem3.Id = 0;
             this.tileBarItem3.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.tileBarItem3.Name = "tileBarItem3";
@@ -258,8 +266,8 @@
             // tileBarItem4
             // 
             this.tileBarItem4.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement4.Text = "Yeni";
-            this.tileBarItem4.Elements.Add(tileItemElement4);
+            tileItemElement12.Text = "Yeni";
+            this.tileBarItem4.Elements.Add(tileItemElement12);
             this.tileBarItem4.Id = 2;
             this.tileBarItem4.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.tileBarItem4.Name = "tileBarItem4";
@@ -268,66 +276,95 @@
             // navigationPage2
             // 
             this.navigationPage2.Caption = "navigationPage2";
-            this.navigationPage2.Controls.Add(this.pictureEdit3);
+            this.navigationPage2.Controls.Add(this.lstLog);
+            this.navigationPage2.Controls.Add(this.progressBar1);
+            this.navigationPage2.Controls.Add(this.tablePanel1);
             this.navigationPage2.Controls.Add(this.tablePanel4);
-            this.navigationPage2.Controls.Add(this.btnKrediPuanGiris);
             this.navigationPage2.Name = "navigationPage2";
-            this.navigationPage2.Size = new System.Drawing.Size(983, 659);
+            this.navigationPage2.Size = new System.Drawing.Size(509, 650);
             // 
-            // pictureEdit3
+            // progressBar1
             // 
-            this.pictureEdit3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureEdit3.EditValue = global::EntegrefKrediOnay.Properties.Resources.Entegref__1_;
-            this.pictureEdit3.Location = new System.Drawing.Point(0, 0);
-            this.pictureEdit3.Name = "pictureEdit3";
-            this.pictureEdit3.Properties.ShowCameraMenuItem = DevExpress.XtraEditors.Controls.CameraMenuItemVisibility.Auto;
-            this.pictureEdit3.Properties.SizeMode = DevExpress.XtraEditors.Controls.PictureSizeMode.StretchVertical;
-            this.pictureEdit3.Size = new System.Drawing.Size(983, 395);
-            this.pictureEdit3.TabIndex = 7;
+            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.progressBar1.Location = new System.Drawing.Point(0, 270);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(509, 38);
+            this.progressBar1.TabIndex = 8;
             // 
             // tablePanel4
             // 
             this.tablePanel4.Columns.AddRange(new DevExpress.Utils.Layout.TablePanelColumn[] {
-            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 47.3F),
-            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 52.7F)});
-            this.tablePanel4.Controls.Add(this.btnNewDatabase);
-            this.tablePanel4.Controls.Add(this.txtKreidPuanPass);
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 26.1F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 73.9F)});
+            this.tablePanel4.Controls.Add(this.chkSrcWinAuth);
+            this.tablePanel4.Controls.Add(this.txtEntegreFServer);
+            this.tablePanel4.Controls.Add(this.txtEntegreFUser);
+            this.tablePanel4.Controls.Add(this.txtEntegreFPass);
             this.tablePanel4.Controls.Add(this.cmbDatabase);
-            this.tablePanel4.Controls.Add(this.txtKreidPuanUser);
             this.tablePanel4.Controls.Add(this.lblnewdatabase);
             this.tablePanel4.Controls.Add(this.labelControl5);
-            this.tablePanel4.Controls.Add(this.txtKrediPuanDbName);
-            this.tablePanel4.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tablePanel4.Location = new System.Drawing.Point(0, 395);
+            this.tablePanel4.Controls.Add(this.txtEntegreFDbName);
+            this.tablePanel4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tablePanel4.Location = new System.Drawing.Point(0, 0);
             this.tablePanel4.Name = "tablePanel4";
             this.tablePanel4.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F),
+            new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F),
             new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
-            this.tablePanel4.Size = new System.Drawing.Size(983, 108);
+            this.tablePanel4.Size = new System.Drawing.Size(509, 130);
             this.tablePanel4.TabIndex = 6;
             // 
-            // txtKreidPuanPass
+            // chkSrcWinAuth
             // 
-            this.tablePanel4.SetColumn(this.txtKreidPuanPass, 0);
-            this.txtKreidPuanPass.Location = new System.Drawing.Point(3, 83);
-            this.txtKreidPuanPass.Name = "txtKreidPuanPass";
-            this.tablePanel4.SetRow(this.txtKreidPuanPass, 3);
-            this.txtKreidPuanPass.Size = new System.Drawing.Size(459, 20);
-            this.txtKreidPuanPass.TabIndex = 7;
+            this.tablePanel4.SetColumn(this.chkSrcWinAuth, 0);
+            this.chkSrcWinAuth.Location = new System.Drawing.Point(3, 55);
+            this.chkSrcWinAuth.Name = "chkSrcWinAuth";
+            this.chkSrcWinAuth.Properties.Caption = "Windows Yetkisi Kullan";
+            this.tablePanel4.SetRow(this.chkSrcWinAuth, 2);
+            this.chkSrcWinAuth.Size = new System.Drawing.Size(127, 20);
+            this.chkSrcWinAuth.TabIndex = 9;
+            this.chkSrcWinAuth.CheckedChanged += new System.EventHandler(this.checkEdit1_CheckedChanged);
+            // 
+            // txtEntegreFServer
+            // 
+            this.tablePanel4.SetColumn(this.txtEntegreFServer, 1);
+            this.txtEntegreFServer.Location = new System.Drawing.Point(136, 55);
+            this.txtEntegreFServer.Name = "txtEntegreFServer";
+            this.tablePanel4.SetRow(this.txtEntegreFServer, 2);
+            this.txtEntegreFServer.Size = new System.Drawing.Size(370, 20);
+            this.txtEntegreFServer.TabIndex = 8;
+            // 
+            // txtEntegreFUser
+            // 
+            this.tablePanel4.SetColumn(this.txtEntegreFUser, 1);
+            this.txtEntegreFUser.Location = new System.Drawing.Point(136, 81);
+            this.txtEntegreFUser.Name = "txtEntegreFUser";
+            this.tablePanel4.SetRow(this.txtEntegreFUser, 3);
+            this.txtEntegreFUser.Size = new System.Drawing.Size(370, 20);
+            this.txtEntegreFUser.TabIndex = 2;
+            // 
+            // txtEntegreFPass
+            // 
+            this.tablePanel4.SetColumn(this.txtEntegreFPass, 1);
+            this.txtEntegreFPass.Location = new System.Drawing.Point(136, 107);
+            this.txtEntegreFPass.Name = "txtEntegreFPass";
+            this.tablePanel4.SetRow(this.txtEntegreFPass, 4);
+            this.txtEntegreFPass.Size = new System.Drawing.Size(370, 20);
+            this.txtEntegreFPass.TabIndex = 7;
             // 
             // cmbDatabase
             // 
             this.tablePanel4.SetColumn(this.cmbDatabase, 1);
-            this.cmbDatabase.Location = new System.Drawing.Point(468, 3);
+            this.cmbDatabase.Location = new System.Drawing.Point(136, 3);
             this.cmbDatabase.Name = "cmbDatabase";
             this.cmbDatabase.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.cmbDatabase.Properties.NullText = "Yok";
             this.cmbDatabase.Properties.PopupView = this.gridView1;
             this.tablePanel4.SetRow(this.cmbDatabase, 0);
-            this.cmbDatabase.Size = new System.Drawing.Size(512, 20);
+            this.cmbDatabase.Size = new System.Drawing.Size(370, 20);
             this.cmbDatabase.TabIndex = 6;
             // 
             // gridView1
@@ -336,16 +373,6 @@
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsSelection.EnableAppearanceFocusedCell = false;
             this.gridView1.OptionsView.ShowGroupPanel = false;
-            // 
-            // txtKreidPuanUser
-            // 
-            this.tablePanel4.SetColumn(this.txtKreidPuanUser, 1);
-            this.txtKreidPuanUser.Location = new System.Drawing.Point(468, 83);
-            this.txtKreidPuanUser.Name = "txtKreidPuanUser";
-            this.txtKreidPuanUser.Properties.PasswordChar = '*';
-            this.tablePanel4.SetRow(this.txtKreidPuanUser, 3);
-            this.txtKreidPuanUser.Size = new System.Drawing.Size(512, 20);
-            this.txtKreidPuanUser.TabIndex = 2;
             // 
             // lblnewdatabase
             // 
@@ -367,46 +394,81 @@
             this.labelControl5.TabIndex = 3;
             this.labelControl5.Text = "EntegreF Database";
             // 
-            // txtKrediPuanDbName
+            // txtEntegreFDbName
             // 
-            this.tablePanel4.SetColumn(this.txtKrediPuanDbName, 1);
-            this.txtKrediPuanDbName.EditValue = "EntegreF";
-            this.txtKrediPuanDbName.Location = new System.Drawing.Point(468, 29);
-            this.txtKrediPuanDbName.Name = "txtKrediPuanDbName";
-            this.txtKrediPuanDbName.Properties.ReadOnly = true;
-            this.tablePanel4.SetRow(this.txtKrediPuanDbName, 1);
-            this.txtKrediPuanDbName.Size = new System.Drawing.Size(512, 20);
-            this.txtKrediPuanDbName.TabIndex = 1;
+            this.tablePanel4.SetColumn(this.txtEntegreFDbName, 1);
+            this.txtEntegreFDbName.EditValue = "EntegreF";
+            this.txtEntegreFDbName.Location = new System.Drawing.Point(136, 29);
+            this.txtEntegreFDbName.Name = "txtEntegreFDbName";
+            this.txtEntegreFDbName.Properties.ReadOnly = true;
+            this.tablePanel4.SetRow(this.txtEntegreFDbName, 1);
+            this.txtEntegreFDbName.Size = new System.Drawing.Size(370, 20);
+            this.txtEntegreFDbName.TabIndex = 1;
             // 
-            // btnKrediPuanGiris
+            // btnTest
             // 
-            this.btnKrediPuanGiris.Appearance.BackColor = System.Drawing.Color.Olive;
-            this.btnKrediPuanGiris.Appearance.BackColor2 = System.Drawing.Color.Black;
-            this.btnKrediPuanGiris.Appearance.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
-            this.btnKrediPuanGiris.Appearance.Options.UseBackColor = true;
-            this.btnKrediPuanGiris.Appearance.Options.UseFont = true;
-            this.btnKrediPuanGiris.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnKrediPuanGiris.Location = new System.Drawing.Point(0, 503);
-            this.btnKrediPuanGiris.Name = "btnKrediPuanGiris";
-            this.btnKrediPuanGiris.Size = new System.Drawing.Size(983, 156);
-            this.btnKrediPuanGiris.TabIndex = 1;
-            this.btnKrediPuanGiris.Text = "Yeni EntegreF Datası Oluştur";
+            this.tablePanel1.SetColumn(this.btnTest, 0);
+            this.btnTest.Location = new System.Drawing.Point(3, 7);
+            this.btnTest.Name = "btnTest";
+            this.tablePanel1.SetRow(this.btnTest, 0);
+            this.btnTest.Size = new System.Drawing.Size(164, 126);
+            this.btnTest.TabIndex = 10;
+            this.btnTest.Text = "simpleButton1";
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
-            // btnNewDatabase
+            // btnMigrate
             // 
-            this.tablePanel4.SetColumn(this.btnNewDatabase, 1);
-            this.btnNewDatabase.Location = new System.Drawing.Point(468, 55);
-            this.btnNewDatabase.Name = "btnNewDatabase";
-            this.tablePanel4.SetRow(this.btnNewDatabase, 2);
-            this.btnNewDatabase.Size = new System.Drawing.Size(512, 20);
-            this.btnNewDatabase.TabIndex = 9;
-            this.btnNewDatabase.Text = "Yeni Databse Oluştur";
+            this.tablePanel1.SetColumn(this.btnMigrate, 1);
+            this.btnMigrate.Location = new System.Drawing.Point(173, 7);
+            this.btnMigrate.Name = "btnMigrate";
+            this.tablePanel1.SetRow(this.btnMigrate, 0);
+            this.btnMigrate.Size = new System.Drawing.Size(164, 126);
+            this.btnMigrate.TabIndex = 11;
+            this.btnMigrate.Text = "simpleButton2";
+            this.btnMigrate.Click += new System.EventHandler(this.btnMigrate_Click);
+            // 
+            // btnCancel
+            // 
+            this.tablePanel1.SetColumn(this.btnCancel, 2);
+            this.btnCancel.Location = new System.Drawing.Point(342, 7);
+            this.btnCancel.Name = "btnCancel";
+            this.tablePanel1.SetRow(this.btnCancel, 0);
+            this.btnCancel.Size = new System.Drawing.Size(164, 126);
+            this.btnCancel.TabIndex = 12;
+            this.btnCancel.Text = "simpleButton3";
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // lstLog
+            // 
+            this.lstLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstLog.FormattingEnabled = true;
+            this.lstLog.Location = new System.Drawing.Point(0, 308);
+            this.lstLog.Name = "lstLog";
+            this.lstLog.Size = new System.Drawing.Size(509, 342);
+            this.lstLog.TabIndex = 13;
+            // 
+            // tablePanel1
+            // 
+            this.tablePanel1.Columns.AddRange(new DevExpress.Utils.Layout.TablePanelColumn[] {
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 33F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 33F),
+            new DevExpress.Utils.Layout.TablePanelColumn(DevExpress.Utils.Layout.TablePanelEntityStyle.Relative, 33F)});
+            this.tablePanel1.Controls.Add(this.btnTest);
+            this.tablePanel1.Controls.Add(this.btnMigrate);
+            this.tablePanel1.Controls.Add(this.btnCancel);
+            this.tablePanel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tablePanel1.Location = new System.Drawing.Point(0, 130);
+            this.tablePanel1.Name = "tablePanel1";
+            this.tablePanel1.Rows.AddRange(new DevExpress.Utils.Layout.TablePanelRow[] {
+            new DevExpress.Utils.Layout.TablePanelRow(DevExpress.Utils.Layout.TablePanelEntityStyle.Absolute, 26F)});
+            this.tablePanel1.Size = new System.Drawing.Size(509, 140);
+            this.tablePanel1.TabIndex = 14;
             // 
             // frmEntegrefSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(983, 734);
+            this.ClientSize = new System.Drawing.Size(509, 725);
             this.Controls.Add(this.navigationFrame1);
             this.Controls.Add(this.tileBar1);
             this.Name = "frmEntegrefSettings";
@@ -423,15 +485,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.srcFilitre.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.searchLookUpEdit1View)).EndInit();
             this.navigationPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureEdit3.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tablePanel4)).EndInit();
             this.tablePanel4.ResumeLayout(false);
             this.tablePanel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.txtKreidPuanPass.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chkSrcWinAuth.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFServer.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFUser.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFPass.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbDatabase.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtKreidPuanUser.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtKrediPuanDbName.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEntegreFDbName.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tablePanel1)).EndInit();
+            this.tablePanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -445,16 +510,14 @@
         private DevExpress.XtraBars.Navigation.NavigationFrame navigationFrame1;
         private DevExpress.XtraBars.Navigation.NavigationPage navigationPage1;
         private DevExpress.XtraBars.Navigation.NavigationPage navigationPage2;
-        private DevExpress.XtraEditors.SimpleButton btnKrediPuanGiris;
         private DevExpress.Utils.Layout.TablePanel tablePanel4;
         private DevExpress.XtraEditors.SearchLookUpEdit cmbDatabase;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
         private DevExpress.XtraEditors.LabelControl lblnewdatabase;
         private DevExpress.XtraEditors.LabelControl labelControl5;
-        private DevExpress.XtraEditors.TextEdit txtKrediPuanDbName;
-        private DevExpress.XtraEditors.PictureEdit pictureEdit3;
-        private DevExpress.XtraEditors.TextEdit txtKreidPuanPass;
-        private DevExpress.XtraEditors.TextEdit txtKreidPuanUser;
+        private DevExpress.XtraEditors.TextEdit txtEntegreFDbName;
+        private DevExpress.XtraEditors.TextEdit txtEntegreFPass;
+        private DevExpress.XtraEditors.TextEdit txtEntegreFUser;
         private DevExpress.XtraGrid.GridControl gridDepartment;
         private DevExpress.XtraGrid.Views.Grid.GridView ViewDepartment;
         private DevExpress.XtraEditors.GroupControl groupControl1;
@@ -466,6 +529,13 @@
         private DevExpress.XtraBars.Navigation.TileBarGroup tileBarGroup3;
         private DevExpress.XtraBars.Navigation.TileBarItem tileBarItem3;
         private DevExpress.XtraBars.Navigation.TileBarItem tileBarItem4;
-        private DevExpress.XtraEditors.SimpleButton btnNewDatabase;
+        private DevExpress.XtraEditors.TextEdit txtEntegreFServer;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        private DevExpress.XtraEditors.CheckEdit chkSrcWinAuth;
+        private DevExpress.XtraEditors.SimpleButton btnMigrate;
+        private DevExpress.XtraEditors.SimpleButton btnCancel;
+        private DevExpress.XtraEditors.SimpleButton btnTest;
+        private System.Windows.Forms.ListBox lstLog;
+        private DevExpress.Utils.Layout.TablePanel tablePanel1;
     }
 }

@@ -254,9 +254,9 @@ namespace EntegrefKrediOnay
         {
             //frmBGSec sec = new frmBGSec();
             //sec.ShowDialog();
-            BGConfigProvider.baseLoginUrl = frmLogin.configProvider.baseUrl;
+            BGConfigProvider.baseLoginUrl = Program.configProvider.baseUrl;
             BGConfigProvider.basicAuthUsername = Entegref.GetLogins.userID;
-            BGConfigProvider.Company = frmLogin.CompanyName;
+            BGConfigProvider.Company = Program.configProvider.CompanyName;
             BGConfigProvider.port = "1930";
             BGConfigProvider.Servis = "Login";
             RManagements.Clear();
