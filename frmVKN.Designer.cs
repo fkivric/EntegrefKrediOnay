@@ -28,143 +28,138 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmVKN));
+            this.components = new System.ComponentModel.Container();
             this.btnKaydet = new DevExpress.XtraEditors.SimpleButton();
-            this.label1 = new System.Windows.Forms.Label();
-            this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.layoutControl1 = new DevExpress.XtraLayout.LayoutControl();
             this.txtFirma = new DevExpress.XtraEditors.TextEdit();
-            this.label2 = new System.Windows.Forms.Label();
             this.txtVKN = new DevExpress.XtraEditors.TextEdit();
-            this.btnLogo = new DevExpress.XtraEditors.SimpleButton();
-            this.pictureEdit1 = new DevExpress.XtraEditors.PictureEdit();
-            this.textEdit1 = new DevExpress.XtraEditors.TextEdit();
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
-            this.panelControl1.SuspendLayout();
+            this.Root = new DevExpress.XtraLayout.LayoutControlGroup();
+            this.layoutControlItem1 = new DevExpress.XtraLayout.LayoutControlItem();
+            this.layoutControlItem2 = new DevExpress.XtraLayout.LayoutControlItem();
+            this.layoutControlItem3 = new DevExpress.XtraLayout.LayoutControlItem();
+            this.xtraOpenFileDialog1 = new DevExpress.XtraEditors.XtraOpenFileDialog(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControl1)).BeginInit();
+            this.layoutControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirma.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtVKN.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureEdit1.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Root)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControlItem1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControlItem2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControlItem3)).BeginInit();
             this.SuspendLayout();
             // 
             // btnKaydet
             // 
-            this.btnKaydet.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnKaydet.Location = new System.Drawing.Point(20, 221);
+            this.btnKaydet.Location = new System.Drawing.Point(12, 60);
             this.btnKaydet.Name = "btnKaydet";
-            this.btnKaydet.Size = new System.Drawing.Size(376, 25);
+            this.btnKaydet.Size = new System.Drawing.Size(369, 22);
+            this.btnKaydet.StyleController = this.layoutControl1;
             this.btnKaydet.TabIndex = 5;
             this.btnKaydet.Text = "Kaydet";
             this.btnKaydet.Click += new System.EventHandler(this.btnKaydet_ClickAsync);
             // 
-            // label1
+            // layoutControl1
             // 
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Location = new System.Drawing.Point(2, 2);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(372, 18);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Firma VKN";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // panelControl1
-            // 
-            this.panelControl1.Controls.Add(this.txtFirma);
-            this.panelControl1.Controls.Add(this.label2);
-            this.panelControl1.Controls.Add(this.txtVKN);
-            this.panelControl1.Controls.Add(this.label1);
-            this.panelControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelControl1.Location = new System.Drawing.Point(20, 137);
-            this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(376, 84);
-            this.panelControl1.TabIndex = 6;
+            this.layoutControl1.Controls.Add(this.btnKaydet);
+            this.layoutControl1.Controls.Add(this.txtFirma);
+            this.layoutControl1.Controls.Add(this.txtVKN);
+            this.layoutControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.layoutControl1.Location = new System.Drawing.Point(0, 0);
+            this.layoutControl1.Name = "layoutControl1";
+            this.layoutControl1.Root = this.Root;
+            this.layoutControl1.Size = new System.Drawing.Size(393, 96);
+            this.layoutControl1.TabIndex = 7;
+            this.layoutControl1.Text = "layoutControl1";
             // 
             // txtFirma
             // 
-            this.txtFirma.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtFirma.Location = new System.Drawing.Point(2, 58);
+            this.txtFirma.Location = new System.Drawing.Point(66, 36);
             this.txtFirma.Name = "txtFirma";
-            this.txtFirma.Size = new System.Drawing.Size(372, 20);
+            this.txtFirma.Size = new System.Drawing.Size(315, 20);
+            this.txtFirma.StyleController = this.layoutControl1;
             this.txtFirma.TabIndex = 6;
-            // 
-            // label2
-            // 
-            this.label2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label2.Location = new System.Drawing.Point(2, 40);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(372, 18);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Firma Adı";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // txtVKN
             // 
-            this.txtVKN.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtVKN.Location = new System.Drawing.Point(2, 20);
+            this.txtVKN.Location = new System.Drawing.Point(66, 12);
             this.txtVKN.Name = "txtVKN";
-            this.txtVKN.Size = new System.Drawing.Size(372, 20);
+            this.txtVKN.Size = new System.Drawing.Size(315, 20);
+            this.txtVKN.StyleController = this.layoutControl1;
             this.txtVKN.TabIndex = 3;
             // 
-            // btnLogo
+            // Root
             // 
-            this.btnLogo.ImageOptions.Image = global::EntegrefKrediOnay.Properties.Resources.importimage_32x32;
-            this.btnLogo.Location = new System.Drawing.Point(20, 34);
-            this.btnLogo.Name = "btnLogo";
-            this.btnLogo.Size = new System.Drawing.Size(149, 23);
-            this.btnLogo.TabIndex = 7;
-            this.btnLogo.Text = "Firma LOGO Yükle";
-            this.btnLogo.Click += new System.EventHandler(this.btnLogo_Click);
+            this.Root.EnableIndentsWithoutBorders = DevExpress.Utils.DefaultBoolean.True;
+            this.Root.GroupBordersVisible = false;
+            this.Root.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] {
+            this.layoutControlItem1,
+            this.layoutControlItem2,
+            this.layoutControlItem3});
+            this.Root.Name = "Root";
+            this.Root.Size = new System.Drawing.Size(393, 96);
+            this.Root.TextVisible = false;
             // 
-            // pictureEdit1
+            // layoutControlItem1
             // 
-            this.pictureEdit1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pictureEdit1.Location = new System.Drawing.Point(20, 63);
-            this.pictureEdit1.Name = "pictureEdit1";
-            this.pictureEdit1.Properties.ShowCameraMenuItem = DevExpress.XtraEditors.Controls.CameraMenuItemVisibility.Auto;
-            this.pictureEdit1.Properties.SizeMode = DevExpress.XtraEditors.Controls.PictureSizeMode.Stretch;
-            this.pictureEdit1.Size = new System.Drawing.Size(376, 74);
-            this.pictureEdit1.TabIndex = 1;
-            this.pictureEdit1.Visible = false;
+            this.layoutControlItem1.Control = this.txtFirma;
+            this.layoutControlItem1.Location = new System.Drawing.Point(0, 24);
+            this.layoutControlItem1.Name = "layoutControlItem1";
+            this.layoutControlItem1.Size = new System.Drawing.Size(373, 24);
+            this.layoutControlItem1.Text = "Firma Adı :";
+            this.layoutControlItem1.TextSize = new System.Drawing.Size(51, 13);
             // 
-            // textEdit1
+            // layoutControlItem2
             // 
-            this.textEdit1.Location = new System.Drawing.Point(175, 36);
-            this.textEdit1.Name = "textEdit1";
-            this.textEdit1.Size = new System.Drawing.Size(221, 20);
-            this.textEdit1.TabIndex = 8;
+            this.layoutControlItem2.Control = this.txtVKN;
+            this.layoutControlItem2.Location = new System.Drawing.Point(0, 0);
+            this.layoutControlItem2.Name = "layoutControlItem2";
+            this.layoutControlItem2.Size = new System.Drawing.Size(373, 24);
+            this.layoutControlItem2.Text = "Firma VKN";
+            this.layoutControlItem2.TextSize = new System.Drawing.Size(51, 13);
+            // 
+            // layoutControlItem3
+            // 
+            this.layoutControlItem3.Control = this.btnKaydet;
+            this.layoutControlItem3.Location = new System.Drawing.Point(0, 48);
+            this.layoutControlItem3.Name = "layoutControlItem3";
+            this.layoutControlItem3.Size = new System.Drawing.Size(373, 28);
+            this.layoutControlItem3.TextSize = new System.Drawing.Size(0, 0);
+            this.layoutControlItem3.TextVisible = false;
+            // 
+            // xtraOpenFileDialog1
+            // 
+            this.xtraOpenFileDialog1.FileName = "xtraOpenFileDialog1";
             // 
             // frmVKN
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(416, 266);
-            this.Controls.Add(this.pictureEdit1);
-            this.Controls.Add(this.textEdit1);
-            this.Controls.Add(this.btnLogo);
-            this.Controls.Add(this.panelControl1);
-            this.Controls.Add(this.btnKaydet);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.ClientSize = new System.Drawing.Size(393, 96);
+            this.ControlBox = false;
+            this.Controls.Add(this.layoutControl1);
             this.Name = "frmVKN";
             this.Load += new System.EventHandler(this.frmVKN_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
-            this.panelControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControl1)).EndInit();
+            this.layoutControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtFirma.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtVKN.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureEdit1.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Root)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControlItem1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControlItem2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.layoutControlItem3)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private DevExpress.XtraEditors.PictureEdit pictureEdit1;
         private DevExpress.XtraEditors.SimpleButton btnKaydet;
-        private System.Windows.Forms.Label label1;
         private DevExpress.XtraEditors.TextEdit txtVKN;
-        private DevExpress.XtraEditors.PanelControl panelControl1;
-        private DevExpress.XtraEditors.SimpleButton btnLogo;
         private DevExpress.XtraEditors.TextEdit txtFirma;
-        private System.Windows.Forms.Label label2;
-        private DevExpress.XtraEditors.TextEdit textEdit1;
+        private DevExpress.XtraEditors.XtraOpenFileDialog xtraOpenFileDialog1;
+        private DevExpress.XtraLayout.LayoutControl layoutControl1;
+        private DevExpress.XtraLayout.LayoutControlGroup Root;
+        private DevExpress.XtraLayout.LayoutControlItem layoutControlItem1;
+        private DevExpress.XtraLayout.LayoutControlItem layoutControlItem2;
+        private DevExpress.XtraLayout.LayoutControlItem layoutControlItem3;
     }
 }

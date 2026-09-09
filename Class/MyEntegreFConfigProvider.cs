@@ -39,6 +39,37 @@ namespace EntegrefKrediOnay.Class
         public string Username { get; set; }
 
         public string Password { get; set; }
+
+        public string brandCode { get; set; }
+
+        public string number { get; set; }
+
+        public string message { get; set; }
+
+        public bool kara { get; set; }
+
+        public List<string> numerlist { get; set; }
+
+        public string xmData { get; set; }
+    }
+    public class EntegreFSmsReportProvider : EntegreFDLL.Main.EntegreF_Interface.ISmsReportProvider
+    {
+        public string SmsToken { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DateTime SmsGecerlilik { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public ApiClient.ReportObject reportObject => throw new NotImplementedException();
+
+        public string PackageId { get; set; }
+
+        public string SmsDate { get; set; }
+
+        public string EndDate { get; set; }
+
+        public string Number { get; set; }
+
+        public string Uname { get; set; }
+
+        public string Password { get; set; }
     }
     public class EntegreFBGConfigProvider : EntegreFDLL.Main.EntegreF_Interface.IBGConfigProvider
     {

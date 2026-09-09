@@ -36,6 +36,8 @@ using static EntegreFDLL.Class.DataTableClass;
 using EntegreFDLL.Class;
 using EntegreFDLL;
 using EntegreFDLL.Main;
+using System.Net;
+using System.Net.Sockets;
 
 namespace EntegrefKrediOnay
 {
@@ -67,24 +69,27 @@ namespace EntegrefKrediOnay
                 InitializeComponent();
                 httpClient = new HttpClient();
                 httpClient.BaseAddress = new Uri("http://lisans.entegref.com/");
+                //0190067770
                 RegistryKey key = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\EntegrefKrediOnay");
-                if (Properties.Settings.Default.EntegreFProductName != "")
-                {
-                    key = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\{Properties.Settings.Default.EntegreFProductName}");
-                }
-                else
-                {
-                    key = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\EntegrefKrediOnay");
-                }
                 if (!string.IsNullOrEmpty(key.GetValue("ApplicationVKN").ToString()))
                 {
-                    Program.configProvider.VKN = key.GetValue("ApplicationVKN").ToString();
-                    Program.configProvider.ComputerName = key.GetValue("ComputerName").ToString();
-                    Program.configProvider.ComputerModeli = key.GetValue("ComputerID").ToString();
-                    Program.configProvider.ComputerCpuID = key.GetValue("CPU").ToString();
-                    Program.configProvider.ComputerMboardID = key.GetValue("motherboardid").ToString();
-                    Program.configProvider.ComputerUUID = key.GetValue("ComputerUUID").ToString();
-                    Program.configProvider.ComputerVersion = key.GetValue("ApplicationVersion").ToString();
+                    
+                    if (Program.configProvider.VKN == "" || Program.configProvider.VKN == null)
+                        Program.configProvider.VKN = key.GetValue("ApplicationVKN").ToString();
+                    if (Program.configProvider.ComputerName == "" || Program.configProvider.ComputerName == null)
+                        Program.configProvider.ComputerName = key.GetValue("ComputerName").ToString();
+                    if (Program.configProvider.ComputerModeli == "" || Program.configProvider.ComputerModeli == null)
+                        Program.configProvider.ComputerModeli = key.GetValue("ComputerID").ToString();
+                    if (Program.configProvider.ComputerCpuID == "" || Program.configProvider.ComputerCpuID == null)
+                        Program.configProvider.ComputerCpuID = key.GetValue("CPU").ToString();
+                    if (Program.configProvider.ComputerMboardID == "" || Program.configProvider.ComputerMboardID == null)
+                        Program.configProvider.ComputerMboardID = key.GetValue("motherboardid").ToString();
+                    if (Program.configProvider.ComputerUUID == "" || Program.configProvider.ComputerUUID == null)
+                        Program.configProvider.ComputerUUID = key.GetValue("ComputerUUID").ToString();
+                    if (Program.configProvider.ComputerVersion == "" || Program.configProvider.ComputerVersion == null)
+                        Program.configProvider.ComputerVersion = key.GetValue("ApplicationVersion").ToString();
+
+                                                                
 
                 }
                 else
@@ -122,12 +127,27 @@ namespace EntegrefKrediOnay
         List<Firma> firmas = new List<Firma>();
         public static string version = "";
         public static int lisansKalan = 0;
+        public static string CompanyName = "";
         private readonly HttpClient httpClient;
         List<VKNSettings> VKNSettings = new List<VKNSettings>();
         DB_Connection dB = new DB_Connection();
         Entegref entegreF = new Entegref();
         SqlConnection Entgref = new SqlConnection("Server=31.145.19.56;Database=Netbil_Connector; User ID=fatih;Password=05101981;");
         SqlConnectionObject conn = new SqlConnectionObject();
+        public class Root
+        {
+            public int statusCode { get; set; }
+            public bool success { get; set; }
+            public string results { get; set; }
+            public string message { get; set; }
+            public string internalMessage { get; set; }
+            public List<Validation> validations { get; set; }
+        }
+        public class Validation
+        {
+            public string Field { get; set; }
+            public string Message { get; set; }
+        }
         public class TokenSonuc
         {
             public int statusCode { get; set; }
@@ -155,9 +175,10 @@ namespace EntegrefKrediOnay
             public bool DSSOPSTS { get; set; }
 
         }
+
         string servisAdi = "VOLANT SERVER Zamanı güncelle";
         private async void frmLogin_LoadAsync(object sender, EventArgs e)
-        {            
+        {
             await SplashScrenn.RunWithSplashAsync(this, false, 0, this.Text,
             async (progress, token) =>
             {
@@ -174,15 +195,7 @@ namespace EntegrefKrediOnay
                 //});
                 VolXml();
                 this.Enabled = false;
-                Program.configProvider.ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı            
-                if (Properties.Settings.Default.EntegreFProductName != "")
-                {
-                    Program.configProvider.ProductName = Properties.Settings.Default.EntegreFProductName;
-                }
-                else
-                {
-                    Program.configProvider.ProductName = "EntegrefKrediOnay";
-                }
+                Program.configProvider.ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı
                 Program.configProvider.ProductName = ProductName;
                 RegistryKey key = Registry.CurrentUser.CreateSubKey($@"SOFTWARE\{ProductName}");
                 //System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
@@ -198,29 +211,6 @@ namespace EntegrefKrediOnay
                 }
                 CheckAndRemoveTask_FirstRunOnly();
                 string[] valueNames2 = key.GetValueNames();
-                //try
-                //{
-                //    // Proje dizini içindeki .bat dosyanızın tam yolunu oluşturun
-                //    string exeYolu = Path.Combine(@"C:\EdevletServis", "VolantZaman.exe");
-                //    if (!File.Exists(exeYolu))
-                //    {
-                //        MessageBox.Show("Servis dosyası bulunamadı:\n" + exeYolu);
-                //    }
-                //    if (!ServisYukluMu(servisAdi))
-                //    {
-                //        ServisiYukle(exeYolu);
-                //    }
-                //    var ServisStatus = ServisDurumunuGoster(servisAdi);
-                //    if (ServisStatus != "Running")
-                //    {
-                //        ServisiBaslat(servisAdi);
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                //    CustomMessageBox.ShowMessage("Servis Hatası", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //}
                 if (!valueNames2.Contains("ComputerUUID"))
                 {
                     await Task.Run(() =>
@@ -257,7 +247,6 @@ namespace EntegrefKrediOnay
                     }
                     else
                     {
-                        Program.configProvider.baseUrl = "http://localhost:24853";
                         string response = await entegreF.UpdateLicensingUser(Program.configProvider);
                         List<Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Sonuc>>(response);
                         if (myDeserializedClass[0].status)
@@ -451,15 +440,7 @@ namespace EntegrefKrediOnay
                     key2.Close();
                     try
                     {
-                        Program.configProvider.ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString(); // proje adı            
-                        if (Properties.Settings.Default.EntegreFProductName != "")
-                        {
-                            Program.configProvider.ProductName = Properties.Settings.Default.EntegreFProductName;
-                        }
-                        else
-                        {
-                            Program.configProvider.ProductName = "EntegrefKrediOnay";
-                        }
+                        Program.configProvider.ProductName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name.ToString();
                         // Kayıt defteri alt anahtarının yolunu tanımlayın
                         string registryPath = $@"HKEY_CURRENT_USER\SOFTWARE\{ProductName}";
                         string exePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)); //AppDomain.CurrentDomain.BaseDirectory;
@@ -485,7 +466,6 @@ namespace EntegrefKrediOnay
                         string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
                         System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
                     }
-                    Program.configProvider.ProductName = ProductName;
                     var checkSonuc = await entegreF.Versiyon(Program.configProvider);
                     List<Sonuc> myDeserializedClass3 = JsonConvert.DeserializeObject<List<Sonuc>>(checkSonuc);
                     int newVersion = int.Parse(myDeserializedClass3[0].message.Replace(".", ""));
@@ -498,9 +478,9 @@ namespace EntegrefKrediOnay
                             entegreF.Securety(AppDomain.CurrentDomain.BaseDirectory);
                             if (IsInstallerFailed())
                             {
-                                if (File.Exists("Kasa Update.exe"))
+                                if (File.Exists($"{Program.configProvider.ProductName} Update.exe"))
                                 {
-                                    var psi = new ProcessStartInfo { FileName = @"Kasa Update.exe", WindowStyle = ProcessWindowStyle.Normal };
+                                    var psi = new ProcessStartInfo { FileName = $@"{Program.configProvider.ProductName} Update.exe", WindowStyle = ProcessWindowStyle.Normal };
                                     Process.Start(psi);
                                     Application.Exit();
                                 }
@@ -528,203 +508,6 @@ namespace EntegrefKrediOnay
                     {
                         this.Enabled = true;
                     }
-                    #region lisans kontrol eski
-                    //    if (!valueNames.Contains("ApplicationSetupComplate"))
-                    //    {
-                    //        if (!valueNames.Contains("ComputerLisansingID"))
-                    //        {
-                    //            try
-                    //            {
-                    //                CustomMessageBox.ShowMessage("Lütfen Bekleyin: ", "Propgram Lisanslanıyor", this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //                string response = await client.UpdateLicensingUser(VKN, pcİsmi.ToString(), pcModeli.ToString(), version, ProductName);
-                    //                //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(responseData);
-                    //                List<Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Sonuc>>(response);
-                    //                System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + myDeserializedClass[0].message + VKN + " - " + pcİsmi.ToString() + " - " + pcModeli.ToString() + " - " + version + " - " + ProductName + Environment.NewLine);
-                    //                ComputerLisansingID = myDeserializedClass[0].message;
-                    //                lblProID.Text = "PrgID = " + ComputerLisansingID;
-                    //                string response2 = await client.UpdateLicensing(VKN, ComputerLisansingID, Cpuid.ToString(), Motherboardid.ToString(), ProductName);
-                    //                List<Sonuc> myDeserializedClass2 = JsonConvert.DeserializeObject<List<Sonuc>>(response2);
-                    //                key2.SetValue("ComputerLisansingID", myDeserializedClass2[0].message);
-                    //                key2.SetValue("ApplicationSetupComplate", true);
-                    //                if (!valueNames.Contains("ApplicationSecretPhase"))
-                    //                {
-                    //                    //string SecretPhase = key2.GetValue("ApplicationSecretPhase").ToString();
-
-                    //                    //if (string.IsNullOrEmpty(SecretPhase))
-                    //                    //{
-                    //                    Lisansing(VKN);
-                    //                    //await Task.Delay(1000);
-                    //                    RegistryKey lisans = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegrefKrediOnay");
-                    //                    SKGL.Validate validate = new SKGL.Validate();
-                    //                    validate.secretPhase = VKN;
-                    //                    validate.Key = lisans.GetValue("ApplicationSecretPhase").ToString();
-                    //                    txtLisansing2.Text = "Başlangıç Tarihi : \r\n " + validate.CreationDate.ToShortDateString();
-                    //                    txtLisansing3.Text = "Sona Erme Tarihi : \r\n " + validate.ExpireDate.ToShortDateString();
-                    //                    txtLisansing1.Text = "Kalan Gün : \r\n " + validate.DaysLeft;
-                    //                    lisansKalan = validate.DaysLeft;
-
-                    //                    if (Properties.Settings.Default.EntegrefSecretPhase != "")
-                    //                    {
-                    //                        key2.SetValue("ApplicationSetupComplate", "true");
-                    //                        key2.SetValue("ApplicationSecretPhase", Properties.Settings.Default.EntegrefSecretPhase);// Properties.Settings.Default.EntegrefSecretPhase);
-                    //                    }
-                    //                    if (validate.DaysLeft > 0)
-                    //                    {
-                    //                        pnlLisans.Visible = false;
-                    //                        this.Size = new Size(718, 325);
-                    //                        AdjustFormSize(718, 325);
-                    //                    }
-                    //                    //}
-                    //                }
-                    //                key2.Close();
-                    //                try
-                    //                {
-                    //                    // Kayıt defteri alt anahtarının yolunu tanımlayın
-                    //                    string registryPath = @"HKEY_CURRENT_USER\SOFTWARE\EntegrefKrediOnay";
-                    //                    string exePath = AppDomain.CurrentDomain.BaseDirectory;
-                    //                    string savePath = Path.Combine(exePath, "EntegrefKrediOnay.reg");
-
-                    //                    // Reg.exe komutunu kullanarak kayıt defterini dışa aktar
-                    //                    ProcessStartInfo processInfo = new ProcessStartInfo
-                    //                    {
-                    //                        FileName = "reg.exe",
-                    //                        Arguments = $"export \"{registryPath}\" \"{savePath}\" /y",
-                    //                        RedirectStandardOutput = true,
-                    //                        UseShellExecute = false,
-                    //                        CreateNoWindow = true
-                    //                    };
-
-                    //                    using (Process process = Process.Start(processInfo))
-                    //                    {
-                    //                        process.WaitForExit(); // İşlemin tamamlanmasını bekle
-                    //                    }
-                    //                    CreatePowerShellScript(ProductName);
-                    //                }
-                    //                catch (Exception ex)
-                    //                {
-                    //                    System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
-                    //                }
-                    //            }
-                    //            catch (Exception ex)
-                    //            {
-                    //                System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
-                    //            }
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    #endregion
-                    #region iptal mi değilmi bak buraya tekrar eden kod gibi geldi
-
-                    //else
-                    //{
-                    //    try
-                    //    {
-                    //        string response = await client.UpdateLicensingUser(VKN, pcİsmi.ToString(), pcModeli.ToString(), version, ProductName);
-                    //        List<Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Sonuc>>(response);
-                    //        ComputerLisansingID = myDeserializedClass[0].message;
-                    //        lblProID.Text = "PrgID = " + ComputerLisansingID;
-                    //        string response2 = await client.UpdateLicensing(VKN, ComputerLisansingID, Cpuid.ToString(), Motherboardid.ToString(), ProductName);
-                    //        List<Sonuc> myDeserializedClass2 = JsonConvert.DeserializeObject<List<Sonuc>>(response2);
-                    //        key2.SetValue("ComputerLisansingID", myDeserializedClass2[0].message);
-                    //        key2.SetValue("ApplicationSetupComplate", true);
-                    //        CustomMessageBox.ShowMessage("Lütfen Bekleyin: ", "Propgram Lisanslanıyor", this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //        SKGL.Validate validate = new SKGL.Validate();
-                    //        validate.secretPhase = VKN;
-                    //        validate.Key = key2.GetValue("ApplicationSecretPhase").ToString();
-                    //        txtLisansing2.Text = "Başlangıç Tarihi : \r\n " + validate.CreationDate.ToShortDateString();
-                    //        txtLisansing3.Text = "Sona Erme Tarihi : \r\n " + validate.ExpireDate.ToShortDateString();
-                    //        txtLisansing1.Text = "Kalan Gün : \r\n" + validate.DaysLeft;
-                    //        lisansKalan = validate.DaysLeft;
-                    //        if (Properties.Settings.Default.EntegrefSecretPhase != "")
-                    //        {
-                    //            key2.SetValue("ApplicationSetupComplate", "true");
-                    //            key2.SetValue("ApplicationSecretPhase", Properties.Settings.Default.EntegrefSecretPhase);// Properties.Settings.Default.EntegrefSecretPhase);
-                    //        }
-                    //        if (lisansKalan <= 0)
-                    //        {
-                    //            var ApplicationSecretPhase = key2.GetValue("ApplicationSecretPhase").ToString();
-                    //            var newkey = await client.Newkey(VKN, ProductName, ComputerLisansingID, ComputerUUID);
-                    //            SKGL.Validate validate2 = new SKGL.Validate();
-                    //            validate2.secretPhase = VKN;
-                    //            validate2.Key = newkey.ToString();
-                    //            if (validate2.DaysLeft > 0)
-                    //            {
-                    //                key2.SetValue("ApplicationSecretPhase", newkey);
-                    //                Properties.Settings.Default.EntegrefSecretPhase = newkey;
-                    //                Properties.Settings.Default.Save();
-                    //                key2.Close();
-                    //                CustomMessageBox.ShowMessage("Entegref Lisans Anahtarınız Güncellendi...!", "Kullanım süreniz dolan lisans anahtarı otomatik güncellendi.", this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //                Application.Exit();
-
-                    //                #region uodate
-                    //                try
-                    //                {
-                    //                    System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " Versiyon=> " + VKN + "-" + pcİsmi.ToString() + "-" + pcModeli.ToString() + "-" + version + "-" + ProductName + Environment.NewLine);
-                    //                    string guncelleme = await client.Versiyon(VKN.ToString(), pcİsmi.ToString(), ProductName);
-                    //                    List<Sonuc> guncellemesonuc = JsonConvert.DeserializeObject<List<Sonuc>>(guncelleme);
-
-                    //                    new_version = int.Parse(guncellemesonuc[0].message.Replace(".", ""));
-                    //                    last_version = int.Parse(version.Replace(".", ""));
-                    //                    if (new_version > last_version)
-                    //                    {
-                    //                        this.Enabled = false;
-                    //                        try
-                    //                        {
-                    //                            string pathToUpdater = @"Kasa Update.exe"; // updater.exe dosyasının adını belirtin
-
-                    //                            ProcessStartInfo startInfo = new ProcessStartInfo
-                    //                            {
-                    //                                FileName = pathToUpdater,
-                    //                                WindowStyle = ProcessWindowStyle.Normal // İsteğe bağlı: Pencere stili
-                    //                            };
-
-                    //                            Process.Start(startInfo);
-                    //                            Application.Exit();
-                    //                        }
-                    //                        catch (Exception ex)
-                    //                        {
-                    //                            string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                    //                            CustomMessageBox.ShowMessage("Güncelleme Var Hata = " + ex.Message, "Güncelleme var Oto güncelleme Çalışmadı! Elle güncelleyiniz.\r\n Seçenekler = \r\n 1-) C:\\Program Files (x86)\\Entegref Yazılım Tic. Ltd.Şti\\EntegreF Connector\\updater.exe dosya yoluna gidip güncelleme programını çalıştırınız.\r\n 2-) Başlat butonundan Updater aratarak çıkanı çalıştırınız", this, "Güncelleme Kontrol", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //                            System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine + "Güncelleme var Oto güncelleme Çalışmadı!Elle güncelleyiniz.\r\n Seçenekler = \r\n 1 -) C:\\Program Files(x86)\\Entegref Yazılım Tic.Ltd.Şti\\EntegreF Connector\\updater.exe dosya yoluna gidip güncelleme programını çalıştırınız.\r\n 2 -) Başlat butonundan Updater aratarak çıkanı çalıştırınız" + Environment.NewLine);
-                    //                            this.Enabled = true;
-                    //                        }
-                    //                    }
-                    //                }
-                    //                catch (Exception ex)
-                    //                {
-                    //                    string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                    //                    CustomMessageBox.ShowMessage("Program Hatası", hataDetay, this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //                    System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
-                    //                }
-                    //                #endregion
-                    //            }
-                    //            else
-                    //            {
-                    //                CustomMessageBox.ShowMessage("Entegref ile iletişime geçerek Lütfen Lisansınızı uzatınız", "Kullanım süreniz dolmuştur. Programnı Kullanmaya devam etmek için lütfen Yeni Lisans Anahtarı Satın Alın", this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //                XtraMessageBox.Show("Entegref ile iletişime geçerek Lütfen Lisansınızı uzatınız");
-                    //                Properties.Settings.Default.EntegrefSecretPhase = "";
-                    //                Properties.Settings.Default.Save();
-                    //                Application.Exit();
-                    //            }
-                    //        }
-                    //        else
-                    //        {
-                    //            pnlLisans.Visible = false;
-                    //            this.Size = new Size(718, 325);
-                    //            AdjustFormSize(718, 325);
-                    //        }
-                    //        this.Enabled = true;
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                    //        CustomMessageBox.ShowMessage("Program Hatası", hataDetay, this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //        System.IO.File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SistemLog.txt"), DateTime.Now + " => " + hataDetay + Environment.NewLine);
-                    //        Application.Exit();
-                    //    }
-                    //}
-                    #endregion
                 }
                 catch (Exception ex)
                 {
@@ -735,70 +518,6 @@ namespace EntegrefKrediOnay
                 }
             });
         }
-        public static bool ServisYukluMu(string servisAdi)
-        {
-            return ServiceController.GetServices().Any(s => s.ServiceName == servisAdi);
-        }
-        public static void ServisiYukle(string exeYolu)
-        {
-            string installUtilPath = @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe";
-
-            var process = new Process();
-            process.StartInfo.FileName = installUtilPath;
-            process.StartInfo.Arguments = $"\"{exeYolu}\"";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.Verb = "runas"; // Yönetici olarak çalıştır
-
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            MessageBox.Show("Servis yüklendi:\n" + output);
-        }
-        public static void ServisiKaldir(string exeYolu)
-        {
-            string installUtilPath = @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe";
-
-            var process = new Process();
-            process.StartInfo.FileName = installUtilPath;
-            process.StartInfo.Arguments = $"/u \"{exeYolu}\"";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.Verb = "runas"; // Yönetici olarak çalıştır
-
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            MessageBox.Show("Servis kaldırıldı:\n" + output);
-        }
-        public static void ServisiBaslat(string servisAdi)
-        {
-            var sc = new ServiceController(servisAdi);
-            if (sc.Status == ServiceControllerStatus.Stopped)
-            {
-                sc.Start();
-                sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
-            }
-        }
-        public static void ServisiDurdur(string servisAdi)
-        {
-            var sc = new ServiceController(servisAdi);
-            if (sc.Status == ServiceControllerStatus.Running)
-            {
-                sc.Stop();
-                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
-            }
-        }
-        private string ServisDurumunuGoster(string servisAdi)
-        {
-            ServiceController sc = new ServiceController(servisAdi);
-            return sc.Status.ToString();
-        }
-
         bool IsTaskExists(string taskName)
         {
             ProcessStartInfo psi = new ProcessStartInfo
@@ -889,95 +608,82 @@ namespace EntegrefKrediOnay
                 return g.DpiX / 96.0f;
             }
         }
-        DateTime now = DateTime.Now;
-        private async void Lisansing(string vknid)
+        public static async void Token()
         {
             try
             {
-                if (string.IsNullOrEmpty((Properties.Settings.Default.EntegrefAIPToken)))
+                string username = "VOLANT";
+                string password = "310894";
+                string apiUrl = @"http://fatihkivric.com.tr:5555" + "/api/auth";
+                if (EntegreFDLL.Class.Entegref.GetLogins.userDEPART != "admin")
                 {
-                    using (HttpClient client = new HttpClient())
-                    {
-                        var request = new HttpRequestMessage(HttpMethod.Post, "http://lisans.entegref.com/token");
-                        //var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:44371/token");
-                        request.Content = new StringContent("grant_type=password&username=admin&password=Madam3169");
-
-                        // İstek başlığına gerekli kimlik doğrulama bilgilerini ekleyin
-                        //string clientId = "your_client_id";
-                        //string clientSecret = "your_client_secret";
-                        //string credentials = System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(clientId + ":" + clientSecret));
-                        //request.Headers.Add("Authorization", "Basic " + credentials);
-
-                        // İsteği gönderin ve yanıtı alın
-                        HttpResponseMessage responses = await client.SendAsync(request);
-
-                        // Yanıtın başarılı olup olmadığını kontrol edin
-                        if (responses.IsSuccessStatusCode)
-                        {
-                            string responseData = await responses.Content.ReadAsStringAsync();
-                            Token myDeserializedClass = JsonConvert.DeserializeObject<Token>(responseData);
-                            Properties.Settings.Default.EntegrefAIPToken = myDeserializedClass.access_token;
-                            Properties.Settings.Default.Save();
-                        }
-                        else
-                        {
-                            MessageBox.Show("API isteği başarısız: " + responses.StatusCode, "Servis Uyarısı");
-                        }
-                    }
+                    username = EntegreFDLL.Class.Entegref.GetLogins.userID;
+                    password = EntegreFDLL.Class.Entegref.GetLogins.userPass;
                 }
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Properties.Settings.Default.EntegrefAIPToken);
-                HttpResponseMessage response = await httpClient.GetAsync($"api/data/Lisans?VKN={vknid}&AppName={ProductName}");
-                if (response.IsSuccessStatusCode)
+                string token = await GetAuthToken(apiUrl, username, password);
+                Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(token);
+                if (myDeserializedClass.success)
                 {
-                    string responseData = await response.Content.ReadAsStringAsync();
-                    //Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(responseData);
-                    List<Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Sonuc>>(responseData);
-                    foreach (var item in myDeserializedClass)
-                    {
-                        if (item.status)
-                        {
-                            SKGL.Validate validate = new SKGL.Validate();
-                            validate.secretPhase = Program.configProvider.VKN;
-                            validate.Key = item.message;
-                            Properties.Settings.Default.EntegrefSecretPhase = item.message;
-                            Properties.Settings.Default.Save();
-                            var assembly = typeof(Program).Assembly;
-                            var attribute = (GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0];
-                            var id = attribute.Value;
-                            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegrefKrediOnay");
-                            key.SetValue("ApplicationSetupComplate", "true");
-                            key.SetValue("ApplicationSecretPhase", item.message);// Properties.Settings.Default.EntegrefSecretPhase);
-                            key.Close();
-                        }
-                        else
-                        {
-                            MessageBox.Show(item.message, "Dikkat", MessageBoxButtons.YesNo);
-                        }
-                    }
-                }
-                else
-                {
-                    MessageBox.Show(response.Content.ToString());
-                    //CustomMessageBox.ShowMessage("API isteği başarısız: ", response.Content.ToString(), this, "Dikkat", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Properties.Settings.Default.VolantToken = myDeserializedClass.results;
+                    Properties.Settings.Default.Save();
                 }
             }
             catch (Exception ex)
             {
-                string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                CustomMessageBox.ShowMessage("HataDetay Detayı!", hataDetay, this, "Detaya Bakınız", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string hataDetay = $"Hata Mesajı: {ex.Message}\n {System.Environment.NewLine} Program Adı: {ex.Source}\n {System.Environment.NewLine} İşlem: {ex.TargetSite}\n {System.Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
+                //CustomMessageBox.ShowMessage("Hata Detayı", hataDetay, , "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+        public static async Task<string> GetAuthToken(string apiUrl, string username, string password)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // İstek için body içeriğini JSON formatında oluşturuyoruz
+                    string requestBody = $"{{ \"Username\":\"{username}\", \"Password\":\"{password}\" }}";
+
+                    // İstek başlıklarını ayarlıyoruz
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                    //client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+
+                    // Token almak için POST isteği gönderiyoruz
+                    HttpResponseMessage response = await client.PostAsync(apiUrl, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+
+                    // Yanıtı okuyoruz
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Yanıttan tokeni alıyoruz
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        // Tokeni döndürüyoruz
+                        return responseContent;
+                    }
+                    else
+                    {
+                        // Hata durumunda uygun işlemler yapabilirsiniz
+                        MessageBox.Show("Volant Token alma başarısız. KAPATIP TEKRAR AÇIN.....!!!! Hata kodu: " + response.StatusCode);
+                        return null;
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        DateTime now = DateTime.Now;
         public void VolXml()
         {
             string ConStrg = "";
             try
             {
                 clientName = SystemInformation.ComputerName;
-                if (!File.Exists("C:\\Program Files (x86)\\Volant Yazılım\\Volant Erp Setup\\VolErpConnectio_junmed.xml"))
+                if (!File.Exists(Application.StartupPath + "\\EntegreFConnection.xml"))
                 {
-                    throw new Exception("VolErpConnection Dosyası Eksik!");
+                    throw new Exception("EntegreF Bağlantı Dosyası Eksik!");
                 }
-                XmlTextReader reader = new XmlTextReader("C:\\Program Files (x86)\\Volant Yazılım\\Volant Erp Setup\\VolErpConnectio_junmed.xml");
+                XmlTextReader reader = new XmlTextReader(Application.StartupPath + "\\EntegreFConnection.xml");
                 while (reader.Read())
                 {
                     if ((reader.NodeType == XmlNodeType.Element && reader.Name == "PARAMS") || reader.NodeType != XmlNodeType.Element || !(reader.Name == "DB"))
@@ -996,6 +702,10 @@ namespace EntegrefKrediOnay
                         dB.Db_Database = reader.GetAttribute("DATABASE").TextSifreCoz();
                         dB.Db_User = reader.GetAttribute("LOGIN").TextSifreCoz();
                         dB.Db_Password = reader.GetAttribute("PASSWORD").TextSifreCoz();
+                        Properties.Settings.Default.Company = reader.GetAttribute("DATABASE").TextSifreCoz();
+
+                        //VolantStart.StartupExtension.pathOfPrints = reader.GetAttribute("pathOfPrints").TextSifreCoz();
+                        //VolantStart.StartupExtension.pathOfArchive = reader.GetAttribute("pathOfArchive").TextSifreCoz();
 
                     }
                     catch
@@ -1009,14 +719,21 @@ namespace EntegrefKrediOnay
                         dB.Db_Database = reader.GetAttribute("DATABASE").ToString();
                         dB.Db_User = reader.GetAttribute("LOGIN").ToString();
                         dB.Db_Password = reader.GetAttribute("PASSWORD").ToString();
+                        Properties.Settings.Default.Company = reader.GetAttribute("DATABASE").ToString();
+                        //VolantStart.StartupExtension.pathOfPrints = reader.GetAttribute("pathOfPrints").ToString();
+                        //VolantStart.StartupExtension.pathOfArchive = reader.GetAttribute("pathOfArchive").ToString();
                     }
-                    Properties.Settings.Default.Company = reader.GetAttribute("DATABASE").ToString();
                     Properties.Settings.Default.Save();
                 }
                 Properties.Settings.Default.connectionstring = ConStrg;
                 Properties.Settings.Default.connectionstring2 = ConStrg.Replace(Properties.Settings.Default.Company, Properties.Settings.Default.DbName);
                 Properties.Settings.Default.Save();
-
+                //VolantStart.StartupExtension.connectionString = ConStrg;
+                //VolantStart.StartupExtension.connectionStringMir = ConStrg;
+                //VolantStart.StartupExtension.server = dB.Db_Server;
+                //VolantStart.StartupExtension.database = dB.Db_Database;
+                //VolantStart.StartupExtension.firstServer = dB.Db_Server;
+                //VolantStart.StartupExtension.firstDatabase = dB.Db_Database;
                 reader.Close();
             }
             catch (Exception ex)
@@ -1074,7 +791,7 @@ namespace EntegrefKrediOnay
                         //tablePanel4.Rows[3].Visible = false;
                         //tablePanel4.Rows[4].Visible = false;
                     }
-                    var dd = Sorgu(string.Format("select COMPANYVAL,COMPANYNAME from {0}.dbo.COMPANY", database["database_name"]), Properties.Settings.Default.connectionstring);
+                    var dd = conn.GetData(string.Format("select COMPANYVAL,COMPANYNAME from {0}.dbo.COMPANY", database["database_name"]), Properties.Settings.Default.connectionstring);
                     if (dd != null)
                     {
                         var ff = new Firma();
@@ -1094,10 +811,10 @@ namespace EntegrefKrediOnay
         {
             cmbVolantMagaza.Properties.DataSource = null;
             var compnay = Properties.Settings.Default.Company;
-            DataTable Divison = Sorgu("select DIVVAL,DIVNAME from DIVISON where DIVSTS = 1 and DIVSALESTS = 1", Properties.Settings.Default.connectionstring);
+            DataTable Divison = conn.GetData("select DIVVAL,DIVNAME from DIVISON where DIVSTS = 1 and DIVSALESTS = 1", Properties.Settings.Default.connectionstring);
             if (Divison == null)
             {
-                Divison = Sorgu($"select DIVVAL,DIVNAME from {compnay}..DIVISON where DIVSTS = 1 and DIVSALESTS = 1", Properties.Settings.Default.connectionstring);
+                Divison = conn.GetData($"select DIVVAL,DIVNAME from {compnay}..DIVISON where DIVSTS = 1 and DIVSALESTS = 1", Properties.Settings.Default.connectionstring);
             }
             cmbVolantMagaza.Properties.DataSource = Divison;
             cmbVolantMagaza.Properties.DisplayMember = "DIVNAME";
@@ -1113,85 +830,37 @@ namespace EntegrefKrediOnay
             //    var Vrk = Sorgu("select COMPANYWATNO from COMPANY", Settings.Default.connectionstring);
             //    VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
             //}
-            if (Properties.Settings.Default.connectionstring.Contains("212.174.235.106"))
+            if (Properties.Settings.Default.connectionstring.Contains("62.244.219.23"))
             {
-                var ftp = Sorgu("select MTFTPIP,MTFTPUSER,MTFTPPASSWORD from MANAGEMENT", Properties.Settings.Default.connectionstring);
-                Properties.Settings.Default.VolFtpHost = "ftp://212.174.235.106:1025";
+                var ftp = conn.GetData("select MTFTPIP,MTFTPUSER,MTFTPPASSWORD from MANAGEMENT", Properties.Settings.Default.connectionstring);
+                Properties.Settings.Default.VolFtpHost = ftp.Rows[0]["MTFTPIP"].ToString();
                 Properties.Settings.Default.VolFtpUser = ftp.Rows[0]["MTFTPUSER"].ToString();
                 Properties.Settings.Default.VolFtpPass = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
-                var Vrk = Sorgu("select COMPANYWATNO from COMPANY", Properties.Settings.Default.connectionstring);
+
+
+                Entegref.GetLogins.FTPURL = ftp.Rows[0]["MTFTPIP"].ToString();
+                Entegref.GetLogins.FTPUSER = ftp.Rows[0]["MTFTPUSER"].ToString();
+                Entegref.GetLogins.FTPPASS = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
+
+
+                var Vrk = conn.GetData("select COMPANYWATNO from COMPANY", Properties.Settings.Default.connectionstring);
                 Program.configProvider.VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
             }
             else
             {
-                var ftp = Sorgu("select MTFTPIP,MTFTPUSER,MTFTPPASSWORD from MANAGEMENT", Properties.Settings.Default.connectionstring);
+                var ftp = conn.GetData("select MTFTPIP,MTFTPUSER,MTFTPPASSWORD from MANAGEMENT", Properties.Settings.Default.connectionstring);
                 Properties.Settings.Default.VolFtpHost = ftp.Rows[0]["MTFTPIP"].ToString();
                 Properties.Settings.Default.VolFtpUser = ftp.Rows[0]["MTFTPUSER"].ToString();
                 Properties.Settings.Default.VolFtpPass = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
-                var Vrk = Sorgu("select COMPANYWATNO from COMPANY", Properties.Settings.Default.connectionstring);
+
+
+                Entegref.GetLogins.FTPURL = ftp.Rows[0]["MTFTPIP"].ToString();
+                Entegref.GetLogins.FTPUSER = ftp.Rows[0]["MTFTPUSER"].ToString();
+                Entegref.GetLogins.FTPPASS = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
+                var Vrk = conn.GetData("select COMPANYWATNO from COMPANY", Properties.Settings.Default.connectionstring);
                 Program.configProvider.VKN = Vrk.Rows[0]["COMPANYWATNO"].ToString();
             }
             Properties.Settings.Default.Save();
-        }
-        public static async Task<string> GetAuthToken(string apiUrl, string username, string password)
-        {
-            try
-            {
-                using (HttpClient client = new HttpClient())
-                {
-                    // İstek için body içeriğini JSON formatında oluşturuyoruz
-                    string requestBody = $"{{ \"Username\":\"{username}\", \"Password\":\"{password}\" }}";
-
-                    // İstek başlıklarını ayarlıyoruz
-                    client.DefaultRequestHeaders.Add("Accept", "application/json");
-                    //client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-
-                    // Token almak için POST isteği gönderiyoruz
-                    HttpResponseMessage response = await client.PostAsync(apiUrl, new StringContent(requestBody, Encoding.UTF8, "application/json"));
-
-                    // Yanıtı okuyoruz
-                    if (response.IsSuccessStatusCode)
-                    {
-                        // Yanıttan tokeni alıyoruz
-                        string responseContent = await response.Content.ReadAsStringAsync();
-                        // Tokeni döndürüyoruz
-                        return responseContent;
-                    }
-                    else
-                    {
-                        // Hata durumunda uygun işlemler yapabilirsiniz
-                        MessageBox.Show("Volant Token alma başarısız. KAPATIP TEKRAR AÇIN.....!!!! Hata kodu: " + response.StatusCode);
-                        return null;
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
-        public static async void Token()
-        {
-            try
-            {
-                string username = "TICIMAX";
-                string password = "TicimaxYonAvm2023!";
-                string apiUrl = Properties.Settings.Default.VolantApiUrl + "/auth";
-                string token = await GetAuthToken(apiUrl, username, password);
-                TokenSonuc myDeserializedClass = JsonConvert.DeserializeObject<TokenSonuc>(token);
-                if (myDeserializedClass.success)
-                {
-                    Properties.Settings.Default.VolantToken = myDeserializedClass.results;
-                    Properties.Settings.Default.Save();
-                }
-            }
-            catch (Exception ex1)
-            {
-                XtraMessageBox.Show("Volant Token alırken oluşan Hata \r\n" + ex1.Message);
-            }
         }
         private void cmbVolantSirket_EditValueChanged(object sender, EventArgs e)
         {
@@ -1322,20 +991,6 @@ namespace EntegrefKrediOnay
             //}
 
         }
-        public DataTable Sorgu(string sorgu, string connection)
-        {
-            try
-            {
-                SqlDataAdapter da = new SqlDataAdapter(sorgu, connection);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
         Form formInstance;
         private async void simpleButton2_Click(object sender, EventArgs e)
         {
@@ -1371,23 +1026,20 @@ namespace EntegrefKrediOnay
                         var Kullanici = SMSOP.ToList<SMSOP>();
                         var extend = Kullanici.FirstOrDefault(x => x.SSOPVAL == "TTMESAJ API" && x.DSSOPUSRNAME == "yonavm.api");
                         Entegref.GetLogins.SMSUname = extend.DSSOPUSRNAME;
-                        Entegref.GetLogins.SMSPassword = Volant.KriptoCoz(extend.DSSOPPASS);
+                        Entegref.GetLogins.SMSPassword = EntegreFDLL.Class.Volant.KriptoCoz(extend.DSSOPPASS);
                     }
-                    if (IsInstallerFailed())
-                    {
-                        return (ekranAc: false, formToOpen: new frmEntegrefSettings(), msg: "");
-                    }
-                    var yetki = Sorgu(
+                    var yetki = conn.GetData(
                         string.Format(@"select * from SOCIAL  
-                                left outer join SOCIALCONNECT on SOCOSOCODE = SOCODE 
+                                left outer join EMAILACCOUNT on EMASOCODE = SOCODE 
                                 left outer join CASHIER on CHSOCODE = SOCODE 
                                 where SOSTS = 1 and SOCODE = '{0}' and SOENTERKEY = '{1}'",
                             txtVolantUser.Text, txtVolantPassword.Text),
                         Properties.Settings.Default.connectionstring);
 
+                    if (yetki == null)
+                        return (ekranAc: false, formToOpen: (Form)null, msg: "Giriş Bilgilerinizi Kontrol Ediniz");
                     if (yetki.Rows.Count == 0)
                         return (ekranAc: false, formToOpen: (Form)null, msg: "Giriş Bilgilerinizi Kontrol Ediniz");
-
                     // Kullanıcı bilgilerini çek
                     Entegref.GetLogins.userID = yetki.Rows[0][0].ToString();
                     Entegref.GetLogins.userPass = yetki.Rows[0]["SOENTERKEY"].ToString();
@@ -1401,12 +1053,20 @@ namespace EntegrefKrediOnay
                     //userDEPART = yetki.Rows[0]["SODEPART"].ToString();
                     //userDIVVAL = cmbVolantMagaza.EditValue?.ToString();
                     //userREGION = conn.GetValueConnection($"select DIVREGION from DIVISON where DIVVAL = '{userDIVVAL}'", Properties.Settings.Default.connectionstring);
-                    Properties.Settings.Default.MailAdress = yetki.Rows[0]["SOCOMAILADRESS"].ToString();
-                    Properties.Settings.Default.MailPassword = yetki.Rows[0]["SOCOMAILPASS"].ToString();
+                    if (!string.IsNullOrWhiteSpace(yetki.Rows[0]["EMAUSERNAME"].ToString()))
+                    {
+                        Entegref.GetLogins.MailHost = yetki.Rows[0]["EMAHOST"].ToString();
+                        Entegref.GetLogins.MailPort = int.Parse(yetki.Rows[0]["EMAPORT"].ToString());
+                        Entegref.GetLogins.MailAdress = yetki.Rows[0]["EMAUSERNAME"].ToString();
+                        Entegref.GetLogins.MailPassword = yetki.Rows[0]["EMAPASSWORD"].ToString();
+                        Properties.Settings.Default.MailAdress = yetki.Rows[0]["EMAUSERNAME"].ToString();
+                        Properties.Settings.Default.MailPassword = yetki.Rows[0]["EMAPASSWORD"].ToString();
+                    }
 
                     // Admin departman özel kontrol
-                    if (Entegref.GetLogins.userDEPART == "ADMIN")
+                    if (Entegref.GetLogins.userID == "FK")
                     {
+                        //VolantStart.StartupExtension.admin = true;
                         int count;
                         string query = $"select count(*) from EntegreF..UserDepart where USRDPNAME = '{cmbVolantSirket.EditValue}' and USRDPDEPVAL = ''";
                         string resultCount = conn.GetValueConnection(query, Properties.Settings.Default.connectionstring);
@@ -1416,6 +1076,10 @@ namespace EntegrefKrediOnay
                             frmEntegrefSettings settings = new frmEntegrefSettings();
                             return (ekranAc: true, formToOpen: settings, msg: "");
                         }
+                    }
+                    else
+                    {
+                        //VolantStart.StartupExtension.admin = false;
                     }
                     // Hangi form açılacak?
                     var formAdi = conn.GetData($@"select rtrim(ltrim(USRFRNAME)) as USRFRNAME,
@@ -1436,17 +1100,6 @@ namespace EntegrefKrediOnay
                     if (formType == null)
                         return (ekranAc: false, formToOpen: (Form)null, msg: $"Form bulunamadı: {formName}");
 
-                    // Muhasebe özel connectionstring değişimi
-                    if (formName == "frmMuhasebeNewMain")
-                    {
-                        var builder = new SqlConnectionStringBuilder(Properties.Settings.Default.connectionstring);
-                        // Seçilen veritabanını ata
-                        builder.InitialCatalog = conn.GetValueConnection("select MTTODBNAME from MANAGEMENT", builder.ConnectionString);
-                        // Güncellenmiş connection string
-                        Properties.Settings.Default.connectionstring = builder.ConnectionString;
-                        Properties.Settings.Default.Save();
-                    }
-
                     // Versiyon kontrol
                     var checkSonuc = await entegreF.GetNewCheck(Program.configProvider);
                     if (checkSonuc == null || checkSonuc.Count != 1)
@@ -1465,9 +1118,6 @@ namespace EntegrefKrediOnay
                         return (ekranAc: false, formToOpen: (Form)null, msg: "update-required");
                         
                     }
-
-                    // Form instance oluştur (UI’de göstereceğiz)
-                    //formInstance = (Form)Activator.CreateInstance(formType);
                     return (ekranAc: true, formToOpen: (Form)null, msg: "");
                 });
 
@@ -1486,12 +1136,15 @@ namespace EntegrefKrediOnay
                 {
                     lblversion.Text = ProductName;
                     // Hata veya bilgilendirme mesajı
-                    XtraMessageBox.Show(result.msg);
+                    //MessageBox.Show(result.msg);
+                    //XtraMessageBox.Show(result.msg);
+                    ShowTopMostMessage(result.msg);
                     return;
                 }
 
                 if (result.ekranAc)
                 {
+                    //Token();
                     // Login formunu gizle, hedef formu göster
                     this.Hide();
                     if (result.formToOpen != null)
@@ -1514,6 +1167,14 @@ namespace EntegrefKrediOnay
                         }
                         else
                         {
+                            Program.filter.username = Entegref.GetLogins.userID;
+                            Program.filter.password = Entegref.GetLogins.userPass;
+                            Program.filter.soCode = Entegref.GetLogins.userID;
+                            Program.FBGConfigProvider.filter = Program.filter;
+                            Program.FBGConfigProvider.baseLoginUrl = "http://fatihkivric.com.tr";
+                            Program.FBGConfigProvider.port = "1930";
+                            Program.FBGConfigProvider.basicAuthUsername = "VOLANT";
+                            Program.FBGConfigProvider.basicAuthPassword = "310894";
                             formInstancee.ShowDialog();
                         }
                     }
@@ -1524,22 +1185,33 @@ namespace EntegrefKrediOnay
                 var hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
                 XtraMessageBox.Show(hataDetay);
                 DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm(false, 1000, this);
-                //CustomMessageBox.ShowMessage("Program Hatası", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             finally
             {
                 // 5) UI thread: her durumda formu tekrar erişilebilir yap
                 if (!this.Visible)
                 {
-                    //if (formInstance.Name.Contains("Admin"))
-                    //{
-                    //    formInstance.ShowDialog();
-                    //}
                     this.Show();
                 }
                 this.Enabled = true;
                 simpleButton2.Enabled = true;
             }
+        }
+        public void ShowTopMostMessage(string message)
+        {
+            XtraMessageBoxArgs args = new XtraMessageBoxArgs();
+            args.Caption = "Bilgi";
+            args.Text = message;
+            args.Buttons = new DialogResult[] { DialogResult.OK };
+            args.DefaultButtonIndex = 0;
+
+            // Mesaj kutusu açılırken TopMost özelliğini aktif et
+            args.Showing += (s, e) =>
+            {
+                e.Form.TopMost = true;
+            };
+
+            XtraMessageBox.Show(args);
         }
         private bool IsInstallerFailed()
         {
@@ -1658,9 +1330,10 @@ namespace EntegrefKrediOnay
         }
         private void txtVolantUser_TextChanged(object sender, EventArgs e)
         {
-            var sonuc = Sorgu(@"select SONAME +SPACE(1)+SOSURNAME,isnull(CHDIVISON,'00') as CHDIVISON,SODEPART from SOCIAL
+            var sonuc = conn.GetData(@"select SONAME +SPACE(1)+SOSURNAME,isnull(CHDIVISON,'00') as CHDIVISON,SODEPART from SOCIAL
             left outer join CASHIER on CHSOCODE = SOCODE
             where SOCODE = '" + txtVolantUser.Text + "'", Properties.Settings.Default.connectionstring);
+            if (sonuc != null)
             if (sonuc.Rows.Count > 0)
             {
                 if (sonuc.Rows[0]["SODEPART"].ToString() == "ADMIN")

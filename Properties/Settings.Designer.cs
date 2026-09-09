@@ -193,7 +193,7 @@ namespace EntegrefKrediOnay.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://fatihkivric.com.tr:5555/api")]
         public string VolantApiUrl {
             get {
                 return ((string)(this["VolantApiUrl"]));
@@ -212,6 +212,30 @@ namespace EntegrefKrediOnay.Properties {
             }
             set {
                 this["VolantToken"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ScanDublex {
+            get {
+                return ((bool)(this["ScanDublex"]));
+            }
+            set {
+                this["ScanDublex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ScanDpi {
+            get {
+                return ((int)(this["ScanDpi"]));
+            }
+            set {
+                this["ScanDpi"] = value;
             }
         }
     }

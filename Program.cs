@@ -1,4 +1,5 @@
-﻿using EntegrefKrediOnay.Class;
+﻿using EntegreFDLL.Class;
+using EntegrefKrediOnay.Class;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -16,16 +17,19 @@ namespace EntegrefKrediOnay
     static class Program
     {
         public static EntegreFConfigProvider configProvider = new EntegreFConfigProvider();
+        public static EntegreFBGConfigProvider FBGConfigProvider = new EntegreFBGConfigProvider();
+        public static EntegreFIAConfigProvider EntegreFIAConfigProvider = new EntegreFIAConfigProvider();
+        public static VolantApiClass.Filter filter = new VolantApiClass.Filter();        
         public static string sql1;
-        public static string sql2;
+        public static string sql2 = "Data Source=62.244.219.23,1435;Initial Catalog=VDB_JUNEMED01;Persist Security Info=True;User ID=sa;Password=MagicUser2026!;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True;Timeout=0";
         /// <summary>
         /// Uygulamanın ana girdi noktası.
         /// </summary> 
-        [STAThread]
+        [STAThread]        
         static void Main()
         {
             RegistryKey key2 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegrefKrediOnay");
-            var sonuc = key2.GetValue("ApplicationGUID");
+            var sonuc = key2.GetValue("ApplicationSetupComplate");
             if (sonuc == null)
             {
                 RunAsync().Wait();
@@ -46,16 +50,17 @@ namespace EntegrefKrediOnay
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("tr-TR");
                 Thread.CurrentThread.CurrentCulture = new CultureInfo("tr-TR");
                 Thread.CurrentThread.CurrentUICulture = new CultureInfo("tr-TR");
-
+                EntegreFDLL.Main.StartupExtension.connectionString = Properties.Settings.Default.connectionstring;
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new frmLogin());
+                //Application.Run(new FrmKimlikTarama());
             }
         }
         static async Task RunAsync()
         {
-            // Asenkron işlemleri burada gerçekleştirin
-            //await Task.Delay(1000); // Örnek bir asenkron işlem
+            //Asenkron işlemleri burada gerçekleştirin
+            await Task.Delay(1000); // Örnek bir asenkron işlem
 
             string Cpuid = "";
             string Motherboardid = "";
@@ -104,32 +109,25 @@ namespace EntegrefKrediOnay
             var attribute = (GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0];
             var id = attribute.Value;
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegrefKrediOnay");
-            //RegistryKey key2 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFMuhasebeTools");
-            //RegistryKey key3 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFIKTools");
-            //RegistryKey key4 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFSatışDestekTools");
-            //RegistryKey key5 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegrefMagazaTools");
-            //RegistryKey key6 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFAraçTool");
-            //RegistryKey key7 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFSatınalmaTool");
-            //RegistryKey key8 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFTeslimatTool");
-            //RegistryKey key9 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFITTool");
-            //RegistryKey key10 = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EntegreFCallCenterTool");
             var vknvar = key.GetValue("ApplicationVKN");
             if (vknvar == null)
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new frmVKN());
-                Application.Exit();
-                System.Environment.Exit(0);
+                //Application.Exit();
+                //System.Environment.Exit(0);
             }
+            //configProvider.VKN = vknvar.ToString();
             //Entegref client = new Entegref();
-            //string response = await client.UpdateLicensingUser("6200080458", pcİsmi.ToString(), pcModeli.ToString(), _s4, _s6);
+            //string response = await client.UpdateLicensingUser(configProvider);// "6200080458", pcİsmi.ToString(), pcModeli.ToString(), _s4, _s6);
             //List<Entegref.Sonuc> myDeserializedClass = JsonConvert.DeserializeObject<List<Entegref.Sonuc>>(response);
             //var ConnectionLisansingID = myDeserializedClass[0].message;
             //string response2 = await client.UpdateLicensing("6200080458", ConnectionLisansingID.ToString(), Cpuid.ToString(), Motherboardid.ToString(), _s6);
             //if (response2 != null)
             //{
             //List<Entegref.Sonuc> myDeserializedClass2 = JsonConvert.DeserializeObject<List<Entegref.Sonuc>>(response2);
+            //VolantStart.StartupExtension.computerName = pcİsmi.ToString();
             key.SetValue("ApplicationGUID", id);
             key.SetValue("ApplicationVersion", _s4);
             key.SetValue("ApplicationVKN", vknvar);
@@ -141,6 +139,7 @@ namespace EntegrefKrediOnay
             key.SetValue("ComputerID", pcModeli);
             key.SetValue("ComputerUUID", "");
             key.SetValue("ComputerLisansingID", "");
+            key.SetValue("ApplicationSetupComplate", true);
             key.Close();
             //}
             //else

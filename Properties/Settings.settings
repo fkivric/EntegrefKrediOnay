@@ -45,10 +45,16 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="VolantApiUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">http://fatihkivric.com.tr:5555/api</Value>
     </Setting>
     <Setting Name="VolantToken" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ScanDublex" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ScanDpi" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

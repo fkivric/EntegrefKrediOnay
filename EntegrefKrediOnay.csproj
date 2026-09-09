@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\Volant\packages\OpenCvSharp4.runtime.win.4.5.0.20201013\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('..\..\Volant\packages\OpenCvSharp4.runtime.win.4.5.0.20201013\build\net\OpenCvSharp4.runtime.win.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,17 +35,66 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Entegref %281%29.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\BouncyCastle.Cryptography.2.6.2\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Charts.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.Data.Desktop.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Data.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.DataAccess.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.DataAccess.v20.1.UI, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Dialogs.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Images.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Office.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Pdf.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Pdf.v20.1.Drawing, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.PivotGrid.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.Printing.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.RichEdit.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Spreadsheet.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.Utils.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Utils.v20.1.UI, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.XtraBars.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraDialogs.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraEditors.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraGrid.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraLayout.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraNavBar.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPdfViewer.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPivotGrid.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraPrinting.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraRichEdit.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraSpreadsheet.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraTreeList.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="Emgu.CV.World, Version=3.1.0.2282, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Volant Yazılım\Volant Erp Setup\Emgu.CV.World.dll</HintPath>
+    </Reference>
     <Reference Include="EntegreFDLL">
       <HintPath>..\EntegreFDLL\EntegreFDLL\bin\Debug\EntegreFDLL.dll</HintPath>
     </Reference>
@@ -51,6 +103,72 @@
     </Reference>
     <Reference Include="FoxLearn.License">
       <HintPath>..\Entegref\Lisansing\FoxLearn.License.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis, Version=1.71.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\Google.Apis.1.71.0\lib\net462\Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth, Version=1.71.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\Google.Apis.Auth.1.71.0\lib\net462\Google.Apis.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Core, Version=1.71.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\Google.Apis.Core.1.71.0\lib\net462\Google.Apis.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Vision.v1, Version=1.13.0.475, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\Google.Apis.Vision.v1.1.13.0.475\lib\portable-net45+netcore45+wpa81+wp8\Google.Apis.Vision.v1.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.13.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.13.0\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Shared.v19.2, Version=19.2.20192.134, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb" />
+    <Reference Include="Infragistics4.Win.Misc.v19.2, Version=19.2.20192.134, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.v19.2, Version=19.2.20192.134, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb" />
+    <Reference Include="itext.barcodes, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.barcodes.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.bouncy-castle-connector, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.bouncy-castle-connector.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.commons, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.commons.9.7.0\lib\net461\itext.commons.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.forms, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.forms.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.io, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.io.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.kernel, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.kernel.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.layout, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.layout.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.pdfa, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.pdfa.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.pdfua, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.pdfua.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.sign, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.sign.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.styledxmlparser, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.styledxmlparser.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.svg, Version=9.7.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\itext.9.7.0\lib\net461\itext.svg.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\TwainDotNet.1.0.0\lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Magick.NET-Q8-AnyCPU, Version=13.10.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>packages\Magick.NET-Q8-AnyCPU.13.10.0\lib\netstandard20\Magick.NET-Q8-AnyCPU.dll</HintPath>
+    </Reference>
+    <Reference Include="Magick.NET.Core, Version=14.16.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <HintPath>packages\Magick.NET.Core.14.16.0\lib\netstandard20\Magick.NET.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MailKit, Version=4.17.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\MailKit.4.17.0\lib\net47\MailKit.dll</HintPath>
     </Reference>
     <Reference Include="MetroFramework, Version=1.4.0.0, Culture=neutral, PublicKeyToken=5f91a84759bf584a, processorArchitecture=MSIL">
       <HintPath>..\..\Volant\packages\MetroModernUI.1.4.0.0\lib\net\MetroFramework.dll</HintPath>
@@ -61,20 +179,104 @@
     <Reference Include="MetroFramework.Fonts, Version=1.4.0.0, Culture=neutral, PublicKeyToken=5f91a84759bf584a, processorArchitecture=MSIL">
       <HintPath>..\..\Volant\packages\MetroModernUI.1.4.0.0\lib\net\MetroFramework.Fonts.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\EntegreFDLL\EntegreFDLL\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
-    <Reference Include="NTwain">
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.5.0.0\lib\net461\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Options.5.0.0\lib\net461\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="MimeKit, Version=4.17.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\MimeKit.4.17.0\lib\net47\MimeKit.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniHTMLTextBox, Version=1.0.30115.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DG.MiniHTMLTextBox.1.0.30115.6\lib\net40\MiniHTMLTextBox.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NTwain, Version=3.0.0.0, Culture=neutral, PublicKeyToken=f9f7e0c5169536c8, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EntegreFDLL\EntegreFDLL\bin\Debug\NTwain.dll</HintPath>
     </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\OpenCvSharp4.4.5.0.20201013\lib\net461\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\OpenCvSharp4.4.5.0.20201013\lib\net461\OpenCvSharp.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\OpenCvSharp4.4.5.0.20201013\lib\net461\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.3.1684.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\PdfSharp.1.3\lib\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="SKGL">
       <HintPath>..\..\Volant\packages\SKGL.2.0.5.3\lib\SKGL.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Formats.Asn1, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Formats.Asn1.8.0.1\lib\net462\System.Formats.Asn1.dll</HintPath>
+    </Reference>
     <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=6.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.AccessControl.6.0.1\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Xml, Version=6.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Xml.6.0.2\lib\net461\System.Security.Cryptography.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Volant\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -84,9 +286,22 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Vol.Erp.LIB.Entities">
-      <HintPath>..\EntegreFDLL\EntegreFDLL\bin\Debug\Vol.Erp.LIB.Entities.dll</HintPath>
+    <Reference Include="TwainDotNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d3cd6e1539fa8c71, processorArchitecture=x86">
+      <HintPath>..\..\Volant\packages\TwainDotNet.1.0.0\lib\TwainDotNet.dll</HintPath>
     </Reference>
+    <Reference Include="TwainDotNet.WinFroms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d3cd6e1539fa8c71, processorArchitecture=x86">
+      <HintPath>..\..\Volant\packages\TwainDotNet.1.0.0\lib\TwainDotNet.WinFroms.dll</HintPath>
+    </Reference>
+    <Reference Include="TwainDotNet.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d3cd6e1539fa8c71, processorArchitecture=x86">
+      <HintPath>..\..\Volant\packages\TwainDotNet.1.0.0\lib\TwainDotNet.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="Vol.Erp.LIB.Entities, Version=1.3.4.8, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Volant Web\VolantInvestigationTabletWebApi\bin\Vol.Erp.LIB.Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
     <Reference Include="zxing">
       <HintPath>..\EntegreFDLL\EntegreFDLL\bin\Debug\zxing.dll</HintPath>
     </Reference>
@@ -95,9 +310,48 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class\BGClass\BGKefil.cs" />
+    <Compile Include="Class\BGClass\BGVolantTables.cs" />
     <Compile Include="Class\CustomMessageBox.cs" />
+    <Compile Include="Class\DocumentScan.cs" />
+    <Compile Include="Class\Mail.cs" />
+    <Compile Include="Class\Musteri.cs" />
+    <Compile Include="Class\OCRClass\DocumentCreationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Class\OCRClass\DocumentEnums.cs" />
+    <Compile Include="Class\OCRClass\DocumentScannerConsumer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Class\OCRClass\DocumentScannerNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Class\OCRClass\DrawMatchess.cs" />
+    <Compile Include="Class\OCRClass\eIdCard.cs" />
+    <Compile Include="Class\OCRClass\eJarvis.cs" />
+    <Compile Include="Class\OCRClass\eKimlik.cs" />
+    <Compile Include="Class\OCRClass\Enums.cs" />
+    <Compile Include="Class\OCRClass\GetByIDCompletedEventArgs.cs" />
+    <Compile Include="Class\OCRClass\gOcr.cs" />
+    <Compile Include="Class\OCRClass\GoogleAnnotate.cs" />
+    <Compile Include="Class\OCRClass\GoogleLanguage.cs" />
+    <Compile Include="Class\OCRClass\ImageHelper.cs" />
+    <Compile Include="Class\OCRClass\KTS.cs" />
+    <Compile Include="Class\OCRClass\KtsService.cs" />
+    <Compile Include="Class\OCRClass\Language.cs" />
+    <Compile Include="Class\OCRClass\Parsedresult.cs" />
+    <Compile Include="Class\OCRClass\Rootobject.cs" />
+    <Compile Include="Class\OCRClass\ScannerNew.cs" />
+    <Compile Include="Class\OCRClass\TERMINAL.cs" />
+    <Compile Include="Class\OCRClass\TwainHelper.cs" />
+    <Compile Include="Class\OCRClass\TwainScanner.cs" />
+    <Compile Include="Class\OCRClass\YandexTranslate.cs" />
     <Compile Include="Class\MyEntegreFConfigProvider.cs" />
+    <Compile Include="Class\Satis.cs" />
     <Compile Include="Class\SplashScrenn.cs" />
+    <Compile Include="Class\StartupExtension.cs" />
+    <Compile Include="Class\VolantScannerAdapter.cs" />
+    <Compile Include="DbTrans.cs" />
     <Compile Include="frmCustomSplash.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,6 +369,12 @@
     </Compile>
     <Compile Include="frmLogin.Designer.cs">
       <DependentUpon>frmLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMail.Designer.cs">
+      <DependentUpon>frmMail.cs</DependentUpon>
     </Compile>
     <Compile Include="frmMasterMain.cs">
       <SubType>Form</SubType>
@@ -134,7 +394,150 @@
     <Compile Include="frmVKN.Designer.cs">
       <DependentUpon>frmVKN.cs</DependentUpon>
     </Compile>
-    <Compile Include="ListtoDataTableConverter.cs" />
+    <Compile Include="Magaza\frmYeniSatis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmYeniSatis.Designer.cs">
+      <DependentUpon>frmYeniSatis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Magaza\frmMusteriSec.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmMusteriSec.Designer.cs">
+      <DependentUpon>frmMusteriSec.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Magaza\frmDijitalArsiv.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmDijitalArsiv.Designer.cs">
+      <DependentUpon>frmDijitalArsiv.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Magaza\frmIlkMusteri.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmIlkMusteri.Designer.cs">
+      <DependentUpon>frmIlkMusteri.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Magaza\frmKasiyerMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmKasiyerMain.Designer.cs">
+      <DependentUpon>frmKasiyerMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Magaza\frmMusteri.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmMusteri.Designer.cs">
+      <DependentUpon>frmMusteri.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Magaza\frmMusteriIslemMerkezi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Magaza\frmMusteriIslemMerkezi.Designer.cs">
+      <DependentUpon>frmMusteriIslemMerkezi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGAIParametre.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGAIParametre.Designer.cs">
+      <DependentUpon>frmBGAIParametre.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGAISonuc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGAISonuc.Designer.cs">
+      <DependentUpon>frmBGAISonuc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGBekleyenOnaylar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGBekleyenOnaylar.Designer.cs">
+      <DependentUpon>frmBGBekleyenOnaylar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGFtp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGFtp.Designer.cs">
+      <DependentUpon>frmBGFtp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGKefil.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGKefil.Designer.cs">
+      <DependentUpon>frmBGKefil.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGMusteriOnayli.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGMusteriOnayli.Designer.cs">
+      <DependentUpon>frmBGMusteriOnayli.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGOnayRaporu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGOnayRaporu.Designer.cs">
+      <DependentUpon>frmBGOnayRaporu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGRiskUrunAyarlar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGRiskUrunAyarlar.Designer.cs">
+      <DependentUpon>frmBGRiskUrunAyarlar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmBGSatisOnay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmBGSatisOnay.Designer.cs">
+      <DependentUpon>frmBGSatisOnay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmKefilCoklu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmKefilCoklu.Designer.cs">
+      <DependentUpon>frmKefilCoklu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmKrilim.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmKrilim.Designer.cs">
+      <DependentUpon>frmKrilim.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmStok.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmStok.Designer.cs">
+      <DependentUpon>frmStok.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmSatici.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmSatici.Designer.cs">
+      <DependentUpon>frmSatici.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmKullanici.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmKullanici.Designer.cs">
+      <DependentUpon>frmKullanici.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmMerkezMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmMerkezMain.Designer.cs">
+      <DependentUpon>frmMerkezMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmSatisAl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmSatisAl.Designer.cs">
+      <DependentUpon>frmSatisAl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merkez\frmUrunTemelGrup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Merkez\frmUrunTemelGrup.Designer.cs">
+      <DependentUpon>frmUrunTemelGrup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="ProgressBarFrm.cs">
       <SubType>Form</SubType>
@@ -143,6 +546,8 @@
       <DependentUpon>ProgressBarFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Class\Tema\GridLayoutManager.cs" />
+    <Compile Include="Class\Tema\PivotLayoutManager.cs" />
     <Compile Include="XtraForm1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,6 +563,9 @@
     <EmbeddedResource Include="frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmMail.resx">
+      <DependentUpon>frmMail.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMasterMain.resx">
       <DependentUpon>frmMasterMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -166,6 +574,78 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmVKN.resx">
       <DependentUpon>frmVKN.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmYeniSatis.resx">
+      <DependentUpon>frmYeniSatis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmMusteriSec.resx">
+      <DependentUpon>frmMusteriSec.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmDijitalArsiv.resx">
+      <DependentUpon>frmDijitalArsiv.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmIlkMusteri.resx">
+      <DependentUpon>frmIlkMusteri.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmKasiyerMain.resx">
+      <DependentUpon>frmKasiyerMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmMusteri.resx">
+      <DependentUpon>frmMusteri.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Magaza\frmMusteriIslemMerkezi.resx">
+      <DependentUpon>frmMusteriIslemMerkezi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGAIParametre.resx">
+      <DependentUpon>frmBGAIParametre.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGAISonuc.resx">
+      <DependentUpon>frmBGAISonuc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGBekleyenOnaylar.resx">
+      <DependentUpon>frmBGBekleyenOnaylar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGFtp.resx">
+      <DependentUpon>frmBGFtp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGKefil.resx">
+      <DependentUpon>frmBGKefil.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGMusteriOnayli.resx">
+      <DependentUpon>frmBGMusteriOnayli.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGOnayRaporu.resx">
+      <DependentUpon>frmBGOnayRaporu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGRiskUrunAyarlar.resx">
+      <DependentUpon>frmBGRiskUrunAyarlar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmBGSatisOnay.resx">
+      <DependentUpon>frmBGSatisOnay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmKefilCoklu.resx">
+      <DependentUpon>frmKefilCoklu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmKrilim.resx">
+      <DependentUpon>frmKrilim.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmStok.resx">
+      <DependentUpon>frmStok.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmSatici.resx">
+      <DependentUpon>frmSatici.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmKullanici.resx">
+      <DependentUpon>frmKullanici.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmMerkezMain.resx">
+      <DependentUpon>frmMerkezMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmSatisAl.resx">
+      <DependentUpon>frmSatisAl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merkez\frmUrunTemelGrup.resx">
+      <DependentUpon>frmUrunTemelGrup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProgressBarFrm.resx">
       <DependentUpon>ProgressBarFrm.cs</DependentUpon>
@@ -196,12 +676,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Entegref-_1_.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\key.bin" />
     <None Include="Resources\question_32x32.png" />
   </ItemGroup>
   <ItemGroup>
@@ -447,5 +930,217 @@
   <ItemGroup>
     <None Include="Resources\saveas.svg" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bofileattachment_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\boorderitem_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\boorderitem_16x161.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\boorderitem_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\boproduct_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\boresume_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bosale_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bosale_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bosaleitem_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bosDosya.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\botask_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bouser_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chartsshowlegend_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chartsshowlegend_16x161.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chartsshowlegend_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chartsshowlegend_32x322.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chartyaxissettings_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\clear_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\close_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\convert_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\convert_32x322.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\costanalysis_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\costanalysis_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\currency_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\currency_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\currency_32x322.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\doluDosya.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\driving_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\editdatasource_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edittask_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EhliyetOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Entegref 32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\excel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\filter_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\floatingobjectoutlinecolor_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\formatastable_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\initialstate_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\inserttableofcaptions_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Kamalar_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\linenumbering_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\listmultilevel_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mailmerge_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\newemployee_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nufuscuzdaniArkaTamami1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nufuscuzdaniOn4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pdf.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\phone_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pielabelsdatalabels2_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pielabelsdatalabels2_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\printer_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\printstartdate_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\protectdocument_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\publicfix_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\publicfix_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\resimMakine.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\richeditclearformatting_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\showhidecomment_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\transit_32x321.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\viewsetting_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YeniEhliyetArka.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YeniEhliyetOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YeniKimlikArka.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YeniKimlikOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Yon Logo 16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Yon Logo 32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Yon Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YON_AVM_400.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Entegref %281%29.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\Volant\packages\OpenCvSharp4.runtime.win.4.5.0.20201013\build\net\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Volant\packages\OpenCvSharp4.runtime.win.4.5.0.20201013\build\net\OpenCvSharp4.runtime.win.props'))" />
+    <Error Condition="!Exists('packages\Magick.NET-Q8-AnyCPU.13.10.0\build\netstandard20\Magick.NET-Q8-AnyCPU.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Magick.NET-Q8-AnyCPU.13.10.0\build\netstandard20\Magick.NET-Q8-AnyCPU.targets'))" />
+  </Target>
+  <Import Project="packages\Magick.NET-Q8-AnyCPU.13.10.0\build\netstandard20\Magick.NET-Q8-AnyCPU.targets" Condition="Exists('packages\Magick.NET-Q8-AnyCPU.13.10.0\build\netstandard20\Magick.NET-Q8-AnyCPU.targets')" />
 </Project>

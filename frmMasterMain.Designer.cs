@@ -799,7 +799,6 @@
             // 
             // accordionControlElement10
             // 
-            this.accordionControlElement10.Expanded = true;
             this.accordionControlElement10.Name = "accordionControlElement10";
             this.accordionControlElement10.Text = "Harici Entegrasyonlar";
             // 
@@ -1152,7 +1151,7 @@
             this.ımageCollection1.Images.SetKeyName(43, "driving_32x32");
             this.ımageCollection1.InsertImage(global::EntegrefKrediOnay.Properties.Resources.editdatasource_32x32, "editdatasource_32x32", typeof(global::EntegrefKrediOnay.Properties.Resources), 44);
             this.ımageCollection1.Images.SetKeyName(44, "editdatasource_32x32");
-            this.ımageCollection1.InsertImage(global::EntegrefKrediOnay.Properties.Resources.editdatasource_32x32, "editdatasource_32x32", typeof(global::EntegrefKrediOnay.Properties.Resources), 45);
+            this.ımageCollection1.InsertImage(global::EntegrefKrediOnay.Properties.Resources.editdatasource_32x32, "editdatasource_32x321", typeof(global::EntegrefKrediOnay.Properties.Resources), 45, "editdatasource_32x32");
             this.ımageCollection1.Images.SetKeyName(45, "editdatasource_32x321");
             this.ımageCollection1.InsertImage(global::EntegrefKrediOnay.Properties.Resources.editname_32x32, "editname_32x32", typeof(global::EntegrefKrediOnay.Properties.Resources), 46);
             this.ımageCollection1.Images.SetKeyName(46, "editname_32x32");
@@ -1243,6 +1242,7 @@
             this.ımageCollection1.InsertImage(global::EntegrefKrediOnay.Properties.Resources.transit_32x32, "transit_32x32", typeof(global::EntegrefKrediOnay.Properties.Resources), 90);
             this.ımageCollection1.Images.SetKeyName(90, "transit_32x32");
             this.ımageCollection1.InsertImage(global::EntegrefKrediOnay.Properties.Resources.viewsetting_32x32, "viewsetting_32x32", typeof(global::EntegrefKrediOnay.Properties.Resources), 91);
+            this.ımageCollection1.Images.SetKeyName(91, "viewsetting_32x32");
             // 
             // xtraTabControl
             // 
