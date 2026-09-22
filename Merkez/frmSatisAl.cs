@@ -32,7 +32,7 @@ namespace EntegrefKrediOnay.Merkez
         {
             try
             {
-                EntegreFDLL.Class.Entegref.SplashScreen(this, "Saha Yönetim Destek Tools", Properties.Settings.Default.CompanyName, "Mağaza Satışı İşleme Ekranı Açılıyor");
+                //EntegreFDLL.Class.Entegref.SplashScreen(this, "Saha Yönetim Destek Tools", Properties.Settings.Default.CompanyName, "Mağaza Satışı İşleme Ekranı Açılıyor");
                 InitializeComponent();
                 DevExpress.LookAndFeel.UserLookAndFeel.Default.SkinName = "McSkin";
                 DefaultLookAndFeel defaultLookAndFeel = new DefaultLookAndFeel();
@@ -41,10 +41,7 @@ namespace EntegrefKrediOnay.Merkez
                 DevExpress.Data.CurrencyDataController.DisableThreadingProblemsDetection = true;
                 Control.CheckForIllegalCrossThreadCalls = false;
                 httpClient = new HttpClient();
-                var ss = Properties.Settings.Default.VolantApiUrl;
                 httpClient.BaseAddress = new Uri(Properties.Settings.Default.VolantApiUrl.Replace("/api", ""));
-                GetSALEs = conn.GetData("Select * from SALES", sql).ToList<SALES>();
-                //InitUI();
             }
             catch (Exception ex)
             {
@@ -53,7 +50,7 @@ namespace EntegrefKrediOnay.Merkez
             }
             finally
             {
-                DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm(false, 1000, this);
+                //DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm();
             }
         }
         private BackgroundWorker _backgroundWorker;
@@ -131,116 +128,157 @@ namespace EntegrefKrediOnay.Merkez
         string sql = Properties.Settings.Default.connectionstring;
         string sql2 = Properties.Settings.Default.connectionstring2;
         private readonly HttpClient httpClient;
-        List<Customer> GetCustomers = new List<Customer>();
-        List<CreaditSales> GetCreaditSales = new List<CreaditSales>();
-        List<PaymentSales> GetPaymentSales = new List<PaymentSales>();
         List<MainRood> GetMainRoods = new List<MainRood>();
-        List<SALES> GetSALEs = new List<SALES>();
         SqlConnectionObject conn = new SqlConnectionObject();
         private void frmSatisAl_Load(object sender, EventArgs e)
         {
         }
         private void btnDosyaSec_ItemClick(object sender, TileItemEventArgs e)
         {
+            YeniComboBox();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Excel Dosyaları (*.xlsx;*.xls)|*.xlsx;*.xls|Tüm Dosyalar (*.*)|*.*";
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            spreadsheetControl1.Document.BeginUpdate();
+            // Excel dosyasını uzantısına göre yükle
+            spreadsheetControl1.Document.LoadDocument(openFileDialog.FileName);
+
+            Worksheet worksheet = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
+
+            worksheet.Name = "Sheet1";
+
+            CellRange usedRange = worksheet.GetUsedRange();
+            usedRange.AutoFitColumns();
+            spreadsheetControl1.Document.EndUpdate();
+            for (int columnIndex = usedRange.LeftColumnIndex; columnIndex <= usedRange.RightColumnIndex + 1; columnIndex++)
+            {
+                // Sütunun harf karşılığını hesaplayın
+                string columnName = GetColumnName(columnIndex);
+                // Sütun ismini listeye ekleyin
+                cmbMusteriKodu.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbMusteriTipi.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbMusteriAdi.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbMusteriSoyadi.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbTCKN.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbVD.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbGSM.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbMusteriDogumTarihi.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbEMail.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbAdress.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbStokKodu.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbAdet.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbNetFiyat.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbIskonto.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbTaksitSayisi.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbTarih.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbSiparisNo.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbSatici.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbKampanya.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbMagaza.Items.Add(new ComboBoxItem(columnIndex, columnName));
+            }
+
+            //spreadsheetControl1.Document.Worksheets.ActiveWorksheet.Cells.AutoFitColumns();
+            btnKontrol.Enabled = true;
+            YeniExcel(usedRange, worksheet);
+
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //openFileDialog.Filter = "Excel Dosyaları (*.xlsx;*.xls)|*.xlsx;*.xls|Tüm Dosyalar (*.*)|*.*";
+            //for (int i = spreadsheetControl1.Document.Worksheets.Count - 1; i >= 0; i--)
+            //{
+            //    var sheet = spreadsheetControl1.Document.Worksheets[i];
+            //    if (sheet != spreadsheetControl1.Document.Worksheets.ActiveWorksheet)
+            //    {
+            //        spreadsheetControl1.Document.Worksheets.Remove(sheet);
+            //    }
+            //}
+            //spreadsheetControl1.Document.Worksheets.ActiveWorksheet.Name = "Sheet1";
+
+            ////Worksheet worksheet = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
+            ////// Çalışma sayfasının içeriğini temizle
+            ////worksheet.Clear(worksheet.GetDataRange());
+            //spreadsheetControl1.Document.BeginUpdate();
+            //// Kullanıcıdan dosyayı seçmesini iste
+            //if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //{                
+            //    spreadsheetControl1.Document.LoadDocument(openFileDialog.FileName);
+            //}
+            //spreadsheetControl1.Document.EndUpdate();
+            //Worksheet worksheet2 = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
+            //CellRange usedRange = worksheet2.GetUsedRange();
+
+            // Dolu sütunları dolaşarak sıralı harf isimlerini elde edin
+            this.IconOptions.Icon = Properties.Resources.Entegref;
+        }
+        void YeniComboBox()
+        {
+
+            // ComboBox'ları temizle
+            cmbMusteriKodu.Items.Clear();
+            cmbMusteriTipi.Items.Clear();
+            cmbMusteriAdi.Items.Clear();
+            cmbMusteriSoyadi.Items.Clear();
+            cmbTCKN.Items.Clear();
+            cmbVD.Items.Clear();
+            cmbGSM.Items.Clear();
+            cmbMusteriDogumTarihi.Items.Clear();
+            cmbEMail.Items.Clear();
+            cmbAdress.Items.Clear();
+            cmbStokKodu.Items.Clear();
+            cmbAdet.Items.Clear();
+            cmbNetFiyat.Items.Clear();
+            cmbIskonto.Items.Clear();
+            cmbTaksitSayisi.Items.Clear();
+            cmbTarih.Items.Clear();
+            cmbSiparisNo.Items.Clear();
+            cmbSatici.Items.Clear();
+            cmbKampanya.Items.Clear();
+            cmbMagaza.Items.Clear();
+        }
+        void YeniExcel(CellRange usedRange, Worksheet worksheet)
+        {
+            // Önce mevcut dokümanı temizle
             for (int i = spreadsheetControl1.Document.Worksheets.Count - 1; i >= 0; i--)
             {
-                var sheet = spreadsheetControl1.Document.Worksheets[i];
+                Worksheet sheet = spreadsheetControl1.Document.Worksheets[i];
+
                 if (sheet != spreadsheetControl1.Document.Worksheets.ActiveWorksheet)
                 {
                     spreadsheetControl1.Document.Worksheets.Remove(sheet);
                 }
             }
-            spreadsheetControl1.Document.Worksheets.ActiveWorksheet.Name = "Sheet1";
-
-            //Worksheet worksheet = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
-            //// Çalışma sayfasının içeriğini temizle
-            //worksheet.Clear(worksheet.GetDataRange());
-            spreadsheetControl1.Document.BeginUpdate();
-            // Kullanıcıdan dosyayı seçmesini iste
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                spreadsheetControl1.Document.LoadDocument(openFileDialog.FileName, DocumentFormat.Xlsx);
-            }
-            spreadsheetControl1.Document.EndUpdate();
-            try
-            {
-                EntegreFDLL.Class.Entegref.SplashScreen(this, "Saha Yönetim Destek Tools", Properties.Settings.Default.CompanyName, "Seçili Excel Verilieri İşleniyor");
-
-                Worksheet worksheet2 = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
-                CellRange usedRange = worksheet2.GetUsedRange();
-
-                // Dolu sütunları dolaşarak sıralı harf isimlerini elde edin
-                for (int columnIndex = usedRange.LeftColumnIndex; columnIndex <= usedRange.RightColumnIndex + 1; columnIndex++)
-                {
-                    // Sütunun harf karşılığını hesaplayın
-                    string columnName = GetColumnName(columnIndex);
-                    // Sütun ismini listeye ekleyin
-                    cmbMusteriKodu.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbMusteriTipi.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbMusteriAdi.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbMusteriSoyadi.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbTCKN.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbVD.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbGSM.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbMusteriDogumTarihi.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbEMail.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbAdress.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbStokKodu.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbAdet.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbNetFiyat.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbIskonto.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbTaksitSayisi.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbTarih.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbSiparisNo.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbSatici.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbKampanya.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                    cmbMagaza.Items.Add(new ComboBoxItem(columnIndex, columnName));
-                }
-                var comboList = new List<ComboBox>
-            {
-                cmbMusteriKodu, cmbMusteriTipi, cmbMusteriAdi, cmbMusteriSoyadi,
-                cmbTCKN, cmbVD, cmbGSM, cmbMusteriDogumTarihi, cmbEMail, cmbAdress,
-                cmbStokKodu, cmbAdet, cmbNetFiyat, cmbIskonto, cmbTaksitSayisi,
-                cmbTarih, cmbSiparisNo, cmbSatici, cmbKampanya, cmbMagaza
-            };
-
-                for (int col = usedRange.LeftColumnIndex; col <= usedRange.RightColumnIndex; col++)
-                {
-                    string headerText = worksheet2.Cells[usedRange.TopRowIndex, col].DisplayText?.Trim();
-
-                    if (string.IsNullOrEmpty(headerText)) continue;
-
-                    foreach (var combo in comboList)
+            var comboList = new List<ComboBox>
                     {
-                        if (combo.Tag != null &&
-                            headerText.Equals(combo.Tag.ToString(), StringComparison.OrdinalIgnoreCase))
+                        cmbMusteriKodu, cmbMusteriTipi, cmbMusteriAdi, cmbMusteriSoyadi,
+                        cmbTCKN, cmbVD, cmbGSM, cmbMusteriDogumTarihi, cmbEMail, cmbAdress,
+                        cmbStokKodu, cmbAdet, cmbNetFiyat, cmbIskonto, cmbTaksitSayisi,
+                        cmbTarih, cmbSiparisNo, cmbSatici, cmbKampanya, cmbMagaza
+                    };
+
+            for (int col = usedRange.LeftColumnIndex; col <= usedRange.RightColumnIndex; col++)
+            {
+                string headerText = worksheet.Cells[usedRange.TopRowIndex, col].DisplayText?.Trim();
+
+                if (string.IsNullOrEmpty(headerText)) continue;
+
+                foreach (var combo in comboList)
+                {
+                    if (combo.Tag != null &&
+                        headerText.Equals(combo.Tag.ToString(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        // eşleşen combobox için doğru item’i seç
+                        foreach (ComboBoxItem item in combo.Items)
                         {
-                            // eşleşen combobox için doğru item’i seç
-                            foreach (ComboBoxItem item in combo.Items)
+                            if (item.Value == col + 1)
                             {
-                                if (item.Value == col + 1)
-                                {
-                                    combo.SelectedItem = item;
-                                    break;
-                                }
+                                combo.SelectedItem = item;
+                                break;
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace} {Environment.NewLine} Inner: {ex.InnerException?.ToString()}";
-                CustomMessageBox.ShowMessage("İşlem Hatası Detaya Bekanız", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            finally
-            {
-                DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm(false, 1000, this);
-            }
-            spreadsheetControl1.Document.Worksheets.ActiveWorksheet.Cells.AutoFitColumns();
-            btnKontrol.Enabled = true;
         }
         private string GetColumnName(int index)
         {
@@ -282,17 +320,13 @@ namespace EntegrefKrediOnay.Merkez
 
             return sira;
         }
-
-        Customer customer = new Customer();
-        CreaditSales creaditSales = new CreaditSales();
-        PaymentSales paymentSales = new PaymentSales();
-        DeliverAddress deliverAddress = new DeliverAddress();
-        CustomerAddress customerAdress = new CustomerAddress();
         private void btnKontrol_ItemClick(object sender, TileItemEventArgs e)
         {
             try
             {
-                //EntegreFDLL.Class.Entegref.SplashScreen(this, "Satışlar İşleniyor", Properties.Settings.Default.CompanyName, "Lütfen Bekleyin");
+                List<Customer> GetCustomers = new List<Customer>();
+                List<CreaditSales> GetCreaditSales = new List<CreaditSales>();
+                List<PaymentSales> GetPaymentSales = new List<PaymentSales>();
                 XtraMessageBoxArgs args = new XtraMessageBoxArgs();
                 args.AutoCloseOptions.Delay = 2000;
                 args.Caption = "Uyarı";
@@ -341,6 +375,11 @@ namespace EntegrefKrediOnay.Merkez
                             progressForm.Show(this);
                             for (int rowIndex = index; rowIndex < usedRange.RowCount; rowIndex++)
                             {
+                                Customer customer = new Customer();
+                                CreaditSales creaditSales = new CreaditSales();
+                                PaymentSales paymentSales = new PaymentSales();
+                                DeliverAddress deliverAddress = new DeliverAddress();
+                                CustomerAddress customerAdress = new CustomerAddress();
                                 MainRood MainRoodS = new MainRood();
                                 if (uniqueMusteriNo.Add(usedRange[rowIndex, SiraMusteriKodu - 1].Value.ToString()))
                                 {
@@ -420,10 +459,10 @@ namespace EntegrefKrediOnay.Merkez
                                     GetCustomers.Add(customer);
                                     MainRoodS.Customers.Add(customer);
                                 }
-                                var SatisVar = GetSALEs.Any(x => x.SALUSEFIELD1 != null
-                                                        && x.SALUSEFIELD1 == usedRange[rowIndex, SiraSiparisNo - 1].Value.ToString());
-                                if (!SatisVar)
-                                {
+                                //var SatisVar = GetSALEs.Any(x => x.SALUSEFIELD1 != null
+                                //                        && x.SALUSEFIELD1 == usedRange[rowIndex, SiraSiparisNo - 1].Value.ToString());
+                                //if (!SatisVar)
+                                //{
                                     if (MainRoodS.CustomerCode == null)
                                     {
                                         var Musterivar = GetCustomers
@@ -487,24 +526,26 @@ namespace EntegrefKrediOnay.Merkez
                                                 }
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 creaditSales.Products.Add(urun);
                                                 creaditSales.Payments = new List<Payment>
-                                            {
-                                                new Payment
                                                 {
-                                                    PaymentAmount = 0,
-                                                    PaymentTypeCode = "N"
-                                                }
-                                            };
+                                                    new Payment
+                                                    {
+                                                        PaymentAmount = 0,
+                                                        PaymentTypeCode = "N"
+                                                    }
+                                                };
                                                 creaditSales.Instalments = new List<Instalment>
-                                            {
-                                                new Instalment
                                                 {
-                                                    instalmentFixDate = DateTime.Today.AddMonths(1),
-                                                    instalmentAmount = urun.PriceWithTax
-                                                }
-                                            };
+                                                    new Instalment
+                                                    {
+                                                        instalmentFixDate = DateTime.Today.AddMonths(1),
+                                                        instalmentAmount = urun.PriceWithTax - urun.ListDisAmount,
+                                                    }
+                                                };
                                                 creaditSales.CurrencyCode = "TL";
                                                 string adres = usedRange[rowIndex, SiraAdress - 1].Value.ToString().Replace("/ TUR", "");
                                                 string[] satirlar = adres.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -561,8 +602,11 @@ namespace EntegrefKrediOnay.Merkez
                                                 }
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 satis.Products.Add(urun);
+                                            satis.Instalments[0].instalmentAmount += urun.PriceWithTax - urun.ListDisAmount;
                                             }
                                         }
                                         else
@@ -574,7 +618,18 @@ namespace EntegrefKrediOnay.Merkez
                                                 creaditSales.Products = new List<Product>();
                                                 creaditSales.CustomerCode = usedRange[rowIndex, SiraMusteriKodu - 1].Value.ToString();
                                                 creaditSales.StoreCode = "00";
-                                                creaditSales.StoreWareHouseCode = "00";
+                                                string magaza = usedRange[rowIndex, SiraMagaza - 1].Value.ToString().Replace("6227-", "");
+                                                if (magaza != "")
+                                                {
+                                                    var StoreHouse = conn.GetValue($@"select DIVVAL from DIVISON where DIVREGION like '%{magaza}%'", sql);
+                                                    creaditSales.StoreCode = "00";
+                                                    creaditSales.StoreWareHouseCode = StoreHouse;
+                                                }
+                                                else
+                                                {
+                                                    creaditSales.StoreCode = "00";
+                                                    creaditSales.StoreWareHouseCode = "00";
+                                                }
                                                 creaditSales.OrderDate = DateTime.Parse(usedRange[rowIndex, SiraTarih - 1].Value.ToString());
                                                 creaditSales.OrderNumber = usedRange[rowIndex, SiraSiparisNo - 1].Value.ToString();
                                                 creaditSales.CargoNumber = "";
@@ -596,24 +651,26 @@ namespace EntegrefKrediOnay.Merkez
                                                 }
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 creaditSales.Products.Add(urun);
                                                 creaditSales.Payments = new List<Payment>
-                                            {
-                                                new Payment
                                                 {
-                                                    PaymentAmount = 0,
-                                                    PaymentTypeCode = "N"
-                                                }
-                                            };
-                                                creaditSales.Instalments = new List<Instalment>
-                                            {
-                                                new Instalment
+                                                    new Payment
+                                                    {
+                                                        PaymentAmount = 0,
+                                                        PaymentTypeCode = "N"
+                                                    }
+                                                };
+                                                    creaditSales.Instalments = new List<Instalment>
                                                 {
-                                                    instalmentFixDate = DateTime.Today.AddMonths(1),
-                                                    instalmentAmount = urun.PriceWithTax
-                                                }
-                                            };
+                                                    new Instalment
+                                                    {
+                                                        instalmentFixDate = DateTime.Today.AddMonths(1),
+                                                        instalmentAmount = urun.PriceWithTax - urun.ListDisAmount,
+                                                    }
+                                                };
                                                 creaditSales.CurrencyCode = "TL"; string adres = usedRange[rowIndex, SiraAdress - 1].Value.ToString().Replace("/ TUR", "");
                                                 string[] satirlar = adres.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -670,8 +727,11 @@ namespace EntegrefKrediOnay.Merkez
                                                 }
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 satis.Products.Add(urun);
+                                            satis.Instalments[0].instalmentAmount += urun.PriceWithTax - urun.ListDisAmount;
                                             }
                                         }
                                     }
@@ -726,16 +786,18 @@ namespace EntegrefKrediOnay.Merkez
                                                 urun.PriceVal = "P";
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 paymentSales.Products.Add(urun);
                                                 paymentSales.Payments = new List<Payment>
-                                            {
-                                                new Payment
                                                 {
-                                                    PaymentAmount = UrunFiyati,
-                                                    PaymentTypeCode = "N"
-                                                }
-                                            };
+                                                    new Payment
+                                                    {
+                                                        PaymentAmount = UrunFiyati,
+                                                        PaymentTypeCode = "N"
+                                                    }
+                                                };
                                                 paymentSales.CurrencyCode = "TL";
                                                 string adres = usedRange[rowIndex, SiraAdress - 1].Value.ToString().Replace("/ TUR", "");
                                                 string[] satirlar = adres.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -784,6 +846,8 @@ namespace EntegrefKrediOnay.Merkez
                                                 urun.PriceVal = "P";
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 satis.Products.Add(urun);
                                                 satis.Payments[0].PaymentAmount += UrunFiyati;
@@ -824,6 +888,8 @@ namespace EntegrefKrediOnay.Merkez
                                                 urun.PriceVal = "P";
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 paymentSales.Products.Add(urun);
                                                 paymentSales.Payments = new List<Payment>
@@ -881,6 +947,8 @@ namespace EntegrefKrediOnay.Merkez
                                                 urun.ListDisAmount = decimal.Parse(usedRange[rowIndex, SiraIskonto - 1].Value.ToString());
                                                 var SALESMEN = usedRange[rowIndex, SiraSatici - 1].Value.ToString();
                                                 var SMNENVAL = conn.GetValueConnection($@"select SMENVAL from SALESMEN where SMENNAME = '{SALESMEN}'", Properties.Settings.Default.connectionstring);
+                                                if (SMNENVAL == "")
+                                                    SMNENVAL = "00015";
                                                 urun.SalesmenVal = SMNENVAL;
                                                 satis.Products.Add(urun);
                                                 satis.Payments[0].PaymentAmount += UrunFiyati;
@@ -888,11 +956,11 @@ namespace EntegrefKrediOnay.Merkez
                                         }
                                     }
                                     #endregion
-                                }
-                                else
-                                {
-                                    memoEdit1.Text += "r\n\n işlem hatası : " + rowIndex.ToString() + " sirasındaki" + usedRange[rowIndex, SiraMusteriKodu - 1].Value.ToString()  + "Müşteri Satışı Daha Önceden İşlenmiş";
-                                }
+                                //}
+                                //else
+                                //{
+                                //    memoEdit1.Text += "r\n\n işlem hatası : " + rowIndex.ToString() + " sirasındaki" + usedRange[rowIndex, SiraMusteriKodu - 1].Value.ToString()  + "Müşteri Satışı Daha Önceden İşlenmiş";
+                                //}
                                 progressForm.PerformStep(this);
                             }
                         }
@@ -919,10 +987,6 @@ namespace EntegrefKrediOnay.Merkez
             {
                 string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
                 CustomMessageBox.ShowMessage("İşlem Hatası Detaya Bekanız", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            finally
-            {
-                DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm(false, 1000, this);
             }
         }
         public (string FirstName, string LastName) IsimAyir(string musteri)
@@ -954,7 +1018,6 @@ namespace EntegrefKrediOnay.Merkez
         CreaditSales satisVeri;
         async void satisisle()
         {
-            frmLogin.Token();
             string url = "http://fatihkivric.com.tr:5555" + "/creditsales";
             string jSon = JsonConvert.SerializeObject(satisVeri, Formatting.Indented);
             string requestBody = jSon;
@@ -1006,7 +1069,6 @@ namespace EntegrefKrediOnay.Merkez
         }
         public static async Task<string> Post(string apiUrl, string json)
         {
-            Form form = new frmSatisAl();
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -1031,12 +1093,24 @@ namespace EntegrefKrediOnay.Merkez
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string hataDetay = $"Hata Mesajı: {ex.Message}\n {System.Environment.NewLine} Program Adı: {ex.Source}\n {System.Environment.NewLine} İşlem: {ex.TargetSite}\n {System.Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                CustomMessageBox.ShowMessage("Hata Detayı", hataDetay, form, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return null;
             }
+        }
+        private async Task<string> GetCustomerAsync(string apiUrl)
+        {
+            HttpResponseMessage response =
+                await httpClient.GetAsync(apiUrl);
+
+            return await response.Content.ReadAsStringAsync();
+        }
+        private async Task<string> PostCustomerAsync(string apiUrl, string json)
+        {
+            HttpResponseMessage response =
+                await httpClient.PostAsync(apiUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+
+            return await response.Content.ReadAsStringAsync();
         }
         private static string ToQueryString(object jsonParams)
         {
@@ -1069,171 +1143,336 @@ namespace EntegrefKrediOnay.Merkez
         }
 
         EntegreFDLL.Main.ListtoDataTableConverter converter = new ListtoDataTableConverter();
-        private async void tileBarItem1_ItemClick(object sender, TileItemEventArgs e)
+        private void tileBarItem1_ItemClick(object sender, TileItemEventArgs e)
         {
+            List<CustomerInsert> customers = new List<CustomerInsert>();
+            string Mesaj = "";
             ProgressBarFrm progressForm = new ProgressBarFrm()
             {
                 Start = 0,
-                Finish = GetCustomers.Count,
+                Finish = GetMainRoods.Count - 1,
                 Position = 0,
-                ToplamAdet = GetCustomers.Count.ToString(),
+                ToplamAdet = GetMainRoods.Count.ToString(),
             };
-            List<CustomerInsert> customers = new List<CustomerInsert>();
-            //executeBackground(
-            //    async () =>
-            //    {
-            //        progressForm.Show(this);
-            foreach (var item in GetCustomers)
+            executeBackground(
+            () =>
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Properties.Settings.Default.VolantToken);
-                var code = new Musteri.CustomerCode
+                progressForm.Show(this);
+                try
                 {
-                    customerCode = item.CustomerCode,
-                };
-                // JSON parametrelerini URL'ye eklemek için QueryString'i oluşturun
-                string queryString = ToQueryString(code);
-                string apiUrl = "api/customers" + queryString;
-                HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
-                string responseData = await response.Content.ReadAsStringAsync();
-                Musteri.MusteriVar MVAR = JsonConvert.DeserializeObject<Musteri.MusteriVar>(responseData);
-                if (!MVAR.success)
-                {
-                    Musteri.MusteriYok MYOK = JsonConvert.DeserializeObject<Musteri.MusteriYok>(responseData);
-                    if (MYOK.message == "Müşteri koduyla eşleşen müşteri bulunamadı")
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Properties.Settings.Default.VolantToken);
+                    httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+                    foreach (var item in GetMainRoods)
                     {
-                        var jsons = JsonConvert.SerializeObject(item);
-                        var url = Properties.Settings.Default.VolantApiUrl + "/customers";
-                        var ss = await Post(url, jsons);
-                        if (ss != null)
+                        try
                         {
-                            if (ss.Contains("Curval"))
+                            var code = new Musteri.CustomerCode
                             {
-                                Musteri.MusteriVar MSVAR = JsonConvert.DeserializeObject<Musteri.MusteriVar>(ss);
+                                customerCode = item.CustomerCode,
+                            };
+                            // JSON parametrelerini URL'ye eklemek için QueryString'i oluşturun
+                            string queryString = ToQueryString(code);
+                            string apiUrl = "api/customers" + queryString;
+                            string responseData = GetCustomerAsync(apiUrl).GetAwaiter().GetResult();
+                            //HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+                            //string responseData = await response.Content.ReadAsStringAsync();
+                            Musteri.MusteriVar MVAR = JsonConvert.DeserializeObject<Musteri.MusteriVar>(responseData);
+                            if (!MVAR.success)
+                            {
+                                Musteri.MusteriYok MYOK = JsonConvert.DeserializeObject<Musteri.MusteriYok>(responseData);
+                                if (MYOK.message == "Müşteri koduyla eşleşen müşteri bulunamadı")
+                                {
+                                    var jsons = JsonConvert.SerializeObject(item.Customers[0]);
+                                    var url = Properties.Settings.Default.VolantApiUrl + "/customers";
+                                    var response2 = PostCustomerAsync(url, jsons).GetAwaiter().GetResult(); //await httpClient.PostAsync(url, new StringContent(jsons, Encoding.UTF8, "application/json"));
+                                    //if (response2.IsSuccessStatusCode)
+                                    //{
+                                    //    string responseContent = await response2.Content.ReadAsStringAsync();
+                                        if (response2.Contains("Curval"))
+                                        {
+                                            Musteri.MusteriVar MSVAR = JsonConvert.DeserializeObject<Musteri.MusteriVar>(response2);
 
-                                var ID = conn.GetValue($@"select CURID from CURRENTS where CURVAL = '{MSVAR.results[3].ToString()}'", sql);
+                                            var ID = conn.GetValue($@"select CURID from CURRENTS where CURVAL = '{MSVAR.results[3].ToString()}'", sql);
+                                            customers.Add(new CustomerInsert
+                                            {
+                                                CURID = long.Parse(ID),
+                                                CustomerCode = item.CustomerCode
+                                            });
+                                        }
+                                        else
+                                        {
+                                            try
+                                            {
+                                                Musteri.MusteriYok MYOK1 = JsonConvert.DeserializeObject<Musteri.MusteriYok>(response2);
+                                                foreach (var validations in MYOK1.validations)
+                                                {
+                                                    Mesaj += item.CustomerCode + " " + item.Customers[0].CustomerFirstName + " " + item.Customers[0].CustomerLastName + $@" işlem hatası : {validations.Message}" + "r\n\n";
+                                                }
+                                            }
+                                            catch (Exception)
+                                            {
+                                                Musteri.MusteriHata MYOK2 = JsonConvert.DeserializeObject<Musteri.MusteriHata>(response2);
+                                                Mesaj += item.CustomerCode + " " + item.Customers[0].CustomerFirstName + " " + item.Customers[0].CustomerLastName + $@" işlem hatası : {MYOK2.message}" + Environment.NewLine;
+                                            }
+                                        }
+                                    //}
+                                }
+                            }
+                            else
+                            {
+                                var CURVAL = MVAR.results[3].ToString();
+                                var ID = conn.GetValue($@"select CURID from CURRENTS where CURVAL = '{MVAR.results[3].ToString()}'", sql);
                                 customers.Add(new CustomerInsert
                                 {
                                     CURID = long.Parse(ID),
                                     CustomerCode = item.CustomerCode
                                 });
+                                var jsons = JsonConvert.SerializeObject(item.Customers[0]);
+                                var url = Properties.Settings.Default.VolantApiUrl + "/customersUpdate";
+                                var response2 = PostCustomerAsync(url, jsons).GetAwaiter().GetResult();
+                                //HttpResponseMessage response2 = await httpClient.PostAsync(url, new StringContent(jsons, Encoding.UTF8, "application/json"));
+                                //string responseContent = await response2.Content.ReadAsStringAsync();
+                            }
+                            var CURSALES = conn.GetData($@"
+                            select SALES.* from SALES
+                            join CURRENTS on CURID = SALCURID
+                            where CURUSEFIELD3 = '{item.CustomerCode}'", sql);
+                            if (CURSALES != null)
+                            {
+                                var salesOrderNumbers = CURSALES
+                                .AsEnumerable()
+                                .Select(x => x.Field<string>("SALUSEFIELD1"))
+                                .ToList();
+
+                                if (item.CreaditSales != null)
+                                {
+                                    foreach (var cSales in item.CreaditSales)
+                                    {
+                                        bool exists = salesOrderNumbers.Contains(cSales.OrderNumber);
+                                        if (!exists)
+                                        {
+                                            string url = Properties.Settings.Default.VolantApiUrl + "/creditsales";
+                                            string jSon = JsonConvert.SerializeObject(cSales, Formatting.Indented);
+                                            string requestBody = jSon;
+                                            var response2 = PostCustomerAsync(url, jSon).GetAwaiter().GetResult();
+                                            //HttpResponseMessage response2 = await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+                                            //if (response2.IsSuccessStatusCode)
+                                            //{
+                                                Satislem myDeserializedClass = JsonConvert.DeserializeObject<Satislem>(response2);
+                                                if (myDeserializedClass.success)
+                                                {
+                                                    conn.InsertValue($@"update SALES set SALUSEFIELD1 = '{cSales.OrderNumber}', SALDATE = '{cSales.OrderDate.ToString("yyyy-MM-dd")}', SALDIVISON = '{cSales.StoreWareHouseCode}' where SALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                    conn.InsertValue($@"update ORDERS set ORDDATE = '{cSales.OrderDate.ToString("yyyy-MM-dd")}', ORDDIVISON = '{cSales.StoreWareHouseCode}' where ORDSALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                    conn.InsertValue($@"update ORDERSCHILD set ORDCHSHIPDIV = '{cSales.StoreWareHouseCode}'  from ORDERSCHILD join ORDERS on ORDID = ORDCHORDID where ORDSALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                    var CURID = customers.FirstOrDefault(x => x.CustomerCode == cSales.CustomerCode).CURID;
+                                                    List<SALESINVESTIGATION> sALESINVESTIGATIONs = new List<SALESINVESTIGATION>
+                                                    {
+                                                        new SALESINVESTIGATION
+                                                        {
+                                                            SAINGTSALID = long.Parse(myDeserializedClass.results[1].ToString()),
+                                                            SAINGTPOSTSOCODE = "00KRO001",
+                                                            SAINGTCURORWRTRID = CURID,
+                                                            SAINGTWORKSTS = 0,
+                                                            SAINGTSOCODE= EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                                        }
+                                                    };
+                                                    var SALESINVESTIGATION = converter.ToDataTable(sALESINVESTIGATIONs);
+                                                    var BulkinsertRetourn = conn.BulkInsertRetorn(SALESINVESTIGATION, "SALESINVESTIGATION", sql);
+                                                }
+                                                else
+                                                {
+                                                    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(response2);
+                                                    Mesaj += item.CustomerCode + " nolu müşterinin " + cSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                                }
+                                            //}
+                                            //else
+                                            //{
+                                            //    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(response2);
+                                            //    Mesaj += item.CustomerCode + " nolu müşterinin " + cSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                            //    //myDeserializedClass2.message
+                                            //}
+                                        }
+                                        else
+                                        {
+                                            Mesaj += item.CustomerCode + " nolu müşterinin " + cSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : Daha Önce İşlenmiş Satış" + Environment.NewLine;
+                                        }
+                                    }
+                                }
+                                if (item.PaymentSales != null)
+                                {
+                                    foreach (var pSales in item.PaymentSales)
+                                    {
+                                        bool exists = salesOrderNumbers.Contains(pSales.OrderNumber);
+                                        if (!exists)
+                                        {
+                                            string url = Properties.Settings.Default.VolantApiUrl + "/sales";
+                                            string jSon = JsonConvert.SerializeObject(pSales, Formatting.Indented);
+                                            string requestBody = jSon;
+                                            var response3 = PostCustomerAsync(url, jSon).GetAwaiter().GetResult(); //await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+                                            //if (response3.IsSuccessStatusCode)
+                                            //{
+                                                Satislem myDeserializedClass = JsonConvert.DeserializeObject<Satislem>(response3);
+                                                if (myDeserializedClass.success)
+                                                {
+                                                    conn.InsertValue($@"update SALES set SALUSEFIELD1 = '{pSales.OrderNumber}', SALDATE = '{pSales.OrderDate.ToString("yyyy-MM-dd")}', SALDIVISON = '{pSales.StoreWareHouseCode}' where SALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                    conn.InsertValue($@"update INVOICE set INVDIVISON = '{pSales.StoreWareHouseCode}',INVDATE = '{pSales.OrderDate.ToString("yyyy-MM-dd")}' where INVSALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                    conn.InsertValue($@"
+                                                update PRODUCTSBEHAVE set PROBHDATE = '{pSales.OrderDate.ToString("yyyy-MM-dd")}' from PRODUCTSBEHAVE
+                                                left outer join INVOICECHILDPROBH on INVCHPBHPROBHID = PROBHID
+                                                left outer join INVOICECHILD on INVCHINVID = INVCHPBHID
+                                                left outer join INVOICE on INVID = INVCHINVID
+                                                where INVSALID = { myDeserializedClass.results[1].ToString() }", sql);
+                                                }
+                                                else
+                                                {
+                                                    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(response3);
+                                                    Mesaj += pSales.CustomerCode + " nolu müşterinin " + pSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                                }
+                                            //}
+                                            //else
+                                            //{
+                                            //    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(await response3.Content.ReadAsStringAsync());
+                                            //    Mesaj += pSales.CustomerCode + " nolu müşterinin " + pSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                            //    //myDeserializedClass2.message
+                                            //}
+                                        }
+                                        else
+                                        {
+                                            Mesaj += pSales.CustomerCode + " nolu müşterinin " + pSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : Daha Önce İşlenmiş Satış" + Environment.NewLine;
+                                        }
+
+                                    }
+                                }
                             }
                             else
                             {
-
-
-                                try
+                                if (item.CreaditSales != null)
                                 {
-                                    Musteri.MusteriYok MYOK1 = JsonConvert.DeserializeObject<Musteri.MusteriYok>(ss);
-                                    foreach (var validations in MYOK1.validations)
+                                    foreach (var cSales in item.CreaditSales)
                                     {
-                                        memoEdit1.Text += item.CustomerCode + " " + item.CustomerFirstName + " " + item.CustomerLastName + $@" işlem hatası : {validations.Message}" + "r\n\n";
+                                        string url = Properties.Settings.Default.VolantApiUrl + "/creditsales";
+                                        string jSon = JsonConvert.SerializeObject(cSales, Formatting.Indented);
+                                        string requestBody = jSon;
+                                        var response2 = PostCustomerAsync(url,jSon).GetAwaiter().GetResult();
+                                        //HttpResponseMessage response2 = await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+                                        //if (response2.IsSuccessStatusCode)
+                                        //{
+                                            Satislem myDeserializedClass = JsonConvert.DeserializeObject<Satislem>(response2);
+                                            if (myDeserializedClass.success)
+                                            {
+                                                conn.InsertValue($@"update SALES set SALUSEFIELD1 = '{cSales.OrderNumber}', SALDATE = '{cSales.OrderDate.ToString("yyyy-MM-dd")}', SALDIVISON = '{cSales.StoreWareHouseCode}' where SALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                conn.InsertValue($@"update ORDERS set ORDDATE = '{cSales.OrderDate.ToString("yyyy-MM-dd")}', ORDDIVISON = '{cSales.StoreWareHouseCode}' where ORDSALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                conn.InsertValue($@"update ORDERSCHILD set ORDCHSHIPDIV = '{cSales.StoreWareHouseCode}'  from ORDERSCHILD
+                            join ORDERS on ORDID = ORDCHORDID where ORDSALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                var CURID = customers.FirstOrDefault(x => x.CustomerCode == cSales.CustomerCode).CURID;
+                                                List<SALESINVESTIGATION> sALESINVESTIGATIONs = new List<SALESINVESTIGATION>
+                                                {
+                                                    new SALESINVESTIGATION
+                                                    {
+                                                        SAINGTSALID = long.Parse(myDeserializedClass.results[1].ToString()),
+                                                        SAINGTPOSTSOCODE = "00KRO001",
+                                                        SAINGTCURORWRTRID = CURID,
+                                                        SAINGTWORKSTS = 0,
+                                                        SAINGTSOCODE= EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                                    }
+                                                };
+                                                var SALESINVESTIGATION = converter.ToDataTable(sALESINVESTIGATIONs);
+                                                var BulkinsertRetourn = conn.BulkInsertRetorn(SALESINVESTIGATION, "SALESINVESTIGATION", sql);
+                                            }
+                                            else
+                                            {
+                                                Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(response2);
+                                                memoEdit1.Text += cSales.CustomerCode + " nolu müşterinin " + cSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                            }
+                                        //}
+                                        //else
+                                        //{
+                                        //    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(await response2.Content.ReadAsStringAsync());
+                                        //    memoEdit1.Text += cSales.CustomerCode + " nolu müşterinin " + cSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                        //    //myDeserializedClass2.message
+                                        //}
+                                    }
+
+                                }
+                                if (item.PaymentSales != null)
+                                {
+                                    foreach (var pSales in item.PaymentSales)
+                                    {
+                                        string url = Properties.Settings.Default.VolantApiUrl + "/sales";
+                                        string jSon = JsonConvert.SerializeObject(pSales, Formatting.Indented);
+                                        string requestBody = jSon;
+                                        var response3 = PostCustomerAsync(url,jSon).GetAwaiter().GetResult(); //await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+                                        //HttpResponseMessage response3 = await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+                                        //if (response3.IsSuccessStatusCode)
+                                        //{
+                                            Satislem myDeserializedClass = JsonConvert.DeserializeObject<Satislem>(response3);
+                                            if (myDeserializedClass.success)
+                                            {
+                                                conn.InsertValue($@"update SALES set SALUSEFIELD1 = '{pSales.OrderNumber}', SALDATE = '{pSales.OrderDate.ToString("yyyy-MM-dd")}', SALDIVISON = '{pSales.StoreWareHouseCode}' where SALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                conn.InsertValue($@"update INVOICE set INVDIVISON = '{pSales.StoreWareHouseCode}',INVDATE = '{pSales.OrderDate.ToString("yyyy-MM-dd")}' where INVSALID = {myDeserializedClass.results[1].ToString()}", sql);
+                                                conn.InsertValue($@"
+                                                update PRODUCTSBEHAVE set PROBHDATE = '{pSales.OrderDate.ToString("yyyy-MM-dd")}' from PRODUCTSBEHAVE
+                                                left outer join INVOICECHILDPROBH on INVCHPBHPROBHID = PROBHID
+                                                left outer join INVOICECHILD on INVCHINVID = INVCHPBHID
+                                                left outer join INVOICE on INVID = INVCHINVID
+                                                where INVSALID = { myDeserializedClass.results[1].ToString() }", sql);
+                                            }
+                                            else
+                                            {
+                                                Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(response3);
+                                                Mesaj += pSales.CustomerCode + " nolu müşterinin " + pSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                            }
+                                        //}
+                                        //else
+                                        //{
+                                        //    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(await response3.Content.ReadAsStringAsync());
+                                        //    Mesaj += pSales.CustomerCode + " nolu müşterinin " + pSales.OrderNumber + " satış kodlu işleminde " + $@" işlem hatası : {myDeserializedClass2.message}" + Environment.NewLine;
+                                        //    //myDeserializedClass2.message
+                                        //}
+
                                     }
                                 }
-                                catch (Exception)
-                                {
-                                    Musteri.MusteriHata MYOK2 = JsonConvert.DeserializeObject<Musteri.MusteriHata>(ss);
-                                    memoEdit1.Text += item.CustomerCode + " " + item.CustomerFirstName + " " + item.CustomerLastName + $@" işlem hatası : {MYOK2.message}" + "r\n\n";
-                                }
                             }
+                            progressForm.PerformStep(this);
+                        }
+                        catch (Exception ex)
+                        {
+                            Mesaj += item.CustomerCode + " nolu müşterinin işlem hatası :" + ex.Message + Environment.NewLine;
+                            //myDeserializedClass2.message
                         }
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var CURVAL = MVAR.results[3].ToString();
-                    var ID = conn.GetValue($@"select CURID from CURRENTS where CURVAL = '{MVAR.results[3].ToString()}'", sql);
-                    customers.Add(new CustomerInsert
+                    string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace} {Environment.NewLine} Inner: {ex.InnerException?.ToString()}";
+                    XtraMessageBox.Show(hataDetay,"",MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            },
+                    null, 
+                    () =>
                     {
-                        CURID = long.Parse(ID),
-                        CustomerCode = item.CustomerCode
+                        completeProgress();
+                        progressForm.Close();
+                        memoEdit1.Text = Mesaj;
+                        btnYeni.Enabled = true;
+                        navigationFrame1.SelectedPage = navigationPage1;
+                        memoEdit1.Visible = true;
+                        memoEdit1.Dock = DockStyle.Fill;
+                        spreadsheetControl1.Visible = false;
+                        GetMainRoods.Clear();
+                        //Worksheet worksheet = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
+                        //// Çalışma sayfasının içeriğini temizle
+                        //worksheet.Clear(worksheet.GetDataRange());
+                        //for (int i = spreadsheetControl1.Document.Worksheets.Count - 1; i >= 0; i--)
+                        //{
+                        //    var sheet = spreadsheetControl1.Document.Worksheets[i];
+                        //    if (sheet != spreadsheetControl1.Document.Worksheets.ActiveWorksheet)
+                        //    {
+                        //        spreadsheetControl1.Document.Worksheets.Remove(sheet);
+                        //    }
+                        //}
+                        //spreadsheetControl1.Document.Worksheets.ActiveWorksheet.Name = "Sheet1";
                     });
-
-                    string apiUrl2 = "api/customersUpdate" + queryString;
-                    HttpResponseMessage response2 = await httpClient.GetAsync(apiUrl2);
-                    string responseData2 = await response2.Content.ReadAsStringAsync();
-                }
-                //progressForm.PerformStep(this);
-            }
-            foreach (var item in GetCreaditSales)
-            {
-                string url = Properties.Settings.Default.VolantApiUrl + "/creditsales";
-                string jSon = JsonConvert.SerializeObject(item, Formatting.Indented);
-                string requestBody = jSon;
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Properties.Settings.Default.VolantToken);
-                HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
-                var sonucne = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                    Satislem myDeserializedClass = JsonConvert.DeserializeObject<Satislem>(await response.Content.ReadAsStringAsync());
-                    if (myDeserializedClass.success)
-                    {
-                        conn.InsertValue($@"update SALES set SALUSEFIELD1 = '{item.OrderNumber}', SALDATE = '{item.OrderDate.ToString("yyyy-MM-dd")}', SALDIVISON = '{item.StoreWareHouseCode}' where SALID = {myDeserializedClass.results[1].ToString()}", sql);
-                        conn.InsertValue($@"update ORDERS set ORDDATE = '{item.OrderDate.ToString("yyyy-MM-dd")}', ORDDIVISON = '{item.StoreWareHouseCode}' where ORDSALID = {myDeserializedClass.results[1].ToString()}", sql);
-                        conn.InsertValue($@"update ORDERSCHILD set ORDCHSHIPDIV = '{item.StoreWareHouseCode}'  from ORDERSCHILD
-                        join ORDERS on ORDID = ORDCHORDID where ORDSALID = {myDeserializedClass.results[1].ToString()}", sql);
-                        var CURID = customers.FirstOrDefault(x => x.CustomerCode == item.CustomerCode).CURID;
-                        List<SALESINVESTIGATION> sALESINVESTIGATIONs = new List<SALESINVESTIGATION>
-                        {
-                            new SALESINVESTIGATION
-                            {
-                                SAINGTSALID = long.Parse(myDeserializedClass.results[1].ToString()),
-                                SAINGTPOSTSOCODE = "00KR001",
-                                SAINGTCURORWRTRID = CURID,
-                                SAINGTWORKSTS = 0,
-                            }
-                        };
-                        var SALESINVESTIGATION = converter.ToDataTable(sALESINVESTIGATIONs);
-                        var BulkinsertRetourn = conn.BulkInsertRetorn(SALESINVESTIGATION, "SALESINVESTIGATION", sql);
-                    }
-                    else
-                    {
-
-                    }
-                }
-
-            }
-            foreach (var item in GetPaymentSales)
-            {
-                string url = Properties.Settings.Default.VolantApiUrl + "/sales";
-                string jSon = JsonConvert.SerializeObject(item, Formatting.Indented);
-                string requestBody = jSon;
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Properties.Settings.Default.VolantToken);
-                HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(requestBody, Encoding.UTF8, "application/json"));
-                var sonucne = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                    Satislem myDeserializedClass = JsonConvert.DeserializeObject<Satislem>(await response.Content.ReadAsStringAsync());
-                    if (myDeserializedClass.success)
-                    {
-                        conn.InsertValue($@"update SALES set SALUSEFIELD1 = '{item.OrderNumber}', SALDATE = '{item.OrderDate.ToString("yyyy-MM-dd")}', SALDIVISON = '{item.StoreWareHouseCode}' where SALID = {myDeserializedClass.results[1].ToString()}", sql);
-                        conn.InsertValue($@"update INVOICE set INVDIVISON = '{item.StoreWareHouseCode}',INVDATE = '{item.OrderDate.ToString("yyyy-MM-dd")}' where INVSALID = {myDeserializedClass.results[1].ToString()}", sql);
-                        conn.InsertValue($@"
-                        update PRODUCTSBEHAVE set PROBHDATE = '{item.OrderDate.ToString("yyyy-MM-dd")}' from PRODUCTSBEHAVE
-                        left outer join INVOICECHILDPROBH on INVCHPBHPROBHID = PROBHID
-                        left outer join INVOICECHILD on INVCHINVID = INVCHPBHID
-                        left outer join INVOICE on INVID = INVCHINVID
-                        where INVSALID = { myDeserializedClass.results[1].ToString() }", sql);
-                    }
-                    else
-                    {
-
-                    }
-                }
-                else
-                {
-                    Hata400 myDeserializedClass2 = JsonConvert.DeserializeObject<Hata400>(await response.Content.ReadAsStringAsync());
-                    memoEdit1.Text += item.CustomerCode + " " + item.OrderNumber + " " + $@" işlem hatası : {myDeserializedClass2.message}" + "r\n\n";
-                    //myDeserializedClass2.message
-                }
-
-            }
-            //}, 
-            //    null, 
-            //    () => 
-            //    {
-            //        progressForm.Close();
-            //        completeProgress();
-            //    });
         }
 
         private void ViewVeriler_MasterRowExpanded(object sender, CustomMasterRowEventArgs e)
@@ -1246,6 +1485,31 @@ namespace EntegrefKrediOnay.Merkez
                     childView.ExpandMasterRow(j);
                 }
             }
+        }
+
+        private void btnYeni_ItemClick(object sender, TileItemEventArgs e)
+        {
+            memoEdit1.Visible = false;
+            memoEdit1.Dock = DockStyle.Right;
+            spreadsheetControl1.Visible = true;
+
+            GetMainRoods.Clear();
+            Worksheet worksheet = spreadsheetControl1.Document.Worksheets.ActiveWorksheet;
+            // Çalışma sayfasının içeriğini temizle
+            worksheet.Clear(worksheet.GetDataRange());
+
+            CellRange usedRange = worksheet.GetUsedRange();
+            usedRange.AutoFitColumns();
+            usedRange.AutoFitRows();
+            for (int i = spreadsheetControl1.Document.Worksheets.Count - 1; i >= 0; i--)
+            {
+                var sheet = spreadsheetControl1.Document.Worksheets[i];
+                if (sheet != spreadsheetControl1.Document.Worksheets.ActiveWorksheet)
+                {
+                    spreadsheetControl1.Document.Worksheets.Remove(sheet);
+                }
+            }
+            spreadsheetControl1.Document.Worksheets.ActiveWorksheet.Name = "Sheet1";
         }
     }
 }

@@ -387,7 +387,7 @@ namespace EntegrefKrediOnay.Merkez
                         string name = line;
 
                         // Denek 1: Windows format = "01-01-20  12:00PM       <DIR>     FolderName"
-                        if (line.ToLower().Contains("<dir>"))
+                        if (line.Contains("<DIR>"))
                         {
                             isFolder = true;
                             // name = en son boşluktan sonrası
@@ -410,7 +410,7 @@ namespace EntegrefKrediOnay.Merkez
                                 int lastSpace = line.LastIndexOf(' ');
                                 if (lastSpace > 0)
                                 {
-                                    name = string.Join(" ", tokens.Skip(8));
+                                    name = tokens[3]; //string.Join(" ", tokens);
                                 }
                             }
                         }

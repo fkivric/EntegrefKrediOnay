@@ -148,117 +148,215 @@ namespace EntegrefKrediOnay.Magaza
             DataTable dt = new DataTable();
             this.Enabled = false;
             executeBackground(
-        () => {
+        () => 
+        {
             try
             {
-                Entegref.SplashScreen(this, "EntegreF", Properties.Settings.Default.Company, "Müşteriler Listeleniyor");
-
-                string filterText = ViewStoklar.ActiveFilterString;
-
-                if (string.IsNullOrWhiteSpace(filterText))
+                if (toggleSwitch1.IsOn)
                 {
-                    sqlQuery = $@"
-                    select distinct top 1000 CURID,CURVAL,CURNAME,
-                    sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
-                    case when IPID is not null then 'Var' else 'Yok' end as Kimlik
-                    from CURRENTS
-                    left outer join CUSIDENTITY on CUSIDCURID = CURID
-                    left outer join CUSTOMER on CURID = CUSCURID
-                    left outer join SALES on CURID = SALCURID
-                    left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
-                    where CURCUSTOMER = 1
-                    group by CURID,CURVAL,CURNAME,SALDATE,IPID
-                    option (fast 1000)";
-                }
-                else
-                {
-                    // Örnek: PRONAME filtresi varsa
-                    string provalFilter = GetFilterValue(ViewStoklar, "CURVAL");
-                    string pronameFilter = GetFilterValue(ViewStoklar, "CURNAME");
-                    if (!string.IsNullOrEmpty(pronameFilter))
+                    string filterText = ViewStoklar.ActiveFilterString;
+
+                    if (string.IsNullOrWhiteSpace(filterText))
                     {
                         sqlQuery = $@"
                     select distinct top 1000 CURID,CURVAL,CURNAME,
                     sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
-                    case when IPID is not null then 'Var' else 'Yok' end as Kimlik
+                    case when CUPIDENTITY is not null then 'Var' else 'Yok' end as Kimlik
                     from CURRENTS
                     left outer join CUSIDENTITY on CUSIDCURID = CURID
                     left outer join CUSTOMER on CURID = CUSCURID
                     left outer join SALES on CURID = SALCURID
-                    left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
-                    where CURCUSTOMER = 1
-                    and CURNAME LIKE '%{pronameFilter.Replace(" ", "%")}%'
-                    group by CURID,CURVAL,CURNAME,SALDATE,IPID
-                    UNION
-                    SELECT 0,NULL AS CURVAL, '{pronameFilter}' AS CURNAME,0 as SALAMOUNT, '' as SALDATE, '' AS DINSNAME
-                    WHERE NOT EXISTS (
-                    SELECT 1 FROM CURRENTS WHERE CURNAME LIKE '%{pronameFilter}%')
-                    order by 3 desc
+                    left outer join CUSTOMERPICTURE on CUPCURID = CURID
+                    where CURCUSTOMER = 1  and CUPIDENTITY is not NULL
+                    group by CURID,CURVAL,CURNAME,SALDATE,CUPIDENTITY
                     option (fast 1000)";
-
-                        //         SELECT TOP 100 PROID,PROVAL, PRONAME, PINVQUAN 
-                        //         FROM PRODUCTS 
-                        //outer apply (select PINVQUAN from PROINV 
-                        //left outer join DEFSTORAGE on DSTORID = PINVSTORID
-                        //where PINVYEAR = '' and PINVMONTH = ''
-                        //and PINVPROID = PROID and DSTORDIVISON = '{Entegref.GetLogins.userDIVVAL}') Env
-                        //         WHERE PRONAME LIKE '%{pronameFilter}%'
-                        //         UNION
-                        //         SELECT 0,NULL AS PROVAL, '{pronameFilter}' AS PRONAME, 0 AS PINVQUAN
-                        //         WHERE NOT EXISTS (
-                        //         SELECT 1 FROM PRODUCTS WHERE PRONAME LIKE '%{pronameFilter}%')
-                        //         order by 3 desc
-                        //         option (fast 100)";
-
-                    }
-                    else if (!string.IsNullOrEmpty(provalFilter))
-                    {
-                        sqlQuery = $@"
-                    select distinct top 1000 CURID,CURVAL,CURNAME,
-                    sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
-                    case when IPID is not null then 'Var' else 'Yok' end as Kimlik
-                    from CURRENTS
-                    left outer join CUSIDENTITY on CUSIDCURID = CURID
-                    left outer join CUSTOMER on CURID = CUSCURID
-                    left outer join SALES on CURID = SALCURID
-                    left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
-                    where CURCUSTOMER = 1
-                    and CURVAL LIKE '%{provalFilter}%'
-                    group by CURID,CURVAL,CURNAME,SALDATE,IPID
-                    order by CURNAME 
-                    UNION
-                    SELECT 0,'{provalFilter}' AS CURVAL, NULL AS CURNAME,0 as SALAMOUNT, '' as SALDATE, '' AS DINSNAME
-                    WHERE NOT EXISTS (
-                    SELECT 1 FROM CURRENTS WHERE CURVAL LIKE '%{provalFilter}%')
-                    order by 3 desc
-                    option (fast 100)";
                     }
                     else
                     {
-                        sqlQuery = $@"
-                    select distinct top 1000 CURID,CURVAL,CURNAME,
-                    sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
-                    case when IPID is not null then 'Var' else 'Yok' end as Kimlik
-                    from CURRENTS
-                    left outer join CUSIDENTITY on CUSIDCURID = CURID
-                    left outer join CUSTOMER on CURID = CUSCURID
-                    left outer join SALES on CURID = SALCURID
-                    left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
-                    where CURCUSTOMER = 1
-                    group by CURID,CURVAL,CURNAME,SALDATE,IPID
-                    option (fast 1000)";
+                        // Örnek: PRONAME filtresi varsa
+                        string provalFilter = GetFilterValue(ViewStoklar, "CURVAL");
+                        string pronameFilter = GetFilterValue(ViewStoklar, "CURNAME");
+                        if (!string.IsNullOrEmpty(pronameFilter))
+                        {
+                            sqlQuery = $@"
+                            select distinct top 1000 CURID,CURVAL,CURNAME,
+                            sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                            case when CUPIDENTITY is not null then 'Var' else 'Yok' end as Kimlik
+                            from CURRENTS
+                            left outer join CUSIDENTITY on CUSIDCURID = CURID
+                            left outer join CUSTOMER on CURID = CUSCURID
+                            left outer join SALES on CURID = SALCURID
+                            left outer join CUSTOMERPICTURE on CUPCURID = CURID
+                            where CURCUSTOMER = 1  and CUPIDENTITY is not NULL
+                            and CURNAME LIKE '%{pronameFilter.Replace(" ", "%")}%'
+                            group by CURID,CURVAL,CURNAME,SALDATE,CUPIDENTITY
+                            UNION
+                            SELECT 0,NULL AS CURVAL, '{pronameFilter}' AS CURNAME,0 as SALAMOUNT, '' as SALDATE, '' AS DINSNAME
+                            WHERE NOT EXISTS (
+                            SELECT 1 FROM CURRENTS WHERE CURNAME LIKE '%{pronameFilter}%')
+                            order by 3 desc
+                            option (fast 1000)";
+
+                            //         SELECT TOP 100 PROID,PROVAL, PRONAME, PINVQUAN 
+                            //         FROM PRODUCTS 
+                            //outer apply (select PINVQUAN from PROINV 
+                            //left outer join DEFSTORAGE on DSTORID = PINVSTORID
+                            //where PINVYEAR = '' and PINVMONTH = ''
+                            //and PINVPROID = PROID and DSTORDIVISON = '{Entegref.GetLogins.userDIVVAL}') Env
+                            //         WHERE PRONAME LIKE '%{pronameFilter}%'
+                            //         UNION
+                            //         SELECT 0,NULL AS PROVAL, '{pronameFilter}' AS PRONAME, 0 AS PINVQUAN
+                            //         WHERE NOT EXISTS (
+                            //         SELECT 1 FROM PRODUCTS WHERE PRONAME LIKE '%{pronameFilter}%')
+                            //         order by 3 desc
+                            //         option (fast 100)";
+
+                        }
+                        else if (!string.IsNullOrEmpty(provalFilter))
+                        {
+                            sqlQuery = $@"
+                            select distinct top 1000 CURID,CURVAL,CURNAME,
+                            sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                            case when CUPIDENTITY is not null then 'Var' else 'Yok' end as Kimlik
+                            from CURRENTS
+                            left outer join CUSIDENTITY on CUSIDCURID = CURID
+                            left outer join CUSTOMER on CURID = CUSCURID
+                            left outer join SALES on CURID = SALCURID
+                            left outer join CUSTOMERPICTURE on CUPCURID = CURID
+                            where CURCUSTOMER = 1  and CUPIDENTITY is not NULL
+                            and CURVAL LIKE '%{provalFilter}%'
+                            group by CURID,CURVAL,CURNAME,SALDATE,CUPIDENTITY
+                            order by CURNAME 
+                            UNION
+                            SELECT 0,'{provalFilter}' AS CURVAL, NULL AS CURNAME,0 as SALAMOUNT, '' as SALDATE, '' AS DINSNAME
+                            WHERE NOT EXISTS (
+                            SELECT 1 FROM CURRENTS WHERE CURVAL LIKE '%{provalFilter}%')
+                            order by 3 desc
+                            option (fast 100)";
+                        }
+                        else
+                        {
+                            sqlQuery = $@"
+                            select distinct top 1000 CURID,CURVAL,CURNAME,
+                            sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                            case when CUPIDENTITY is not null then 'Var' else 'Yok' end as Kimlik
+                            from CURRENTS
+                            left outer join CUSIDENTITY on CUSIDCURID = CURID
+                            left outer join CUSTOMER on CURID = CUSCURID
+                            left outer join SALES on CURID = SALCURID
+                            left outer join CUSTOMERPICTURE on CUPCURID = CURID
+                            where CURCUSTOMER = 1  and CUPIDENTITY is not NULL
+                            group by CURID,CURVAL,CURNAME,SALDATE,CUPIDENTITY
+                            option (fast 1000)";
+                        }
                     }
+                    dt = conn.GetData(sqlQuery, Properties.Settings.Default.connectionstring);
                 }
-                dt = conn.GetData(sqlQuery, Properties.Settings.Default.connectionstring);
+                else
+                {
+                    string filterText = ViewStoklar.ActiveFilterString;
+
+                    if (string.IsNullOrWhiteSpace(filterText))
+                    {
+                        sqlQuery = $@"
+                        select distinct top 1000 CURID,CURVAL,CURNAME,
+                        sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                        case when IPID is not null then 'Var' else 'Yok' end as Kimlik
+                        from CURRENTS
+                        left outer join CUSIDENTITY on CUSIDCURID = CURID
+                        left outer join CUSTOMER on CURID = CUSCURID
+                        left outer join SALES on CURID = SALCURID
+                        left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
+                        where CURCUSTOMER = 1
+                        group by CURID,CURVAL,CURNAME,SALDATE,IPID
+                        option (fast 1000)";
+                    }
+                    else
+                    {
+                        // Örnek: PRONAME filtresi varsa
+                        string provalFilter = GetFilterValue(ViewStoklar, "CURVAL");
+                        string pronameFilter = GetFilterValue(ViewStoklar, "CURNAME");
+                        if (!string.IsNullOrEmpty(pronameFilter))
+                        {
+                            sqlQuery = $@"
+                            select distinct top 1000 CURID,CURVAL,CURNAME,
+                            sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                            case when IPID is not null then 'Var' else 'Yok' end as Kimlik
+                            from CURRENTS
+                            left outer join CUSIDENTITY on CUSIDCURID = CURID
+                            left outer join CUSTOMER on CURID = CUSCURID
+                            left outer join SALES on CURID = SALCURID
+                            left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
+                            where CURCUSTOMER = 1
+                            and CURNAME LIKE '%{pronameFilter.Replace(" ", "%")}%'
+                            group by CURID,CURVAL,CURNAME,SALDATE,IPID
+                            UNION
+                            SELECT 0,NULL AS CURVAL, '{pronameFilter}' AS CURNAME,0 as SALAMOUNT, '' as SALDATE, '' AS DINSNAME
+                            WHERE NOT EXISTS (
+                            SELECT 1 FROM CURRENTS WHERE CURNAME LIKE '%{pronameFilter}%')
+                            order by 3 desc
+                            option (fast 1000)";
+
+                            //         SELECT TOP 100 PROID,PROVAL, PRONAME, PINVQUAN 
+                            //         FROM PRODUCTS 
+                            //outer apply (select PINVQUAN from PROINV 
+                            //left outer join DEFSTORAGE on DSTORID = PINVSTORID
+                            //where PINVYEAR = '' and PINVMONTH = ''
+                            //and PINVPROID = PROID and DSTORDIVISON = '{Entegref.GetLogins.userDIVVAL}') Env
+                            //         WHERE PRONAME LIKE '%{pronameFilter}%'
+                            //         UNION
+                            //         SELECT 0,NULL AS PROVAL, '{pronameFilter}' AS PRONAME, 0 AS PINVQUAN
+                            //         WHERE NOT EXISTS (
+                            //         SELECT 1 FROM PRODUCTS WHERE PRONAME LIKE '%{pronameFilter}%')
+                            //         order by 3 desc
+                            //         option (fast 100)";
+
+                        }
+                        else if (!string.IsNullOrEmpty(provalFilter))
+                        {
+                            sqlQuery = $@"
+                            select distinct top 1000 CURID,CURVAL,CURNAME,
+                            sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                            case when IPID is not null then 'Var' else 'Yok' end as Kimlik
+                            from CURRENTS
+                            left outer join CUSIDENTITY on CUSIDCURID = CURID
+                            left outer join CUSTOMER on CURID = CUSCURID
+                            left outer join SALES on CURID = SALCURID
+                            left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
+                            where CURCUSTOMER = 1
+                            and CURVAL LIKE '%{provalFilter}%'
+                            group by CURID,CURVAL,CURNAME,SALDATE,IPID
+                            order by CURNAME 
+                            UNION
+                            SELECT 0,'{provalFilter}' AS CURVAL, NULL AS CURNAME,0 as SALAMOUNT, '' as SALDATE, '' AS DINSNAME
+                            WHERE NOT EXISTS (
+                            SELECT 1 FROM CURRENTS WHERE CURVAL LIKE '%{provalFilter}%')
+                            order by 3 desc
+                            option (fast 100)";
+                        }
+                        else
+                        {
+                            sqlQuery = $@"
+                            select distinct top 1000 CURID,CURVAL,CURNAME,
+                            sum(case when SALID > 0 then SALAMOUNT else -1*SALAMOUNT end) as SALAMOUNT,SALDATE,
+                            case when IPID is not null then 'Var' else 'Yok' end as Kimlik
+                            from CURRENTS
+                            left outer join CUSIDENTITY on CUSIDCURID = CURID
+                            left outer join CUSTOMER on CURID = CUSCURID
+                            left outer join SALES on CURID = SALCURID
+                            left outer join EntegreF..IDENTYPICTURE on IPIDENTY = CUSIDTCNO
+                            where CURCUSTOMER = 1
+                            group by CURID,CURVAL,CURNAME,SALDATE,IPID
+                            option (fast 1000)";
+                        }
+                    }
+                    dt = conn.GetData(sqlQuery, Properties.Settings.Default.connectionstring);
+                }
             }
             catch (Exception ex)
             {
                 string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
                 CustomMessageBox.ShowMessage("İşlem Hatası Detaya Bekanız", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            finally
-            {
-                DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm(false, 1000, this);
             }
         },
         
@@ -313,6 +411,11 @@ namespace EntegrefKrediOnay.Magaza
                 e.Handled = true; // Enter tuşunun gridde başka işlem yapmasını engelle
             }
 
+        }
+
+        private void toggleSwitch1_Toggled(object sender, EventArgs e)
+        {
+            ApplyFilterAndReloadData();
         }
     }
 }

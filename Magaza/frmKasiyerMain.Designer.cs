@@ -189,6 +189,7 @@
             // 
             this.xtraTabControl.ClosePageButtonShowMode = DevExpress.XtraTab.ClosePageButtonShowMode.InAllTabPagesAndTabControlHeader;
             this.xtraTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.xtraTabControl.Images = this.ımageCollection1;
             this.xtraTabControl.Location = new System.Drawing.Point(0, 158);
             this.xtraTabControl.MultiLine = DevExpress.Utils.DefaultBoolean.True;
             this.xtraTabControl.Name = "xtraTabControl";

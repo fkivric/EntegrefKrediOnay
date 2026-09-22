@@ -156,7 +156,7 @@ namespace EntegrefKrediOnay.Class
 
             public string SAINGTPOSTSOCODE { get; set; }
 
-            public string SAINGTSOCODE { get; set; } = EntegreFDLL.Class.Entegref.GetLogins.userID;
+            public string SAINGTSOCODE { get; set; }
 
             public DateTime SAINGTDATETIME { get; set; } = DateTime.Now;
 

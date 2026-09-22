@@ -35,9 +35,10 @@ namespace EntegrefKrediOnay
         EntegreFDLL.Class.BGClass BGClass = new BGClass();
         public List<Musteriler> musterilers = new List<Musteriler>();
         public frmMusteri()
-        {   try
+        {
+            try
             {
-                EntegreFDLL.Class.Entegref.SplashScreen(this, "Saha Yönetim Destek Tools",Properties.Settings.Default.Company, "Satış Onay Açılıyor");
+                EntegreFDLL.Class.Entegref.SplashScreen(this, "Saha Yönetim Destek Tools",Properties.Settings.Default.Company, "Müşteri İşlem Merkezi Açılıyor");
                 InitializeComponent();
                 DevExpress.LookAndFeel.UserLookAndFeel.Default.SkinName = "McSkin";
                 DefaultLookAndFeel defaultLookAndFeel = new DefaultLookAndFeel();
@@ -75,6 +76,8 @@ namespace EntegrefKrediOnay
         }
         EntegreFDLL.Class.BGClass GetBGClass = new EntegreFDLL.Class.BGClass();
         SqlConnectionObject conn = new SqlConnectionObject();
+        string sql1 = Properties.Settings.Default.connectionstring;
+        string sql2 = Properties.Settings.Default.connectionstring2;
         private Image kimlikresmi;
         private Image Portreresmi;
         public static string CURVAL = "";
@@ -232,7 +235,6 @@ namespace EntegrefKrediOnay
             DataTable urunler = new DataTable();
             DataTable ekstre = new DataTable();
             DataTable gecikmedetay = new DataTable();
-            DataTable Taksitler = new DataTable();
             DataTable TaksitDetayi = new DataTable();
             DataTable kimlik = new DataTable();
             DataTable IsBilgisi = new DataTable();
@@ -246,69 +248,70 @@ namespace EntegrefKrediOnay
             SatisAcik = true;
             RiskYuzdesi = "";
             Geciken = 0;
-
-            Entegref.SplashScreen(this, "", Properties.Settings.Default.CompanyName, "");
-            try
-            {
-                raporSalids = string.Join(",", musterilers
-                .Where(m => m.CURID == CURID)
-                .Select(m => m.SALID));
-
-                var qs = string.Format("select CUPIDENTITY,CUPPORTRAIT from CUSTOMERPICTURE where CUPCURID = '{0}'", CURID);// sabit "1993863"
-                kimlik = conn.GetData(qs, Properties.Settings.Default.connectionstring);
-
-                if (kimlik != null)
+            await SplashScrenn.RunWithSplashAsync(this, false, 0, this.Text,
+                async (progress, token) =>
                 {
-                    var datakimlik = kimlik.Rows[0]["CUPIDENTITY"].ToString();
-                    if (kimlik.Rows[0]["CUPIDENTITY"].ToString() != "")
+                    await Task.Delay(100, token);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report((0, $"Yükleniyor... "));
+
+
+                    try
                     {
-                        kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(kimlik.Rows[0]["CUPIDENTITY"].ToString()).byteArrayToImage();
-                        Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(kimlik.Rows[0]["CUPPORTRAIT"].ToString()).byteArrayToImage();
-                        pictureEdit1.Image = Portreresmi;
-                    }
-                    else
-                    {
-                        kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
-                        Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
-                        pictureEdit1.Image = null;
-                        string rtfMessage = @"{\rtf1\ansi{\colortbl ;\red255\green0\blue0;}\fs16 " +
-                          "Müşteri Kimlik Taraması Eklenmemiş\\line" +
-                          "\\b\\ul\\cf1 Sonki Alışverişler Kimlik Yüklenen Kadar Kapatılacak.\\b0\\ulnone\\cf0 }";
-                        CustomMessageBox.ShowMessage(rtfMessage, "", this, "UYARI", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        SatisAcik = false;
-                    }
-                }
-                else
-                {
-                    var tarama = conn.GetData($@"select IPPORTRAIT,IPFULLSIDE from EntegreF..IDENTYPICTURE
+                        raporSalids = string.Join(",", musterilers
+                        .Where(m => m.CURID == CURID)
+                        .Select(m => m.SALID));
+
+                        var qs = string.Format("select CUPIDENTITY,CUPPORTRAIT from CUSTOMERPICTURE where CUPCURID = '{0}'", CURID);// sabit "1993863"
+                        kimlik = conn.GetData(qs, Properties.Settings.Default.connectionstring);
+
+                        if (kimlik != null)
+                        {
+                            var datakimlik = kimlik.Rows[0]["CUPIDENTITY"].ToString();
+                            if (kimlik.Rows[0]["CUPIDENTITY"].ToString() != "")
+                            {
+                                kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(kimlik.Rows[0]["CUPIDENTITY"].ToString()).byteArrayToImage();
+                                Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(kimlik.Rows[0]["CUPPORTRAIT"].ToString()).byteArrayToImage();
+                                pictureEdit1.Image = Portreresmi;
+                            }
+                            else
+                            {
+                                kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
+                                Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
+                                pictureEdit1.Image = null;
+                            }
+                        }
+                        else
+                        {
+                            var tarama = conn.GetData($@"select IPPORTRAIT,IPFULLSIDE from EntegreF..IDENTYPICTURE
                         left outer join CUSIDENTITY on CUSIDTCNO = IPIDENTY
                         where CUSIDCURID = {CURID}", Properties.Settings.Default.connectionstring);
-                    //if (tarama != null)
-                    //{
-                    //    var CUPIDENTITY = kimlik.Rows[0]["IPPORTRAIT"].ToString();
-                    //    var CUPPORTRAIT = kimlik.Rows[0]["IPFULLSIDE"].ToString();
-                    //    kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(CUPIDENTITY).byteArrayToImage();
-                    //    Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(CUPPORTRAIT).byteArrayToImage();
-                    //    pictureEdit1.Image = Portreresmi;
-                    //}
-                    //else
-                    //{
-                    kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
-                    Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
-                    pictureEdit1.Image = null;
-                    string rtfMessage = @"{\rtf1\ansi{\colortbl ;\red255\green0\blue0;}\fs16 " +
-                      "Müşteri Kimlik Taraması Eklenmemiş\\line" +
-                      "\\b\\ul\\cf1 Sonki Alışverişler Kimlik Yüklenen Kadar Kapatılacak.\\b0\\ulnone\\cf0 }";
-                    //XtraMessageBox.Show(rtfMessage);
-                    //CustomMessageBox.ShowMessage(rtfMessage, "", this, "UYARI", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    SatisAcik = false;
-                    //}
-                }
-                //Image resim = Class.Convert.FromBase64String(kimlikresmi).byteArrayToImage();
-                //string kaydetmeYolu = "resmi.png";
-                //resim.Save(kaydetmeYolu);
+                            //if (tarama != null)
+                            //{
+                            //    var CUPIDENTITY = kimlik.Rows[0]["IPPORTRAIT"].ToString();
+                            //    var CUPPORTRAIT = kimlik.Rows[0]["IPFULLSIDE"].ToString();
+                            //    kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(CUPIDENTITY).byteArrayToImage();
+                            //    Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String(CUPPORTRAIT).byteArrayToImage();
+                            //    pictureEdit1.Image = Portreresmi;
+                            //}
+                            //else
+                            //{
+                            kimlikresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
+                            Portreresmi = EntegreFDLL.Class.VolantConvert.FromBase64String("").byteArrayToImage();
+                            pictureEdit1.Image = null;
+                            string rtfMessage = @"{\rtf1\ansi{\colortbl ;\red255\green0\blue0;}\fs16 " +
+                              "Müşteri Kimlik Taraması Eklenmemiş\\line" +
+                              "\\b\\ul\\cf1 Sonki Alışverişler Kimlik Yüklenen Kadar Kapatılacak.\\b0\\ulnone\\cf0 }";
+                            //XtraMessageBox.Show(rtfMessage);
+                            //CustomMessageBox.ShowMessage(rtfMessage, "", this, "UYARI", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            SatisAcik = false;
+                            //}
+                        }
+                        //Image resim = Class.Convert.FromBase64String(kimlikresmi).byteArrayToImage();
+                        //string kaydetmeYolu = "resmi.png";
+                        //resim.Save(kaydetmeYolu);
 
-                urunler = conn.GetData($@"select PROVAL as [Stok Kodu],PRONAME as [Stok Adı],ORDCHQUAN as [Satış Adeti],ORDCHBALANCE as [Satış Tutarı],
+                        urunler = conn.GetData($@"select PROVAL as [Stok Kodu],PRONAME as [Stok Adı],ORDCHQUAN as [Satış Adeti],ORDCHBALANCE as [Satış Tutarı],
                         case when (select SALAMOUNT from SALES where SALID = ORDSALID) <= Risk_TutarMax then Risk_id else Risk_id+1 end as Risktutar,
                         case when ORDCHBALANCE >= Risk_TutarMax then Risk_id+1 else Risk_id end as Riskid ,
                         SMENNAME as [Satış Yapan Satıcı]
@@ -334,78 +337,81 @@ namespace EntegrefKrediOnay
                         group by DIVNAME,Risk_Adi,p.id
                         order by 1 desc", Properties.Settings.Default.connectionstring);
 
-                ekstre = conn.GetData($@"select * from(
-                        select 2 as sira,SALID as ID,SALDATE as tarih,DIVNAME as MagazaAdı,
-                        case when SALID > 0 then 'Alışveriş Toplamı' else 'İade Toplamı' end as Tip,
-                        case when SALID > 0 then 'Alışveriş Toplamı' else 'İade Toplamı' end as [Ürün Kodu],
-                        case when SALID > 0 then 'Alışveriş Toplamı' else 'İade Toplamı' end as [Ürün Adı],
-                        isnull(case when ORDCHQUAN != 0 then case when SALID < 0 then -1*ORDCHQUAN else ORDCHQUAN end else case when SALID < 0 then -1*INVCHQUAN else INVCHQUAN end end, 0) as [Satılan Adet], 
-                        isnull(case when SALID < 0 then -1*ORDCHBALANCE else ORDCHBALANCE end, 0) as [Teslimat Bekleyen Adet],
-                        case when SALID < 0 then -1*SALAMOUNT else SALAMOUNT end as [Alisveriş Tutar],
-                        cast(TaksitToplam as Char(2)) + '/' + cast(TaksitKalan as Char(2)) as [Kalan Taksit Sayısı], '' as Satici
-                        from SALES
-                        left outer join DIVISON on DIVVAL = SALDIVISON
-                        outer apply(select SUM(isnull(ORDCHQUAN, 0)) as ORDCHQUAN from ORDERS
-                                    left outer join ORDERSCHILD on ORDID = ORDCHORDID
-                                    where SALID = ORDSALID) ORDERSCHILD
-                                    outer apply(select SUM(isnull(ORDCHBALANCEQUAN, 0)) as ORDCHBALANCE from ORDERS
-                                    left outer join ORDERSCHILD on ORDID = ORDCHORDID
-                                    where SALID = ORDSALID) ORDERSCHILDBALANCE
-                        outer apply(select SUM(isnull(PROBHQUAN, 0)) as INVCHQUAN from INVOICE
-                                    left outer join INVOICECHILD on INVID = INVCHINVID
-                                    left outer join INVOICECHILDPROBH on INVCHPBHID = INVCHID
-                                    left outer join PRODUCTSBEHAVE on PROBHID = INVCHPBHPROBHID
-                                    where SALID = INVSALID) INVOICECHILD
-                        outer apply (select count(*) as TaksitToplam from INSTALMENT where INSSALID = SALID) INSTALMENTCount
-                        outer apply (select count(*) as TaksitKalan from INSTALMENT where INSSALID = SALID and INSBALANCE > 0) INSTALMENT
-                        where SALCURID = {CURID}
-                        union all
-                        select 1 as sira, ORDSALID as ID,ORDDATE as tarih,DIVNAME as MagazaAdı,
-                        case when SALID > 0 and SALAMOUNT != 0 then 'Ürünler' else 'İade Ürünler' end,PROVAL,PRONAME,
-                        case when SALID < 0 then -1*ORDCHQUAN else ORDCHQUAN end,
-                        case when SALID < 0 then -1*ORDCHBALANCEQUAN else ORDCHBALANCEQUAN end,
-                        case when SALID < 0 then -1*ORDCHBALANCE else ORDCHBALANCE end AlisverisTutar,'', SMENNAME from ORDERS
-                        left outer join SALES on SALID = ORDSALID
-                        left outer join ORDERSCHILD on ORDID = ORDCHORDID
-                        left outer join PRODUCTS on PROID = ORDCHPROID
-                        left outer join SALESMEN on SMENID = ORDCHSMENID
-                        left outer join DIVISON on DIVVAL = ORDDIVISON
-                        where ORDCURID = {CURID}
-                        and SALSHIPKIND = 'S'
-                        union all
-                        select 1 as sira, SALID as ID,INVDATE as tarih,DIVNAME as MagazaAdı,
-                        case when SALID > 0 and SALAMOUNT = 0 then 'VADE FARKI'
-                        when SALID > 0 and SALAMOUNT != 0 then 'Ürünler' else 'İade Ürünler' end,PROVAL,PRONAME,
-                        case when SALID < 0 then -1*PROBHQUAN else PROBHQUAN end,
-                        case when SALID < 0 then -1*PROBHQUAN else PROBHQUAN end,
-                        case when SALID < 0 then -1*INVCHBALANCE else INVCHBALANCE end AlisverisTutar,'', SMENNAME from INVOICE
-                        left outer join SALES on SALID = INVSALID 
-                        left outer join INVOICECHILD on INVID = INVCHINVID
-                        left outer join INVOICECHILDPROBH on INVCHPBHID = INVCHID
-                        left outer join PRODUCTSBEHAVE on PROBHID = INVCHPBHPROBHID
-                        left outer join PRODUCTS on PROID = PROBHPROID
-                        left outer join SALESMEN on SMENID = INVCHSMENID
-                        left outer join DIVISON on DIVVAL = INVDIVISON
-                        where SALCURID = {CURID}
-                        and SALSHIPKIND = 'H'
-                        union all
-                        select 1 as sira, 99999999 as ID,PCDSDATE as tarih,DIVNAME as MagazaAdı,
-                        case when PCDSDC = 0 then 'Ödeme' else 'Ödeme İadesi' end,'','',0,0,
-                        case when PCDSDC = 0 then PCDSAMOUNT else PCDSAMOUNT *-1 end AlisverisTutar,'', SONAME +' ' + SOSURNAME from PROCEEDS
-                        left outer join CASHIER on CHVAL = PCDSCASHIER
-                        left outer join SOCIAL on SOCODE = CHSOCODE
-                        left outer join DIVISON on DIVVAL = PCDSDIVISON
-                        where PCDSCURID = {CURID}
-                        ) net
-                        order by 3,2,1", Properties.Settings.Default.connectionstring);
+                        Dictionary<string, string> keys = new Dictionary<string, string>();
+                        keys.Add("@curID", CURID);
+                        ekstre = conn.DicQuery("Ekstre", keys, Properties.Settings.Default.connectionstring);
+                        //ekstre = conn.GetData($@"select * from(
+                        //select 2 as sira,SALID as ID,SALDATE as tarih,DIVNAME as MagazaAdı,
+                        //case when SALID > 0 then 'Alışveriş Toplamı' else 'İade Toplamı' end as Tip,
+                        //case when SALID > 0 then 'Alışveriş Toplamı' else 'İade Toplamı' end as [Ürün Kodu],
+                        //case when SALID > 0 then 'Alışveriş Toplamı' else 'İade Toplamı' end as [Ürün Adı],
+                        //isnull(case when ORDCHQUAN != 0 then case when SALID < 0 then -1*ORDCHQUAN else ORDCHQUAN end else case when SALID < 0 then -1*INVCHQUAN else INVCHQUAN end end, 0) as [Satılan Adet], 
+                        //isnull(case when SALID < 0 then -1*ORDCHBALANCE else ORDCHBALANCE end, 0) as [Teslimat Bekleyen Adet],
+                        //case when SALID < 0 then -1*SALAMOUNT else SALAMOUNT end as [Alisveriş Tutar],
+                        //cast(TaksitToplam as Char(2)) + '/' + cast(TaksitKalan as Char(2)) as [Kalan Taksit Sayısı], '' as Satici
+                        //from SALES
+                        //left outer join DIVISON on DIVVAL = SALDIVISON
+                        //outer apply(select SUM(isnull(ORDCHQUAN, 0)) as ORDCHQUAN from ORDERS
+                        //            left outer join ORDERSCHILD on ORDID = ORDCHORDID
+                        //            where SALID = ORDSALID) ORDERSCHILD
+                        //            outer apply(select SUM(isnull(ORDCHBALANCEQUAN, 0)) as ORDCHBALANCE from ORDERS
+                        //            left outer join ORDERSCHILD on ORDID = ORDCHORDID
+                        //            where SALID = ORDSALID) ORDERSCHILDBALANCE
+                        //outer apply(select SUM(isnull(PROBHQUAN, 0)) as INVCHQUAN from INVOICE
+                        //            left outer join INVOICECHILD on INVID = INVCHINVID
+                        //            left outer join INVOICECHILDPROBH on INVCHPBHID = INVCHID
+                        //            left outer join PRODUCTSBEHAVE on PROBHID = INVCHPBHPROBHID
+                        //            where SALID = INVSALID) INVOICECHILD
+                        //outer apply (select count(*) as TaksitToplam from INSTALMENT where INSSALID = SALID) INSTALMENTCount
+                        //outer apply (select count(*) as TaksitKalan from INSTALMENT where INSSALID = SALID and INSBALANCE > 0) INSTALMENT
+                        //where SALCURID = {CURID}
+                        //union all
+                        //select 1 as sira, ORDSALID as ID,ORDDATE as tarih,DIVNAME as MagazaAdı,
+                        //case when SALID > 0 and SALAMOUNT != 0 then 'Ürünler' else 'İade Ürünler' end,PROVAL,PRONAME,
+                        //case when SALID < 0 then -1*ORDCHQUAN else ORDCHQUAN end,
+                        //case when SALID < 0 then -1*ORDCHBALANCEQUAN else ORDCHBALANCEQUAN end,
+                        //case when SALID < 0 then -1*ORDCHBALANCE else ORDCHBALANCE end AlisverisTutar,'', SMENNAME from ORDERS
+                        //left outer join SALES on SALID = ORDSALID
+                        //left outer join ORDERSCHILD on ORDID = ORDCHORDID
+                        //left outer join PRODUCTS on PROID = ORDCHPROID
+                        //left outer join SALESMEN on SMENID = ORDCHSMENID
+                        //left outer join DIVISON on DIVVAL = ORDDIVISON
+                        //where ORDCURID = {CURID}
+                        //and SALSHIPKIND = 'S'
+                        //union all
+                        //select 1 as sira, SALID as ID,INVDATE as tarih,DIVNAME as MagazaAdı,
+                        //case when SALID > 0 and SALAMOUNT = 0 then 'VADE FARKI'
+                        //when SALID > 0 and SALAMOUNT != 0 then 'Ürünler' else 'İade Ürünler' end,PROVAL,PRONAME,
+                        //case when SALID < 0 then -1*PROBHQUAN else PROBHQUAN end,
+                        //case when SALID < 0 then -1*PROBHQUAN else PROBHQUAN end,
+                        //case when SALID < 0 then -1*INVCHBALANCE else INVCHBALANCE end AlisverisTutar,'', SMENNAME from INVOICE
+                        //left outer join SALES on SALID = INVSALID 
+                        //left outer join INVOICECHILD on INVID = INVCHINVID
+                        //left outer join INVOICECHILDPROBH on INVCHPBHID = INVCHID
+                        //left outer join PRODUCTSBEHAVE on PROBHID = INVCHPBHPROBHID
+                        //left outer join PRODUCTS on PROID = PROBHPROID
+                        //left outer join SALESMEN on SMENID = INVCHSMENID
+                        //left outer join DIVISON on DIVVAL = INVDIVISON
+                        //where SALCURID = {CURID}
+                        //and SALSHIPKIND = 'H'
+                        //union all
+                        //select 1 as sira, 99999999 as ID,PCDSDATE as tarih,DIVNAME as MagazaAdı,
+                        //case when PCDSDC = 0 then 'Ödeme' else 'Ödeme İadesi' end,'','',0,0,
+                        //case when PCDSDC = 0 then PCDSAMOUNT else PCDSAMOUNT *-1 end AlisverisTutar,'', SONAME +' ' + SOSURNAME from PROCEEDS
+                        //left outer join CASHIER on CHVAL = PCDSCASHIER
+                        //left outer join SOCIAL on SOCODE = CHSOCODE
+                        //left outer join DIVISON on DIVVAL = PCDSDIVISON
+                        //where PCDSCURID = {CURID}
+                        //) net
+                        //order by 3,2,1", Properties.Settings.Default.connectionstring);
 
-                Pesin = double.Parse(conn.GetValueConnection($@"
+                        Pesin = double.Parse(conn.GetValueConnection($@"
                         select isnull(sum(SALAMOUNT),0) from SALES
                         where SALCURID = {CURID}
                         --AND SALID not in ({raporSalids})
                         AND SALSALEKIND = 'P'", Properties.Settings.Default.connectionstring));
 
-                Taksitli = double.Parse(conn.GetValueConnection($@"
+                        Taksitli = double.Parse(conn.GetValueConnection($@"
                         select isnull(sum(SALAMOUNT),0)  from SALES s
                         where SALCURID = {CURID}
                         and SALID > 0
@@ -413,20 +419,20 @@ namespace EntegrefKrediOnay
                         --AND SALID not in ({raporSalids})
                         AND SALSALEKIND = 'T'", Properties.Settings.Default.connectionstring));
 
-                Odenen = double.Parse(conn.GetValueConnection($@"
+                        Odenen = double.Parse(conn.GetValueConnection($@"
                         select 
                         isnull(sum(case when PCDSDC = 0 then (PCDSAMOUNT-PCDSEARLYPAYDISC) else (PCDSAMOUNT-PCDSEARLYPAYDISC)*-1 end +PCDSEARLYPAYDISC+PCDSLATEINCOME),0)
                         from PROCEEDS 
                         where PCDSCURID = {CURID} and (PCDSKIND != 2 and PCDSKIND > 0)", Properties.Settings.Default.connectionstring));
 
-                Kalan = double.Parse(conn.GetValueConnection($@"
+                        Kalan = double.Parse(conn.GetValueConnection($@"
                         select isnull(sum(INSBALANCE),0)  from INSTALMENT
                         where INSCURID = {CURID}
                         --AND INSSALID not in ({raporSalids})
                         AND INSBALANCE > 0", Properties.Settings.Default.connectionstring));
 
-                gecikmedetay = conn.GetData($@"select count(*) ,isnull(sum(PCDSLATEINCOME), 0) from PROCEEDS where PCDSCURID = {CURID} and isnull(PCDSLATEINCOME,0) != 0", Properties.Settings.Default.connectionstring);
-                Ortalama = conn.GetValueConnection($@"
+                        gecikmedetay = conn.GetData($@"select count(*) ,isnull(sum(PCDSLATEINCOME), 0) from PROCEEDS where PCDSCURID = {CURID} and isnull(PCDSLATEINCOME,0) != 0", Properties.Settings.Default.connectionstring);
+                        Ortalama = conn.GetValueConnection($@"
                         select isnull(sum(DATEDIFF(Day,INSFIXDATE,PCDSDATE))/count(*),0) from INSTALMENT
                         outer apply(select PCDSDATE from INSTALMENTPROCEEDS 
 			                        left outer join PROCEEDS on PCDSID = INSPCDPCDID
@@ -434,18 +440,18 @@ namespace EntegrefKrediOnay
 			                        and INSPCDLATEINCOME != 0) odeme
                          where INSCURID = {CURID}  and odeme.PCDSDATE is not NULL", Properties.Settings.Default.connectionstring);
 
-                var gc = conn.GetData($@"
+                        var gc = conn.GetData($@"
                         select isnull(sum(isnull(INSBALANCE,0)),0) as Tutar, isnull(min(INSFIXDATE),0) as Tarih from INSTALMENT
                         where INSCURID = {CURID}
                         --AND INSSALID not in ({raporSalids})
                         AND INSBALANCE > 0
                         AND INSFIXDATE between '2000-01-01' and DATEADD(day,-60, GETDATE())", Properties.Settings.Default.connectionstring);
-                if (gc != null)
-                {
-                    Geciken = double.Parse(gc.Rows[0][0].ToString());
-                    GecikmeTarihi = DateTime.Parse(gc.Rows[0][1].ToString()).ToString("yyyy-MM-dd");
-                }
-                RiskYuzdesi = conn.GetValueConnection($@"
+                        if (gc != null)
+                        {
+                            Geciken = double.Parse(gc.Rows[0][0].ToString());
+                            GecikmeTarihi = DateTime.Parse(gc.Rows[0][1].ToString()).ToString("yyyy-MM-dd");
+                        }
+                        RiskYuzdesi = conn.GetValueConnection($@"
                         select ROUND(RiskYuzdesi,0) from (
                         select ROUND(sum(SALAMOUNT),0) as SALAMOUNT from SALES 
                         where SALID in ({raporSalids})
@@ -463,9 +469,9 @@ namespace EntegrefKrediOnay
                         FROM EntegreF..KrediPuan_RiskSatısGurupPuan
                         WHERE (SALAMOUNT+{Kalan}) BETWEEN Risk_TutarMin AND Risk_TutarMax) oran", Properties.Settings.Default.connectionstring);
 
-                WARANTER = conn.GetValueConnection($@"select SALWWRTRID from SALESWARRANTERS where SALWSALID = {SALID}", Properties.Settings.Default.connectionstring);
+                        WARANTER = conn.GetValueConnection($@"select SALWWRTRID from SALESWARRANTERS where SALWSALID = {SALID}", Properties.Settings.Default.connectionstring);
 
-                TaksitDetayi = conn.GetData($@"
+                        TaksitDetayi = conn.GetData($@"
                         select Convert(char(10),INSFIXDATE,121) as [Tarksit Tarihi],INSAMOUNT as [Taksit Tutarı],INSBALANCE as [Ödenecek Bakiye],
                             Convert(numeric(18,2),(
                               SELECT 
@@ -489,36 +495,8 @@ namespace EntegrefKrediOnay
                         AND taksit.INSBALANCE > 0
                         --AND taksit.INSSALID not in ({raporSalids})
                         ORDER BY 1", Properties.Settings.Default.connectionstring);
-                Taksitler = conn.GetData($@"
-                    SET language turkish
-                    select INFIXDATE as [Tarksit Tarihi], sum(INSAMOUNT) as [Taksit Toplamı],sum(INSBALANCE) as [Ödenecek Bakiye], sum(VADEFARKI) as [Vade Farkı] from (
-                    select 
-                    DATENAME(YEAR,INSFIXDATE) +' '+ upper(DATENAME(MONTH,INSFIXDATE)) as INFIXDATE,
-                    INSAMOUNT,
-                    INSBALANCE,
-                        Convert(numeric(18,2),(
-                          SELECT 
-                            SUM(
-                              CASE WHEN DATEDIFF(DAY, vade.INSFIXDATE, getdate()) <= 59 
-                              THEN 
-                                0 
-                              ELSE (
-                                vade.INSBALANCE * 3.00 * DATEDIFF(DAY, (vade.INSFIXDATE),getdate()) / 3000) 
-                              END
-                            ) 
-                          FROM 
-                            INSTALMENT vade WITH (NOLOCK) 
-                          WHERE 
-                            INSCOMPANY = INSCOMPANY 
-                            AND INSID = taksit.INSID
-                            AND INSBALANCE > 0                             
-                        )) VADEFARKI 
-                    from INSTALMENT taksit
-                    where taksit.INSCURID = {CURID}
-                    AND taksit.INSBALANCE > 0) toplam
-                    group by INFIXDATE
-                        ORDER BY 1", Properties.Settings.Default.connectionstring);
-                IsBilgisi = conn.GetData($@"
+                        
+                        IsBilgisi = conn.GetData($@"
                         select 
                         CUSIDWORKNAME,
                         CUSIDWORKADR1,
@@ -535,26 +513,18 @@ namespace EntegrefKrediOnay
                         CUSIDWORKCITY != '' or CUSIDWORKPOSTALCODE  != '' or
                         CUSIDWORKPHONE1 != '' or CUSIDWORKSGKNO != '')", Properties.Settings.Default.connectionstring);
 
-            }
-            catch (Exception ex)
-            {
-                string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
-                CustomMessageBox.ShowMessage("İşlem Hatası Detaya Bekanız", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            await SplashScrenn.RunWithSplashAsync(this, false, 0, this.Text,
-                async (progress, token) =>
-                {
-                    await Task.Delay(100, token);
-                    token.ThrowIfCancellationRequested();
-                    progress.Report((0, $"Yükleniyor... "));
-
-
+                    }
+                    catch (Exception ex)
+                    {
+                        string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
+                        CustomMessageBox.ShowMessage("İşlem Hatası Detaya Bekanız", hataDetay, this, "Uyarı", true, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     if (!string.IsNullOrWhiteSpace(WARANTER))
                     {
                         Kefil();
                     }
                     await Musteri();
-                    navBarDetay.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
+                    //navBarDetay.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
                     navigationFrame1.SelectedPage = navigationPage1;
                     Invoke((MethodInvoker)delegate
                     {
@@ -617,14 +587,10 @@ namespace EntegrefKrediOnay
                         //UpdateRiskBar(int.Parse(RiskYuzdesi.Replace(".00", "")));
                         pictureEdit1.Image = Portreresmi;//Class.Convert.FromBase64String(kimlikresmi).byteArrayToImage();
                         gridEkstre.DataSource = ekstre;
-                        gridTaksitDetay.DataSource = TaksitDetayi;
-                        gridTaksit.DataSource = Taksitler;
                         ViewEkstre.OptionsBehavior.Editable = false;
                         ViewEkstre.OptionsBehavior.ReadOnly = true;
                         ViewEkstre.OptionsBehavior.ReadOnly = true;
-                        ViewEkstre.Columns["tarih"].GroupIndex = 0;
-                        ViewEkstre.Columns["sira"].Visible = false;
-                        ViewEkstre.Columns["ID"].Visible = false;
+                        ViewEkstre.Columns["Tarih"].GroupIndex = 0;
                         ViewEkstre.OptionsSelection.EnableAppearanceFocusedRow = false;
                         ViewEkstre.Appearance.FocusedRow.Options.UseBackColor = false;
                         ViewEkstre.Appearance.SelectedRow.Options.UseBackColor = false;
@@ -634,28 +600,14 @@ namespace EntegrefKrediOnay
                         ViewEkstre.BestFitColumns(true);
                         ViewEkstre.Appearance.FocusedCell.Options.UseBackColor = false;
                         ViewEkstre.Appearance.FocusedCell.Options.UseForeColor = false;
-                        ViewTaksitDetay.FocusedRowHandle = GridControl.InvalidRowHandle;
-                        ViewTaksitDetay.OptionsSelection.MultiSelect = false;
-                        ViewTaksitDetay.OptionsBehavior.Editable = false;
-                        ViewTaksitDetay.OptionsBehavior.ReadOnly = true;
-                        ViewTaksitDetay.OptionsSelection.EnableAppearanceFocusedRow = false;
-                        ViewTaksitDetay.Appearance.FocusedRow.Options.UseBackColor = false;
-                        ViewTaksitDetay.Appearance.SelectedRow.Options.UseBackColor = false;
-                        ViewTaksitDetay.OptionsView.ColumnAutoWidth = false;
-                        ViewTaksitDetay.ExpandAllGroups();
-                        ViewTaksitDetay.OptionsView.BestFitMaxRowCount = -1;
-                        ViewTaksitDetay.BestFitColumns(true);
-                        ViewTaksitDetay.Appearance.FocusedCell.Options.UseBackColor = false;
-                        ViewTaksitDetay.Appearance.FocusedCell.Options.UseForeColor = false;
                         ViewNotes.OptionsView.ColumnAutoWidth = false;
                         ViewNotes.OptionsView.BestFitMaxRowCount = -1;
                         ViewNotes.BestFitColumns(true);
-
-
-                        completeProgress();
-                        navBarDetay.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
-
-
+                        gridDetay.DataSource = null;
+                        gridTaksit.DataSource = null;
+                        gridPesinat.DataSource = null;
+                        gridKefil.DataSource = null;
+                        tabPane2.SelectedPage = tabNavigationPage1;
                     });
                 });
 
@@ -827,7 +779,7 @@ namespace EntegrefKrediOnay
         }
         private void tileBarItem5_ItemClick(object sender, TileItemEventArgs e)
         {
-            navigationFrame1.SelectedPage = navigationPage6;
+            //navigationFrame1.SelectedPage = navigationPage6;
         }
         private void tileBarItem6_ItemClick(object sender, TileItemEventArgs e)
         {
@@ -846,7 +798,7 @@ namespace EntegrefKrediOnay
                     SALID = Kefil.Rows[i]["SALID"].ToString(),
                 });
             }
-            pnlMain.OpenForm<frmKefilCoklu>(kefils);
+            //pnlMain.OpenForm<frmKefilCoklu>(kefils);
             //frmKefilCoklu kefilCoklu = new frmKefilCoklu(kefils);
             //kefilCoklu.ShowDialog();
             //frmBGKefil kefil = new frmBGKefil(tileBarItem6.Tag.ToString(), raporSalids, CURID);
@@ -854,7 +806,7 @@ namespace EntegrefKrediOnay
         }
         private void tileBarItem7_ItemClick(object sender, TileItemEventArgs e)
         {
-            navigationFrame1.SelectedPage = navigationPage5;
+            //navigationFrame1.SelectedPage = navigationPage5;
         }
         public async Task Musteri()
         {
@@ -870,13 +822,13 @@ namespace EntegrefKrediOnay
             {
                 //Kişisel Bilgiler
                 txtMagaza.EditValue = conn.GetValueConnection($@"select DIVNAME from DIVISON where DIVVAL = '{myDeserializedClass.rCurrents.CURDIVISONk__BackingField}'", Properties.Settings.Default.connectionstring);
-                txtKodu.EditValue = myDeserializedClass.rCurrents.CURVALk__BackingField;
+                //txtKodu.EditValue = myDeserializedClass.rCurrents.CURVALk__BackingField;
                 txtAdi.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDNAMEk__BackingField;
                 txtSoyadi.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSIRNAMEk__BackingField;
                 txtTC.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDTCNOk__BackingField;
                 txtVknName.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHWATPk__BackingField;
                 txtVknNo.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHWATNOk__BackingField;
-                txtSgkNoı.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDWORKSGKNOk__BackingField;
+                //txtSgkNoı.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDWORKSGKNOk__BackingField;
                 if (myDeserializedClass.rCurrents.CURSTSk__BackingField)
                 {
                     togAktif.IsOn = true;
@@ -891,7 +843,7 @@ namespace EntegrefKrediOnay
                 bool sinif_Var = false;
                 foreach (string line in lines)
                 {
-                    if (line.Contains("ALIŞVERİŞ KREDİ YAPISI"))
+                    if (line.Contains("Kredi Uygunluğu"))
                     {
                         sinif_Var = true;
                     }
@@ -910,57 +862,66 @@ namespace EntegrefKrediOnay
 
                             CustomMessageBox.ShowMessage(rtfMessage, "", this, "UYARI", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
-                        if (key == "EV SAHIBI")
-                        {
-                            if (value == "EV SAHİBİ")
-                            {
-                                chkEvSahibi.Checked = true;
-                            }
-                            chkEvSahibi.Text = value;
+                        //if (key == "EV SAHIBI")
+                        //{
+                        //    if (value == "EV SAHİBİ")
+                        //    {
+                        //        chkEvSahibi.Checked = true;
+                        //    }
+                        //    chkEvSahibi.Text = value;
 
-                        }
+                        //}
                         dt.Rows.Add(key, value);
                     }
                 }
                 if (!sinif_Var)
                 {
-                    var varyok = conn.GetData($@"select * from WAVECUSTOMER where WCUSCURID = {CURID} and WCUSUNIQ = 9", Properties.Settings.Default.connectionstring);
+                    var varyok = conn.GetData($@"select * from WAVECUSTOMER where WCUSCURID = {CURID} and WCUSUNIQ = 4", Properties.Settings.Default.connectionstring);
                     if (varyok == null)
                     {
-                        var sinifekleme = conn.InsertValue($@"insert into WAVECUSTOMER values ({CURID},9,'YON')", Properties.Settings.Default.connectionstring);
-                        dt.Rows.Add("ALIŞVERİŞ KREDİ YAPISI", "Satışa Açık");
+                        var sinifekleme = conn.InsertValue($@"insert into WAVECUSTOMER values ({CURID},4,'BM00')", Properties.Settings.Default.connectionstring);
+                        dt.Rows.Add("Kredi Uygunluğu", "Satışa Açık Müşteri");
                     }
                 }
-                gridSiniflar.DataSource = dt;
+                var kirilim = conn.GetData($@"
+                select DWCUSUNIQ,DWCUSTITLE,WCUSVAL as WCTREVAL,WCTRENAME,WCUSVAL as LASTPROVAL from DEFWAVECUS
+                outer apply(select WCUSVAL,WCTRENAME from WAVECUSTOMER 
+                            left outer join WAVECUSTREE on WCUSUNIQ = WCTREUNIQ and WCTREVAL = WCUSVAL
+                            where WCTREUNIQ = DWCUSUNIQ
+                            and WCUSCURID = {CURID}
+                            ) PRODUC
+                where DWCUSSTS = 1", sql1);
+                gridKirilim.DataSource = kirilim;
+                //gridSiniflar.DataSource = dt;
                 dteDogumTarihi.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHDAYk__BackingField;
-                txtYas.EditValue = DateTime.Now.Year - DateTime.Parse(myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHDAYk__BackingField.ToString()).Year;
+                //txtYas.EditValue = DateTime.Now.Year - DateTime.Parse(myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHDAYk__BackingField.ToString()).Year;
 
                 //Kimlik Bilgileri
                 txtCuzdanNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSERIALNOk__BackingField;
                 txtBaba.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDFATHERk__BackingField;
                 txtAnne.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDMOTHERk__BackingField;
-                txtDogumYeri.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHPLACEk__BackingField;
-                txtDogumIl.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCITYk__BackingField;
-                txtDogumIlce.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCOUNTYk__BackingField;
-                txtMahlle.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGREGIONk__BackingField;
-                txtCiltNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDVOLNOk__BackingField;
-                txtAileSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDFAMILYNOk__BackingField;
-                txtSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSORTNOk__BackingField;
-                txtKayitNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGNOk__BackingField;                
-                txtVerildigiYer1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENPLACEk__BackingField;
-                dteVerildiTarih1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENDATEk__BackingField;
+                //txtDogumYeri.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHPLACEk__BackingField;
+                //txtDogumIl.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCITYk__BackingField;
+                //txtDogumIlce.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCOUNTYk__BackingField;
+                //txtMahlle.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGREGIONk__BackingField;
+                //txtCiltNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDVOLNOk__BackingField;
+                //txtAileSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDFAMILYNOk__BackingField;
+                //txtSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSORTNOk__BackingField;
+                //txtKayitNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGNOk__BackingField;                
+                //txtVerildigiYer1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENPLACEk__BackingField;
+                //dteVerildiTarih1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENDATEk__BackingField;
                 int vierilisnedeni = int.Parse(myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENREASONk__BackingField.ToString());
-                foreach (CheckedListBoxItem item in chekVerilisNedeni.Items)
-                {
-                    if (int.Parse(item.Value.ToString()) == vierilisnedeni)
-                    {
-                        item.CheckState = CheckState.Checked;
-                    }
-                    else
-                    {
-                        item.CheckState = CheckState.Unchecked;
-                    }
-                }
+                //foreach (CheckedListBoxItem item in chekVerilisNedeni.Items)
+                //{
+                //    if (int.Parse(item.Value.ToString()) == vierilisnedeni)
+                //    {
+                //        item.CheckState = CheckState.Checked;
+                //    }
+                //    else
+                //    {
+                //        item.CheckState = CheckState.Unchecked;
+                //    }
+                //}
                 string sex = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSEXk__BackingField;
                 string maried = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDMARRIEDk__BackingField;
                 for (int i = 0; i < rdCinsiyet.Properties.Items.Count; i++)
@@ -971,17 +932,17 @@ namespace EntegrefKrediOnay
                         break; // eşleşmeyi bulduysan döngüden çık
                     }
                 }
-                for (int i = 0; i < rdMedeniHal.Properties.Items.Count; i++)
-                {
-                    if (rdMedeniHal.Properties.Items[i].Value.ToString() == maried)
-                    {
-                        rdMedeniHal.SelectedIndex = i;
-                        break; // eşleşmeyi bulduysan döngüden çık
-                    }
-                }
+                //for (int i = 0; i < rdMedeniHal.Properties.Items.Count; i++)
+                //{
+                //    if (rdMedeniHal.Properties.Items[i].Value.ToString() == maried)
+                //    {
+                //        rdMedeniHal.SelectedIndex = i;
+                //        break; // eşleşmeyi bulduysan döngüden çık
+                //    }
+                //}
                 txtEhilyetNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVNOk__BackingField;
-                txtVerildiYer2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENPLACEk__BackingField;
-                dteVerildiTarih2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENDATEk__BackingField;
+                //txtVerildiYer2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENPLACEk__BackingField;
+                //dteVerildiTarih2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENDATEk__BackingField;
 
                 txtEvIl.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHCITYk__BackingField;
                 txtEvIlce.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHCOUNTYk__BackingField;
@@ -999,11 +960,11 @@ namespace EntegrefKrediOnay
 
                 txtGsm1.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM1k__BackingField;
                 txtGsm2.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM2k__BackingField;
-                txtGsm3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM3k__BackingField;
+                //txtGsm3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM3k__BackingField;
 
-                txtTel1.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE1k__BackingField;
-                txtTel2.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE2k__BackingField;
-                txtTel3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE3k__BackingField;
+                //txtTel1.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE1k__BackingField;
+                //txtTel2.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE2k__BackingField;
+                //txtTel3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE3k__BackingField;
             }
         }
         public async void Kefil()
@@ -1025,13 +986,13 @@ namespace EntegrefKrediOnay
             {
                 //Kişisel Bilgiler
                 txtMagaza.EditValue = conn.GetValueConnection($@"select DIVNAME from DIVISON where DIVVAL = '{myDeserializedClass.rCurrents.CURDIVISONk__BackingField}'", Properties.Settings.Default.connectionstring);
-                txtKodu.EditValue = myDeserializedClass.rCurrents.CURVALk__BackingField;
+                //txtKodu.EditValue = myDeserializedClass.rCurrents.CURVALk__BackingField;
                 txtAdi.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDNAMEk__BackingField;
                 txtSoyadi.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSIRNAMEk__BackingField;
                 txtTC.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDTCNOk__BackingField;
                 txtVknName.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHWATPk__BackingField;
                 txtVknNo.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHWATNOk__BackingField;
-                txtSgkNoı.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDWORKSGKNOk__BackingField;
+                //txtSgkNoı.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDWORKSGKNOk__BackingField;
                 if (myDeserializedClass.rCurrents.CURSTSk__BackingField)
                 {
                     togAktif.IsOn = true;
@@ -1057,36 +1018,35 @@ namespace EntegrefKrediOnay
                         dt.Rows.Add(key, value);
                     }
                 }
-                gridSiniflar.DataSource = dt;
+                //gridSiniflar.DataSource = dt;
                 dteDogumTarihi.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHDAYk__BackingField;
-
-
                 //Kimlik Bilgileri
                 txtCuzdanNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSERIALNOk__BackingField;
                 txtBaba.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDFATHERk__BackingField;
                 txtAnne.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDMOTHERk__BackingField;
-                txtDogumYeri.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHPLACEk__BackingField;
-                txtDogumIl.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCITYk__BackingField;
-                txtDogumIlce.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCOUNTYk__BackingField;
-                txtMahlle.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGREGIONk__BackingField;
-                txtCiltNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDVOLNOk__BackingField;
-                txtAileSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDFAMILYNOk__BackingField;
-                txtSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSORTNOk__BackingField;
-                txtKayitNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGNOk__BackingField;
-                txtVerildigiYer1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENPLACEk__BackingField;
-                dteVerildiTarih1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENDATEk__BackingField;
+                txtEhilyetNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVNOk__BackingField;
                 int vierilisnedeni = int.Parse(myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENREASONk__BackingField.ToString());
-                foreach (CheckedListBoxItem item in chekVerilisNedeni.Items)
-                {
-                    if (int.Parse(item.Value.ToString()) == vierilisnedeni)
-                    {
-                        item.CheckState = CheckState.Checked;
-                    }
-                    else
-                    {
-                        item.CheckState = CheckState.Unchecked;
-                    }
-                }
+                //txtDogumYeri.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDBIRTHPLACEk__BackingField;
+                //txtDogumIl.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCITYk__BackingField;
+                //txtDogumIlce.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGCOUNTYk__BackingField;
+                //txtMahlle.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGREGIONk__BackingField;
+                //txtCiltNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDVOLNOk__BackingField;
+                //txtAileSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDFAMILYNOk__BackingField;
+                //txtSiraNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSORTNOk__BackingField;
+                //txtKayitNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDREGNOk__BackingField;
+                //txtVerildigiYer1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENPLACEk__BackingField;
+                //dteVerildiTarih1.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDGIVENDATEk__BackingField;
+                //foreach (CheckedListBoxItem item in chekVerilisNedeni.Items)
+                //{
+                //    if (int.Parse(item.Value.ToString()) == vierilisnedeni)
+                //    {
+                //        item.CheckState = CheckState.Checked;
+                //    }
+                //    else
+                //    {
+                //        item.CheckState = CheckState.Unchecked;
+                //    }
+                //}
                 string sex = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDSEXk__BackingField;
                 string maried = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDMARRIEDk__BackingField;
 
@@ -1098,17 +1058,16 @@ namespace EntegrefKrediOnay
                         break; // eşleşmeyi bulduysan döngüden çık
                     }
                 }
-                for (int i = 0; i < rdMedeniHal.Properties.Items.Count; i++)
-                {
-                    if (rdMedeniHal.Properties.Items[i].Value.ToString() == maried)
-                    {
-                        rdMedeniHal.SelectedIndex = i;
-                        break; // eşleşmeyi bulduysan döngüden çık
-                    }
-                }
-                txtEhilyetNo.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVNOk__BackingField;
-                txtVerildiYer2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENPLACEk__BackingField;
-                dteVerildiTarih2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENDATEk__BackingField;
+                //for (int i = 0; i < rdMedeniHal.Properties.Items.Count; i++)
+                //{
+                //    if (rdMedeniHal.Properties.Items[i].Value.ToString() == maried)
+                //    {
+                //        rdMedeniHal.SelectedIndex = i;
+                //        break; // eşleşmeyi bulduysan döngüden çık
+                //    }
+                //}
+                //txtVerildiYer2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENPLACEk__BackingField;
+                //dteVerildiTarih2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENDATEk__BackingField;
 
                 txtEvIl.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHCITYk__BackingField;
                 txtEvIlce.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHCOUNTYk__BackingField;
@@ -1126,11 +1085,11 @@ namespace EntegrefKrediOnay
 
                 txtGsm1.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM1k__BackingField;
                 txtGsm2.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM2k__BackingField;
-                txtGsm3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM3k__BackingField;
+                //txtGsm3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHGSM3k__BackingField;
 
-                txtTel1.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE1k__BackingField;
-                txtTel2.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE2k__BackingField;
-                txtTel3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE3k__BackingField;
+                //txtTel1.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE1k__BackingField;
+                //txtTel2.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE2k__BackingField;
+                //txtTel3.EditValue = myDeserializedClass.rCurrents.rCurrentsChildk__BackingField.CURCHPHONE3k__BackingField;
             }
         }
         public async void Notlar()
@@ -1141,22 +1100,26 @@ namespace EntegrefKrediOnay
             await Task.Run(async () =>
             {
                 var sonuc = await GetBGClass.VolantServisAsync(Program.FBGConfigProvider);
-                myDeserializedClass = JsonConvert.DeserializeObject<CurNotes>(sonuc);
+                if(sonuc != null)
+                    myDeserializedClass = JsonConvert.DeserializeObject<CurNotes>(sonuc);
             });
-            foreach (var item in myDeserializedClass.lCurNotes)
+            if (myDeserializedClass.lCurNotes != null)
             {
-                curNotes.Add(new Notes
+                foreach (var item in myDeserializedClass.lCurNotes)
                 {
-                    NOT_TIPI = item.notTipForServicek__BackingField,
-                    NOT = item.CURNTNOTESk__BackingField,
-                    KAYDEDEN = item.CURNTSOCODEk__BackingField,
-                    KAYITZAMANI = item.CURNTDATETIMEk__BackingField
-                });
+                    curNotes.Add(new Notes
+                    {
+                        NOT_TIPI = item.notTipForServicek__BackingField,
+                        NOT = item.CURNTNOTESk__BackingField,
+                        KAYDEDEN = item.CURNTSOCODEk__BackingField,
+                        KAYITZAMANI = item.CURNTDATETIMEk__BackingField
+                    });
+                }
+                EntegreFDLL.Main.ListtoDataTableConverter converter = new EntegreFDLL.Main.ListtoDataTableConverter();
+                var dt = converter.ToDataTable(curNotes);
+                gridNotes.DataSource = dt;
             }
             
-            EntegreFDLL.Main.ListtoDataTableConverter converter = new EntegreFDLL.Main.ListtoDataTableConverter();
-            var dt = converter.ToDataTable(curNotes);
-            gridNotes.DataSource = dt;
         }
         public static string[] GetMailListBySALID(int salid)
         {
@@ -1466,6 +1429,158 @@ namespace EntegrefKrediOnay
             musteriKoduTbx.Text = CURVAL;
             CURID = conn.GetValueConnection($"select CURID from CURRENTS where CURVAL = '{CURVAL}'", Properties.Settings.Default.connectionstring);
             musteriKoduTbx.IsModified = true;
+        }
+
+        private void ViewEkstre_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
+        {
+            if (e.FocusedRowHandle >= 0)
+            {
+                tabPane2.SelectedPage = tabNavigationPage1;
+                var ID = ViewEkstre.GetRowCellValue(e.FocusedRowHandle, "IslemRefNo");
+                var Islem = ViewEkstre.GetRowCellValue(e.FocusedRowHandle, "IslemAck").ToString();
+                if (Islem.Contains("SATIS"))
+                {
+                    var detay = conn.GetData($@"
+                    select PROVAL,PRONAME,ORDCHAMOUNT,ORDCHDISC,ORDCHVAT,ORDCHBALANCE,SMENNAME,SONAME + space(1)+ SOSURNAME as SONAME from ORDERSCHILD
+                    join ORDERS on ORDID = ORDCHORDID
+                    join PRODUCTS on PROID = ORDCHPROID
+                    join SALESMEN on SMENID = ORDCHSMENID
+                    join SOCIAL on SOCODE = ORDSOCODE
+                    where ORDSALID = {ID}", sql1);
+                    var taksitler = conn.GetData($@"
+                    select INSFIXDATE,INSID,INSSALID,
+                    DATEDIFF(DAY, INSFIXDATE, GETDATE()),
+                    INSAMOUNT,
+                    isnull(odeme,0) as PAYMENT,
+                    isnull(iade,0) as CANCEL,
+                    INSBALANCE
+                    from INSTALMENT INS1
+                    outer apply(select sum(INSPCDAMOUNT) odeme from INSTALMENTPROCEEDS where INSPCDINSID = INSID) INSPCD
+                    outer apply(select sum(INSCAMOUNT) iade from INSTALMENTCANCEL where INSCINSID = INSID) INSC
+                    where INSSALID = {ID}", sql1);
+                    //Taksitler = conn.GetData($@"
+                    //SET language turkish
+                    //select INFIXDATE as [Tarksit Tarihi], sum(INSAMOUNT) as [Taksit Toplamı],sum(INSBALANCE) as [Ödenecek Bakiye], sum(VADEFARKI) as [Vade Farkı] from (
+                    //select 
+                    //DATENAME(YEAR,INSFIXDATE) +' '+ upper(DATENAME(MONTH,INSFIXDATE)) as INFIXDATE,
+                    //INSAMOUNT,
+                    //INSBALANCE,
+                    //    Convert(numeric(18,2),(
+                    //      SELECT 
+                    //        SUM(
+                    //          CASE WHEN DATEDIFF(DAY, vade.INSFIXDATE, getdate()) <= 59 
+                    //          THEN 
+                    //            0 
+                    //          ELSE (
+                    //            vade.INSBALANCE * 3.00 * DATEDIFF(DAY, (vade.INSFIXDATE),getdate()) / 3000) 
+                    //          END
+                    //        ) 
+                    //      FROM 
+                    //        INSTALMENT vade WITH (NOLOCK) 
+                    //      WHERE 
+                    //        INSCOMPANY = INSCOMPANY 
+                    //        AND INSID = taksit.INSID
+                    //        AND INSBALANCE > 0                             
+                    //    )) VADEFARKI 
+                    //from INSTALMENT taksit
+                    //where taksit.INSCURID = {CURID}
+                    //AND taksit.INSBALANCE > 0) toplam
+                    //group by INFIXDATE
+                    //    ORDER BY 1", Properties.Settings.Default.connectionstring);
+                    var pesinat = conn.GetData($@"
+                    select DPYMVAL,DPYMNAME,sum(PCDSCHAMOUNT) as odeme from PROCEEDSCHILD
+                    join PROCEEDS on PCDSID = PCDSCHPCDSID
+                    join DEFPAYMENTKIND on PCDSCHDPYMID = DPYMID
+                    where PCDSSALID = {ID}
+                    group by DPYMVAL,DPYMNAME", sql1);
+                    var kefil = conn.GetData($@"
+                    select WRTRIDNO,WRTRNAME +space(1)+ WRTRSURNAME as WRTRNAME,WRTRGSM,CURVAL,SALWNOTES,WRTRNOTES from SALESWARRANTERS
+                    join WARRANTERS on WRTRID = SALWWRTRID
+                    left outer join CUSIDENTITY on CUSIDTCNO = WRTRIDNO
+                    left outer join CURRENTS on CURID = CUSIDCURID
+                    where SALWSALID = {ID}", sql1);
+                    gridDetay.DataSource = detay;
+                    gridTaksit.DataSource = taksitler;
+                    gridPesinat.DataSource = pesinat;
+                    gridKefil.DataSource = kefil;
+                }
+                else
+                {
+
+                }
+            }
+        }
+
+        private void ViewEkstre_RowClick(object sender, DevExpress.XtraGrid.Views.Grid.RowClickEventArgs e)
+        {
+
+        }
+
+        public static string WCTRENAME;
+        public static string WCTREVAL;
+        private void repositoryItemButtonEdit1_ButtonClick(object sender, ButtonPressedEventArgs e)
+        {
+            var DWCUSUNIQ = ViewKirilim.GetRowCellValue(ViewKirilim.FocusedRowHandle, "DWCUSUNIQ").ToString();
+            Merkez.frmMusteriKirilim krilim = new Merkez.frmMusteriKirilim(DWCUSUNIQ);
+            krilim.ShowDialog();
+            ViewKirilim.SetRowCellValue(ViewKirilim.FocusedRowHandle, "WCTREVAL", WCTREVAL);
+            ViewKirilim.SetRowCellValue(ViewKirilim.FocusedRowHandle, "WCTRENAME", WCTRENAME);
+            ViewKirilim.RefreshRow(ViewKirilim.FocusedRowHandle);
+        }
+
+        private void barButtonKaydet_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void barButtonIptal_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void barButtonGuncelle_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            txtEhilyetNo.Enabled = true;
+            //txtVerildiYer2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENPLACEk__BackingField;
+            //dteVerildiTarih2.EditValue = myDeserializedClass.rCurrents.rCusIdentityk__BackingField.CUSIDDRVGIVENDATEk__BackingField;
+
+            txtEvIl.Enabled = true;
+            txtEvIlce.Enabled = true;
+            txtEvMahalle.Enabled = true;
+            txtEvAdres.Enabled = true;
+            txtPKod.Enabled = true;
+            txtMail.Enabled = true;
+
+            txtIsIl.Enabled = true;
+            txtIsIlce.Enabled = true;
+            txtIsAdi.Enabled = true;
+            txtIsTel.Enabled = true;
+            txtIsadres1.Enabled = true;
+            txtIsAdres2.Enabled = true;
+
+            txtGsm1.Enabled = true;
+            txtGsm2.Enabled = true;
+            rdCinsiyet.Enabled = true;
+
+            dteDogumTarihi.Enabled = true;
+            //Kimlik Bilgileri
+            txtCuzdanNo.Enabled = true;
+            txtBaba.Enabled = true;
+            txtAnne.Enabled = true;
+            txtEhilyetNo.Enabled = true;
+
+
+            gridKirilim.Enabled = true;
+            //gridSiniflar.DataSource = dt;
+            dteDogumTarihi.Enabled = true;
+
+            txtMagaza.Enabled = true;
+            //txtKodu.EditValue = myDeserializedClass.rCurrents.CURVALk__BackingField;
+            txtAdi.Enabled = true;
+            txtSoyadi.Enabled = true;
+            txtTC.Enabled = true;
+            txtVknName.Enabled = true;
+            txtVknNo.Enabled = true;
         }
     }
 }

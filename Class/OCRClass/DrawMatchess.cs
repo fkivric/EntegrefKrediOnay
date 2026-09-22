@@ -21,86 +21,172 @@ namespace EntegrefKrediOnay.Class.OCRClass
 
         public static Bitmap CroppedImage;
 
-        public static void FindMatch(Mat modelImage, Mat observedImage, out long matchTime, out VectorOfKeyPoint modelKeyPoints, out VectorOfKeyPoint observedKeyPoints, VectorOfVectorOfDMatch matches, out Mat mask, out Mat homography)
+        public static void FindMatch(
+            Mat modelImage,
+            Mat observedImage,
+            out long matchTime,
+            out VectorOfKeyPoint modelKeyPoints,
+            out VectorOfKeyPoint observedKeyPoints,
+            VectorOfVectorOfDMatch matches,
+            out Mat mask,
+            out Mat homography)
         {
-            int i = 2;
+            // ------------------------------------------------------------
+            // Ayarlar
+            // ------------------------------------------------------------
+            int k = 2;
             double uniquenessThreshold = 0.8;
-            double hessianThresh = 300.0;
+
             homography = null;
+            mask = null;
+
             modelKeyPoints = new VectorOfKeyPoint();
             observedKeyPoints = new VectorOfKeyPoint();
-            Stopwatch watch;
-            if (CudaInvoke.HasCuda)
+
+            Stopwatch watch = null;
+
+            try
             {
-                CudaSURF surfCuda = new CudaSURF((float)hessianThresh);
-                using (GpuMat gpuModelImage = new GpuMat(modelImage))
+                // --------------------------------------------------------
+                // Descriptor'lar
+                // --------------------------------------------------------
+                using (Mat modelDescriptors = new Mat())
+                using (Mat observedDescriptors = new Mat())
+                using (SIFT sift = new SIFT())
                 {
-                    using (GpuMat gpuModelKeyPoints = surfCuda.DetectKeyPointsRaw(gpuModelImage))
+                    // ----------------------------------------------------
+                    // MODEL IMAGE
+                    // ----------------------------------------------------
+                    sift.DetectAndCompute(
+                        modelImage,
+                        null,
+                        modelKeyPoints,
+                        modelDescriptors,
+                        false
+                    );
+
+                    // ----------------------------------------------------
+                    // OBSERVED IMAGE
+                    // ----------------------------------------------------
+                    watch = Stopwatch.StartNew();
+
+                    sift.DetectAndCompute(
+                        observedImage,
+                        null,
+                        observedKeyPoints,
+                        observedDescriptors,
+                        false
+                    );
+
+                    // ----------------------------------------------------
+                    // Descriptor kontrolü
+                    // ----------------------------------------------------
+                    if (modelDescriptors.IsEmpty ||
+                        observedDescriptors.IsEmpty)
                     {
-                        using (GpuMat gpuModelDescriptors = surfCuda.ComputeDescriptorsRaw(gpuModelImage, null, gpuModelKeyPoints))
+                        watch.Stop();
+                        matchTime = watch.ElapsedMilliseconds;
+
+                        mask = new Mat();
+
+                        return;
+                    }
+
+                    // ----------------------------------------------------
+                    // BF MATCHER
+                    //
+                    // SIFT descriptor = CV_32F
+                    // Bu yüzden DistanceType.L2 kullanıyoruz.
+                    // ----------------------------------------------------
+                    using (BFMatcher matcher = new BFMatcher(DistanceType.L2))
+                    {
+                        matcher.Add(modelDescriptors);
+
+                        matcher.KnnMatch(
+                            observedDescriptors,
+                            matches,
+                            k
+                        );
+                    }
+
+                    // ----------------------------------------------------
+                    // Match maskesi
+                    // ----------------------------------------------------
+                    mask = new Mat(
+                        matches.Size,
+                        1,
+                        DepthType.Cv8U,
+                        1
+                    );
+
+                    mask.SetTo(new MCvScalar(255));
+
+                    // ----------------------------------------------------
+                    // Uniqueness testi
+                    // ----------------------------------------------------
+                    Features2DToolbox.VoteForUniqueness(
+                        matches,
+                        uniquenessThreshold,
+                        mask
+                    );
+
+                    int nonZeroCount =
+                        CvInvoke.CountNonZero(mask);
+
+                    // ----------------------------------------------------
+                    // En az 4 iyi match gerekli
+                    // Homography için minimum 4 nokta gerekir.
+                    // ----------------------------------------------------
+                    if (nonZeroCount >= 4)
+                    {
+                        // ------------------------------------------------
+                        // Scale + Orientation testi
+                        // ------------------------------------------------
+                        nonZeroCount =
+                            Features2DToolbox.VoteForSizeAndOrientation(
+                                modelKeyPoints,
+                                observedKeyPoints,
+                                matches,
+                                mask,
+                                1.5,
+                                20
+                            );
+
+                        // ----------------------------------------------
+                        // Homography
+                        // ----------------------------------------------
+                        if (nonZeroCount >= 4)
                         {
-                            using (CudaBFMatcher matcher = new CudaBFMatcher(DistanceType.L2))
-                            {
-                                surfCuda.DownloadKeypoints(gpuModelKeyPoints, modelKeyPoints);
-                                watch = Stopwatch.StartNew();
-                                using (GpuMat gpuObservedImage = new GpuMat(observedImage))
-                                {
-                                    using (GpuMat gpuObservedKeyPoints = surfCuda.DetectKeyPointsRaw(gpuObservedImage))
-                                    {
-                                        using (GpuMat gpuObservedDescriptors = surfCuda.ComputeDescriptorsRaw(gpuObservedImage, null, gpuObservedKeyPoints))
-                                        {
-                                            matcher.KnnMatch(gpuObservedDescriptors, gpuModelDescriptors, matches, i);
-                                            surfCuda.DownloadKeypoints(gpuObservedKeyPoints, observedKeyPoints);
-                                            mask = new Mat(matches.Size, 1, DepthType.Cv8U, 1);
-                                            mask.SetTo(new MCvScalar(255.0));
-                                            Features2DToolbox.VoteForUniqueness(matches, uniquenessThreshold, mask);
-                                            int nonZeroCount = CvInvoke.CountNonZero(mask);
-                                            if (nonZeroCount >= 4)
-                                            {
-                                                nonZeroCount = Features2DToolbox.VoteForSizeAndOrientation(modelKeyPoints, observedKeyPoints, matches, mask, 1.5, 20);
-                                                if (nonZeroCount >= 4)
-                                                {
-                                                    homography = Features2DToolbox.GetHomographyMatrixFromMatchedFeatures(modelKeyPoints, observedKeyPoints, matches, mask, 2.0);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                watch.Stop();
-                            }
+                            homography =
+                                Features2DToolbox
+                                    .GetHomographyMatrixFromMatchedFeatures(
+                                        modelKeyPoints,
+                                        observedKeyPoints,
+                                        matches,
+                                        mask,
+                                        2.0
+                                    );
                         }
                     }
                 }
-            }
-            else
-            {
-                UMat uModelImage = modelImage.ToUMat(AccessType.Fast);
-                UMat uObservedImage = observedImage.ToUMat(AccessType.Fast);
-                SURF surfCPU = new SURF(hessianThresh);
-                UMat modelDescriptors = new UMat();
-                surfCPU.DetectAndCompute(uModelImage, null, modelKeyPoints, modelDescriptors, useProvidedKeyPoints: false);
-                watch = Stopwatch.StartNew();
-                UMat observedDescriptors = new UMat();
-                surfCPU.DetectAndCompute(uObservedImage, null, observedKeyPoints, observedDescriptors, useProvidedKeyPoints: false);
-                BFMatcher matcher2 = new BFMatcher(DistanceType.L2);
-                matcher2.Add(modelDescriptors);
-                matcher2.KnnMatch(observedDescriptors, matches, i, null);
-                mask = new Mat(matches.Size, 1, DepthType.Cv8U, 1);
-                mask.SetTo(new MCvScalar(255.0));
-                Features2DToolbox.VoteForUniqueness(matches, uniquenessThreshold, mask);
-                int nonZeroCount2 = CvInvoke.CountNonZero(mask);
-                if (nonZeroCount2 >= 4)
-                {
-                    nonZeroCount2 = Features2DToolbox.VoteForSizeAndOrientation(modelKeyPoints, observedKeyPoints, matches, mask, 1.5, 20);
-                    if (nonZeroCount2 >= 4)
-                    {
-                        homography = Features2DToolbox.GetHomographyMatrixFromMatchedFeatures(modelKeyPoints, observedKeyPoints, matches, mask, 2.0);
-                    }
-                }
+
                 watch.Stop();
+
+                matchTime = watch.ElapsedMilliseconds;
             }
-            matchTime = watch.ElapsedMilliseconds;
+            catch
+            {
+                if (watch != null && watch.IsRunning)
+                    watch.Stop();
+
+                matchTime = watch != null
+                    ? watch.ElapsedMilliseconds
+                    : 0;
+
+                throw;
+            }
         }
+
 
         public static Image Draw(Mat modelImage, Mat observedImage, out long matchTime, Enums.ScanObject ScanObjEnums, bool backSide = false)
         {
@@ -139,7 +225,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
 
                         //CvInvoke.Polylines(result, vp, isClosed: true, new MCvScalar(255,0,0,255), 5);
                     }
-                    Bitmap bmp = observedImage.Bitmap;
+                    Bitmap bmp = observedImage.ToBitmap();
                     img = GetImage(points, bmp, ScanObjEnums);
                     Bitmap cropImg = (Bitmap)img;
                 }

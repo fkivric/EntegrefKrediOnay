@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DevExpress.XtraEditors.TileItemElement tileItemElement5 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement1 = new DevExpress.XtraEditors.TileItemElement();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSatisAl));
-            DevExpress.XtraEditors.TileItemElement tileItemElement6 = new DevExpress.XtraEditors.TileItemElement();
-            DevExpress.XtraEditors.TileItemElement tileItemElement7 = new DevExpress.XtraEditors.TileItemElement();
-            DevExpress.XtraEditors.TileItemElement tileItemElement8 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement2 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement3 = new DevExpress.XtraEditors.TileItemElement();
+            DevExpress.XtraEditors.TileItemElement tileItemElement4 = new DevExpress.XtraEditors.TileItemElement();
             this.navBarTarih = new DevExpress.XtraNavBar.NavBarControl();
             this.navBarGroup1 = new DevExpress.XtraNavBar.NavBarGroup();
             this.navBarGroupControlContainer2 = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
@@ -101,13 +101,13 @@
             this.spreadsheetControl1 = new DevExpress.XtraSpreadsheet.SpreadsheetControl();
             this.navigationFrame1 = new DevExpress.XtraBars.Navigation.NavigationFrame();
             this.navigationPage1 = new DevExpress.XtraBars.Navigation.NavigationPage();
+            this.memoEdit1 = new DevExpress.XtraEditors.MemoEdit();
             this.navigationPage2 = new DevExpress.XtraBars.Navigation.NavigationPage();
             this.gridVeriler = new DevExpress.XtraGrid.GridControl();
             this.ViewVeriler = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.tileBar1 = new DevExpress.XtraBars.Navigation.TileBar();
             this.tileBarGroup2 = new DevExpress.XtraBars.Navigation.TileBarGroup();
             this.tileBarItem1 = new DevExpress.XtraBars.Navigation.TileBarItem();
-            this.memoEdit1 = new DevExpress.XtraEditors.MemoEdit();
             ((System.ComponentModel.ISupportInitialize)(this.navBarTarih)).BeginInit();
             this.navBarTarih.SuspendLayout();
             this.navBarGroupControlContainer2.SuspendLayout();
@@ -154,10 +154,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.navigationFrame1)).BeginInit();
             this.navigationFrame1.SuspendLayout();
             this.navigationPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.memoEdit1.Properties)).BeginInit();
             this.navigationPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridVeriler)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ViewVeriler)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.memoEdit1.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // navBarTarih
@@ -800,12 +800,12 @@
             this.btnDosyaSec.AppearanceItem.Normal.BackColor2 = System.Drawing.Color.Blue;
             this.btnDosyaSec.AppearanceItem.Normal.Options.UseBackColor = true;
             this.btnDosyaSec.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement5.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image")));
-            tileItemElement5.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            tileItemElement5.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
-            tileItemElement5.Text = "Dosya Seç Yükle";
-            tileItemElement5.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            this.btnDosyaSec.Elements.Add(tileItemElement5);
+            tileItemElement1.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image")));
+            tileItemElement1.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            tileItemElement1.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
+            tileItemElement1.Text = "Dosya Seç Yükle";
+            tileItemElement1.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            this.btnDosyaSec.Elements.Add(tileItemElement1);
             this.btnDosyaSec.Id = 0;
             this.btnDosyaSec.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.btnDosyaSec.Name = "btnDosyaSec";
@@ -814,11 +814,11 @@
             // btnKontrol
             // 
             this.btnKontrol.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement6.ImageOptions.Image = global::EntegrefKrediOnay.Properties.Resources.chartsshowlegend_32x321;
-            tileItemElement6.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            tileItemElement6.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
-            tileItemElement6.Text = "Dijital Tabloya Çevir";
-            this.btnKontrol.Elements.Add(tileItemElement6);
+            tileItemElement2.ImageOptions.Image = global::EntegrefKrediOnay.Properties.Resources.chartsshowlegend_32x321;
+            tileItemElement2.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            tileItemElement2.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
+            tileItemElement2.Text = "Dijital Tabloya Çevir";
+            this.btnKontrol.Elements.Add(tileItemElement2);
             this.btnKontrol.Enabled = false;
             this.btnKontrol.Id = 4;
             this.btnKontrol.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
@@ -831,21 +831,22 @@
             this.btnYeni.AppearanceItem.Normal.BackColor2 = System.Drawing.Color.Green;
             this.btnYeni.AppearanceItem.Normal.Options.UseBackColor = true;
             this.btnYeni.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement7.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            tileItemElement7.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
-            tileItemElement7.Text = "Yeni";
-            this.btnYeni.Elements.Add(tileItemElement7);
+            tileItemElement3.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            tileItemElement3.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
+            tileItemElement3.Text = "Yeni";
+            this.btnYeni.Elements.Add(tileItemElement3);
             this.btnYeni.Enabled = false;
             this.btnYeni.Id = 3;
             this.btnYeni.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.btnYeni.Name = "btnYeni";
+            this.btnYeni.ItemClick += new DevExpress.XtraEditors.TileItemClickEventHandler(this.btnYeni_ItemClick);
             // 
             // spreadsheetControl1
             // 
             this.spreadsheetControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.spreadsheetControl1.Location = new System.Drawing.Point(264, 95);
             this.spreadsheetControl1.Name = "spreadsheetControl1";
-            this.spreadsheetControl1.Size = new System.Drawing.Size(1169, 693);
+            this.spreadsheetControl1.Size = new System.Drawing.Size(957, 693);
             this.spreadsheetControl1.TabIndex = 27;
             this.spreadsheetControl1.Text = "spreadsheetControl1";
             // 
@@ -868,16 +869,25 @@
             // 
             this.navigationPage1.Caption = "navigationPage1";
             this.navigationPage1.Controls.Add(this.spreadsheetControl1);
+            this.navigationPage1.Controls.Add(this.memoEdit1);
             this.navigationPage1.Controls.Add(this.groupControl1);
             this.navigationPage1.Controls.Add(this.navBarTarih);
             this.navigationPage1.Name = "navigationPage1";
             this.navigationPage1.Size = new System.Drawing.Size(1433, 788);
             // 
+            // memoEdit1
+            // 
+            this.memoEdit1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.memoEdit1.Location = new System.Drawing.Point(1221, 95);
+            this.memoEdit1.Name = "memoEdit1";
+            this.memoEdit1.Size = new System.Drawing.Size(212, 693);
+            this.memoEdit1.TabIndex = 28;
+            this.memoEdit1.Visible = false;
+            // 
             // navigationPage2
             // 
             this.navigationPage2.Caption = "navigationPage2";
             this.navigationPage2.Controls.Add(this.gridVeriler);
-            this.navigationPage2.Controls.Add(this.memoEdit1);
             this.navigationPage2.Controls.Add(this.tileBar1);
             this.navigationPage2.Name = "navigationPage2";
             this.navigationPage2.Size = new System.Drawing.Size(1433, 788);
@@ -888,7 +898,7 @@
             this.gridVeriler.Location = new System.Drawing.Point(0, 0);
             this.gridVeriler.MainView = this.ViewVeriler;
             this.gridVeriler.Name = "gridVeriler";
-            this.gridVeriler.Size = new System.Drawing.Size(1221, 722);
+            this.gridVeriler.Size = new System.Drawing.Size(1433, 722);
             this.gridVeriler.TabIndex = 0;
             this.gridVeriler.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.ViewVeriler});
@@ -930,24 +940,16 @@
             this.tileBarItem1.AppearanceItem.Normal.BackColor2 = System.Drawing.Color.Blue;
             this.tileBarItem1.AppearanceItem.Normal.Options.UseBackColor = true;
             this.tileBarItem1.DropDownOptions.BeakColor = System.Drawing.Color.Empty;
-            tileItemElement8.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image1")));
-            tileItemElement8.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            tileItemElement8.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
-            tileItemElement8.Text = "Dosya Seç Yükle";
-            tileItemElement8.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
-            this.tileBarItem1.Elements.Add(tileItemElement8);
+            tileItemElement4.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("resource.Image1")));
+            tileItemElement4.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            tileItemElement4.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.TileControlImageToTextAlignment.Left;
+            tileItemElement4.Text = "Satışları Sisteme İşle";
+            tileItemElement4.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            this.tileBarItem1.Elements.Add(tileItemElement4);
             this.tileBarItem1.Id = 0;
             this.tileBarItem1.ItemSize = DevExpress.XtraBars.Navigation.TileBarItemSize.Wide;
             this.tileBarItem1.Name = "tileBarItem1";
             this.tileBarItem1.ItemClick += new DevExpress.XtraEditors.TileItemClickEventHandler(this.tileBarItem1_ItemClick);
-            // 
-            // memoEdit1
-            // 
-            this.memoEdit1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.memoEdit1.Location = new System.Drawing.Point(1221, 0);
-            this.memoEdit1.Name = "memoEdit1";
-            this.memoEdit1.Size = new System.Drawing.Size(212, 722);
-            this.memoEdit1.TabIndex = 5;
             // 
             // frmSatisAl
             // 
@@ -955,8 +957,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1433, 788);
             this.Controls.Add(this.navigationFrame1);
+            this.IconOptions.Image = global::EntegrefKrediOnay.Properties.Resources.Entegref__1_;
             this.Name = "frmSatisAl";
-            this.Text = "frmSatisAl";
+            this.Text = "Excel Yani Satışları İşle";
             this.Load += new System.EventHandler(this.frmSatisAl_Load);
             ((System.ComponentModel.ISupportInitialize)(this.navBarTarih)).EndInit();
             this.navBarTarih.ResumeLayout(false);
@@ -1004,10 +1007,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.navigationFrame1)).EndInit();
             this.navigationFrame1.ResumeLayout(false);
             this.navigationPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.memoEdit1.Properties)).EndInit();
             this.navigationPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridVeriler)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ViewVeriler)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.memoEdit1.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

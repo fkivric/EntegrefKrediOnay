@@ -55,7 +55,7 @@ namespace EntegrefKrediOnay.Merkez
                 {
                     backstageViewControl1.Visible = false;
                     ribbon.ApplicationButtonDropDownControl = null;
-                }
+                }           
             }
             catch (Exception ex)
             {
@@ -146,6 +146,7 @@ namespace EntegrefKrediOnay.Merkez
         public static List<RSocial> RSocials = new List<RSocial>();
         private async void frmBGMain_Load(object sender, EventArgs e)
         {
+            await frmLogin.Token();
             Program.FBGConfigProvider.Servis = "Login";
             var sonuc = await GetBGClass.VolantServisAsync(Program.FBGConfigProvider);
             try
@@ -172,25 +173,26 @@ namespace EntegrefKrediOnay.Merkez
             }
 
             //Program.FBGConfigProvider.Servis = "GetDigitalArchilveDownload";
-            Program.FBGConfigProvider.filter.directory = "/384/N Kolay Şirket Hesabına Para Yatırma API Teknik Dokümanı v1.1.pdf";
-            using (var client = new HttpClient())
-            {
-                var byteArray = Encoding.ASCII.GetBytes($"{Program.FBGConfigProvider.basicAuthUsername}:{Program.FBGConfigProvider.basicAuthPassword}");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-                var json = new StringContent(JsonConvert.SerializeObject(Program.FBGConfigProvider.filter), Encoding.UTF8, "application/json");
-                var response = await client.PostAsync("http://fatihkivric.com.tr:1930/api/Investigation/GetDigitalArchilveDownload", json);
-                if (response.Content.Headers.ContentType?.MediaType == "application/octet-stream")
-                {
-                    byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
-                    File.WriteAllBytes(@"C:\Users\FatihKivric\Desktop\indirilen.pdf", fileBytes);
-                }
-                else
-                {
-                    // Hata durumu — JSON response
-                    var errorJson = await response.Content.ReadAsStringAsync();
-                    // hata işle...
-                }
-            }
+            //Program.FBGConfigProvider.filter.directory = "/384/Yüklenen Dosyalar/fiyat listesi";
+            //using (var client = new HttpClient())
+            //{
+            //    var byteArray = Encoding.ASCII.GetBytes($"{Program.FBGConfigProvider.basicAuthUsername}:{Program.FBGConfigProvider.basicAuthPassword}");
+            //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            //    var json = new StringContent(JsonConvert.SerializeObject(Program.FBGConfigProvider.filter), Encoding.UTF8, "application/json");
+            //    var response = await client.PostAsync("http://fatihkivric.com.tr:1930/api/Investigation/GetDigitalArchilveDownload", json);
+            //    if (response.Content.Headers.ContentType?.MediaType == "application/octet-stream")
+            //    {
+            //        byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
+            //        File.WriteAllBytes(@"C:\Users\FatihKivric\Desktop\indirilen.pdf", fileBytes);
+            //    }
+            //    else
+            //    {
+            //        byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
+            //        // Hata durumu — JSON response
+            //        var errorJson = await response.Content.ReadAsStringAsync();
+            //        // hata işle...
+            //    }
+            //}
         }
         public void OpenTabForm(Form form)
         {
@@ -488,6 +490,11 @@ namespace EntegrefKrediOnay.Merkez
             {
                 CustomMessageBox.ShowMessage("Sadece EntegreF üzerinden Eklenebilir", "", this, "", false, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+        EntegreFDLL.Class.Entegref GetEntegref = new Entegref();
+        private void barButtonItem20_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenTabForm(new frmMusteri()); 
         }
     }
 }

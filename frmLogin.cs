@@ -608,7 +608,7 @@ namespace EntegrefKrediOnay
                 return g.DpiX / 96.0f;
             }
         }
-        public static async void Token()
+        public static async Task Token()
         {
             try
             {
@@ -833,12 +833,12 @@ namespace EntegrefKrediOnay
             if (Properties.Settings.Default.connectionstring.Contains("62.244.219.23"))
             {
                 var ftp = conn.GetData("select MTFTPIP,MTFTPUSER,MTFTPPASSWORD from MANAGEMENT", Properties.Settings.Default.connectionstring);
-                Properties.Settings.Default.VolFtpHost = ftp.Rows[0]["MTFTPIP"].ToString();
+                Properties.Settings.Default.VolFtpHost = "ftp://62.244.219.23";// ftp.Rows[0]["MTFTPIP"].ToString();
                 Properties.Settings.Default.VolFtpUser = ftp.Rows[0]["MTFTPUSER"].ToString();
                 Properties.Settings.Default.VolFtpPass = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
 
 
-                Entegref.GetLogins.FTPURL = ftp.Rows[0]["MTFTPIP"].ToString();
+                Entegref.GetLogins.FTPURL = "ftp://62.244.219.23";// ftp.Rows[0]["MTFTPIP"].ToString();
                 Entegref.GetLogins.FTPUSER = ftp.Rows[0]["MTFTPUSER"].ToString();
                 Entegref.GetLogins.FTPPASS = ftp.Rows[0]["MTFTPPASSWORD"].ToString();
 
@@ -1144,9 +1144,9 @@ namespace EntegrefKrediOnay
 
                 if (result.ekranAc)
                 {
-                    //Token();
                     // Login formunu gizle, hedef formu göster
                     this.Hide();
+                    var tokennnn = Properties.Settings.Default.VolantToken;
                     if (result.formToOpen != null)
                     {
                         result.formToOpen.ShowDialog();
@@ -1167,9 +1167,9 @@ namespace EntegrefKrediOnay
                         }
                         else
                         {
-                            Program.filter.username = Entegref.GetLogins.userID;
-                            Program.filter.password = Entegref.GetLogins.userPass;
-                            Program.filter.soCode = Entegref.GetLogins.userID;
+                            Program.filter.username = "00KRO001"; // Entegref.GetLogins.userID;
+                            Program.filter.password = "123"; // Entegref.GetLogins.userPass;
+                            Program.filter.soCode = "00KRO001"; // Entegref.GetLogins.userID;
                             Program.FBGConfigProvider.filter = Program.filter;
                             Program.FBGConfigProvider.baseLoginUrl = "http://fatihkivric.com.tr";
                             Program.FBGConfigProvider.port = "1930";

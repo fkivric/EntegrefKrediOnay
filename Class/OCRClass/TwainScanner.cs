@@ -53,6 +53,10 @@ namespace EntegrefKrediOnay.Class.OCRClass
         public Image Head { get; set; }
 
         public Image Identity { get; set; }
+        public Image ONYUZ { get; set; }
+
+        public Image ARKAYUZ { get; set; }
+        public List<Image> Tarama { get; set; }
         private void SetupTwain()
         {
             PlatformInfo.Current.PreferNewDSM = false;
@@ -224,6 +228,9 @@ namespace EntegrefKrediOnay.Class.OCRClass
             {
                 if (scannedImages != null)
                 {
+                    Tarama = scannedImages;
+                    ONYUZ = scannedImages[0];
+                    ARKAYUZ = scannedImages[1];
                     var dt = conn.GetData("select * from TERMINAL where  TERSTS = 1", Properties.Settings.Default.connectionstring);
                     TERMINAL rTerminal = dt.AsEnumerable()
                     .Select(row => new TERMINAL
@@ -334,7 +341,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
 
         private Bitmap CombineBitmap(List<Image> images)
         {
-            SplashScreenManager.ShowForm(null, typeof(SplashScreen), useFadeIn: true, useFadeOut: true, throwExceptionIfAlreadyOpened: false);
+            //SplashScreenManager.ShowForm(null, typeof(SplashScreen), useFadeIn: true, useFadeOut: true, throwExceptionIfAlreadyOpened: false);
             Bitmap finalImage = null;
             try
             {

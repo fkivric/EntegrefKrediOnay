@@ -44,15 +44,12 @@ namespace EntegrefKrediOnay
                 key.SetValue("ApplicationVersion", _s4);
                 key.Close();
 
-
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("tr-TR");
                 Thread.CurrentThread.CurrentCulture = new CultureInfo("tr-TR");
                 Thread.CurrentThread.CurrentUICulture = new CultureInfo("tr-TR");
                 EntegreFDLL.Main.StartupExtension.connectionString = Properties.Settings.Default.connectionstring;
                 Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+                Application.SetCompatibleTextRenderingDefault(false);                
                 Application.Run(new frmLogin());
                 //Application.Run(new FrmKimlikTarama());
             }

@@ -114,7 +114,54 @@ namespace EntegrefKrediOnay.Class.OCRClass
         /// </summary>
         public static Mat ConvertBitmapToMat(Bitmap bmp)
         {
+            Bitmap convertedBitmap = null;
 
+            try
+            {
+                // 24bpp RGB formatına çevir
+                convertedBitmap = new Bitmap(
+                    bmp.Width,
+                    bmp.Height,
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+                using (Graphics g = Graphics.FromImage(convertedBitmap))
+                {
+                    g.DrawImage(bmp, 0, 0, bmp.Width, bmp.Height);
+                }
+
+                Rectangle rect = new Rectangle(
+                    0,
+                    0,
+                    convertedBitmap.Width,
+                    convertedBitmap.Height);
+
+                BitmapData bmpData = convertedBitmap.LockBits(
+                    rect,
+                    ImageLockMode.ReadOnly,
+                    PixelFormat.Format24bppRgb);
+
+                try
+                {
+                    Mat mat = new Mat(
+                        convertedBitmap.Height,
+                        convertedBitmap.Width,
+                        DepthType.Cv8U,
+                        3,
+                        bmpData.Scan0,
+                        bmpData.Stride);
+
+                    return mat.Clone();
+                }
+                finally
+                {
+                    convertedBitmap.UnlockBits(bmpData);
+                }
+            }
+            finally
+            {
+                if (convertedBitmap != null)
+                    convertedBitmap.Dispose();
+            }
             //if (bmp == null)
             //    return null;
 
@@ -138,92 +185,68 @@ namespace EntegrefKrediOnay.Class.OCRClass
             //{
             //    return img.Mat.Clone();
             //}
-            if (bmp == null) return null;
+            //// parti kod
+            //if (bmp == null) return null;
 
-            // 1. Her zaman 24bppRgb formatına zorla (Emgu Bgr tipi için en güvenlisi)
-            Bitmap workingBmp = new Bitmap(bmp.Width, bmp.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            using (Graphics g = Graphics.FromImage(workingBmp))
-            {
-                g.DrawImage(bmp, new Rectangle(0, 0, workingBmp.Width, workingBmp.Height));
-            }
+            //Bitmap workingBmp = new Bitmap(bmp.Width, bmp.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            //using (Graphics g = Graphics.FromImage(workingBmp))
+            //{
+            //    g.DrawImage(bmp, new Rectangle(0, 0, workingBmp.Width, workingBmp.Height));
+            //}
 
-            // 2. Manuel Veri Kopyalama (Hata riskini minimize eder)
-            var data = workingBmp.LockBits(new Rectangle(0, 0, workingBmp.Width, workingBmp.Height),
-                                           System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                           workingBmp.PixelFormat);
-            try
-            {
-                // Mat nesnesini doğrudan bellek adresinden oluştur
-                Mat mat = new Mat(workingBmp.Height, workingBmp.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 3, data.Scan0, data.Stride);
-                return mat.Clone(); // Veriyi kopyalayıp orijinali serbest bırakıyoruz
-            }
-            finally
-            {
-                workingBmp.UnlockBits(data);
-                workingBmp.Dispose();
-            }
+            //var data = workingBmp.LockBits(new Rectangle(0, 0, workingBmp.Width, workingBmp.Height),
+            //                               System.Drawing.Imaging.ImageLockMode.ReadOnly,
+            //                               workingBmp.PixelFormat);
+            //try
+            //{
+            //    // Mat nesnesini doğrudan bellek adresinden oluştur
+            //    Mat mat = new Mat(workingBmp.Height, workingBmp.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 3, data.Scan0, data.Stride);
+            //    return mat.Clone(); // Veriyi kopyalayıp orijinali serbest bırakıyoruz
+            //}
+            //finally
+            //{
+            //    workingBmp.UnlockBits(data);
+            //    workingBmp.Dispose();
+            //}
         }
         public static Mat GetMatFront(Enums.ScanObject ScanObjEnum)
         {
-            Mat modelImage = null;
+            //Bitmap bitmap = Resources.YeniKimlikOn;
 
-            // Not: Bitmap nesnelerini Image<Bgr, byte> içine atmadan önce 
-            // bellek sızıntısını önlemek için ToImage extension'ı veya constructor kullanırız.
+            //Mat mat = new Mat(
+            //    bitmap.Height,
+            //    bitmap.Width,
+            //    Emgu.CV.CvEnum.DepthType.Cv8U,
+            //    3
+            //);
 
+            //return mat;
             switch (ScanObjEnum)
             {
-
                 case Enums.ScanObject.YeniTcKimlik:
-                    modelImage = ConvertBitmapToMat(Resources.YeniKimlikOn);
-                    break;
-
-                case Enums.ScanObject.Ehliyet:
-                    modelImage = ConvertBitmapToMat(Resources.EhliyetOn);
-                    break;
-
+                    return ConvertBitmapToMat(Resources.YeniKimlikOn);
                 case Enums.ScanObject.YeniEhliyet:
-                    modelImage = ConvertBitmapToMat(Resources.YeniEhliyetOn);
-                    break;
-
+                    return ConvertBitmapToMat(Resources.YeniEhliyetOn);
                 case Enums.ScanObject.Pasaport:
-                    modelImage = null;
-                    break;
-
+                    return null;
                 default:
-                    modelImage = null;
-                    break;
+                    return null;
             }
-
-            return modelImage;
         }
 
         public static Mat GetMatBack(Enums.ScanObject ScanObjEnum)
         {
-            Mat modelImage = null;
             switch (ScanObjEnum)
             {
-
                 case Enums.ScanObject.YeniTcKimlik:
-                    modelImage = ConvertBitmapToMat(Resources.YeniKimlikOn);
-                    break;
-
-                case Enums.ScanObject.Ehliyet:
-                    modelImage = ConvertBitmapToMat(Resources.EhliyetOn);
-                    break;
-
+                    return ConvertBitmapToMat(Resources.YeniKimlikArka);
                 case Enums.ScanObject.YeniEhliyet:
-                    modelImage = ConvertBitmapToMat(Resources.YeniEhliyetOn);
-                    break;
-
+                    return ConvertBitmapToMat(Resources.YeniEhliyetArka);
                 case Enums.ScanObject.Pasaport:
-                    modelImage = null;
-                    break;
-
+                    return null;
                 default:
-                    modelImage = null;
-                    break;
+                    return null;
             }
-            return modelImage;
         }
 
         [STAThread]
@@ -234,7 +257,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 Application.EnableVisualStyles();
                 using (Mat modelImage = GetMatFront(ScanObjEnum))
                 {
-                    using (Mat observedImage = CvInvoke.Imread(filename, LoadImageType.AnyColor))
+                    using (Mat observedImage = CvInvoke.Imread(filename, loadType : ImreadModes.AnyColor))
                     {
                         long matchTime;
                         return FrontImage = DrawMatchess.Draw(modelImage, observedImage, out matchTime, ScanObjEnum);
@@ -247,33 +270,50 @@ namespace EntegrefKrediOnay.Class.OCRClass
             }
         }
 
-        public static void Camera()
-        {
-            Capture capture = new Capture(1);
-            Bitmap image = capture.QueryFrame().Bitmap;
-            image.Save("C:\\Users\\Volant-Abdullah\\Desktop\\Kimlik\\Denemee.png");
-        }
-
         public static Image CropImgSERI(Bitmap bmp1)
         {
-            Image<Bgr, byte> cropImage = new Image<Bgr, byte>(bmp1);
-            for (int i = 0; i < cropImage.Rows; i++)
+            using (Mat mat = ConvertBitmapToMat(bmp1))
             {
-                for (int j = 0; j < cropImage.Cols; j++)
+                using (Image<Bgr, byte> cropImage = mat.ToImage<Bgr, byte>())
                 {
-                    Bgr currentColor = cropImage[i, j];
-                    if (currentColor.Blue > 200.0 || currentColor.Green > 200.0 || currentColor.Red > 200.0)
+                    // işlemleriniz
+                    for (int i = 0; i < cropImage.Rows; i++)
                     {
-                        cropImage[i, j] = new Bgr(255.0, 255.0, 255.0);
+                        for (int j = 0; j < cropImage.Cols; j++)
+                        {
+                            Bgr currentColor = cropImage[i, j];
+                            if (currentColor.Blue > 200.0 || currentColor.Green > 200.0 || currentColor.Red > 200.0)
+                            {
+                                cropImage[i, j] = new Bgr(255.0, 255.0, 255.0);
+                            }
+                            else if (currentColor.Blue > currentColor.Green + 20.0 && currentColor.Blue > currentColor.Red + 20.0)
+                            {
+                                cropImage[i, j] = new Bgr(255.0, 255.0, 255.0);
+                            }
+                        }
                     }
-                    else if (currentColor.Blue > currentColor.Green + 20.0 && currentColor.Blue > currentColor.Red + 20.0)
-                    {
-                        cropImage[i, j] = new Bgr(255.0, 255.0, 255.0);
-                    }
+                    cropImage.Erode(1);
+                    return cropImage.AsBitmap();
                 }
             }
-            cropImage.Erode(1);
-            return cropImage.Bitmap;
+            //Image<Bgr, byte> cropImage = new Image<Bgr, byte>(bmp1);
+            //for (int i = 0; i < cropImage.Rows; i++)
+            //{
+            //    for (int j = 0; j < cropImage.Cols; j++)
+            //    {
+            //        Bgr currentColor = cropImage[i, j];
+            //        if (currentColor.Blue > 200.0 || currentColor.Green > 200.0 || currentColor.Red > 200.0)
+            //        {
+            //            cropImage[i, j] = new Bgr(255.0, 255.0, 255.0);
+            //        }
+            //        else if (currentColor.Blue > currentColor.Green + 20.0 && currentColor.Blue > currentColor.Red + 20.0)
+            //        {
+            //            cropImage[i, j] = new Bgr(255.0, 255.0, 255.0);
+            //        }
+            //    }
+            //}
+            //cropImage.Erode(1);
+            //return cropImage.Bitmap;
         }
 
         [STAThread]
@@ -286,7 +326,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
             Application.EnableVisualStyles();
             using (Mat modelImage = GetMatFront(ScanObjEnum))
             {
-                using (Mat observedImage = CvInvoke.Imread(filename, LoadImageType.AnyColor))
+                using (Mat observedImage = CvInvoke.Imread(filename, loadType : ImreadModes.AnyColor))
                 {
                     long matchTime;
                     Bitmap cropImg = (Bitmap)(FrontImage = DrawMatchess.Draw(modelImage, observedImage, out matchTime, ScanObjEnum));
@@ -382,7 +422,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 //}
                 return rKimlik;
             }
-            catch
+            catch(Exception ex)
             {
                 return null;
             }
@@ -396,13 +436,13 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 Application.EnableVisualStyles();
                 using (Mat modelImage = GetMatBack(ScanObjEnum))
                 {
-                    using (Mat observedImage = CvInvoke.Imread(filename, LoadImageType.AnyColor))
+                    using (Mat observedImage = CvInvoke.Imread(filename, loadType : ImreadModes.AnyColor))
                     {
                         long matchTime;
                         Image img = DrawMatchess.Draw(modelImage, observedImage, out matchTime, ScanObjEnum);
                         if (ScanObjEnum == Enums.ScanObject.TcKimlik)
                         {
-                            Mat modelImageArkaTamami = CvInvoke.Imread("Extensions/nufuscuzdaniArkaTamami.jpg", LoadImageType.AnyColor);
+                            Mat modelImageArkaTamami = CvInvoke.Imread("Extensions/nufuscuzdaniArkaTamami.jpg", loadType: ImreadModes.AnyColor);
                             Image imgArkaTamami = DrawMatchess.Draw(modelImageArkaTamami, observedImage, out matchTime, ScanObjEnum);
                             BackImage = imgArkaTamami;
                         }
@@ -430,7 +470,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
             Application.EnableVisualStyles();
             using (Mat modelImage = GetMatBack(ScanObjEnum))
             {
-                using (Mat observedImage = CvInvoke.Imread(filename, LoadImageType.AnyColor))
+                using (Mat observedImage = CvInvoke.Imread(filename, loadType: ImreadModes.AnyColor))
                 {
                     long matchTime;
                     Image img = (BackImage = DrawMatchess.Draw(modelImage, observedImage, out matchTime, ScanObjEnum));
@@ -450,7 +490,7 @@ namespace EntegrefKrediOnay.Class.OCRClass
                     rKimlik.VERILISTARIHI = DrawMatchess.GetImagePoint(cropImg, ScanObjEnum, 520, 823, 480, 177);
                     if (ScanObjEnum == Enums.ScanObject.TcKimlik)
                     {
-                        Mat modelImageArkaTamami = CvInvoke.Imread("Extensions/nufuscuzdaniArkaTamami1.jpg", LoadImageType.AnyColor);
+                        Mat modelImageArkaTamami = CvInvoke.Imread("Extensions/nufuscuzdaniArkaTamami1.jpg", loadType: ImreadModes.AnyColor);
                         Image imgArkaTamami = DrawMatchess.Draw(modelImageArkaTamami, observedImage, out matchTime, ScanObjEnum);
                         BackImage = imgArkaTamami;
                     }
@@ -473,8 +513,13 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 }
                 using (Mat modelImage = GetMatBack(ScanObjEnum))
                 {
-                    using (Image<Bgr, byte> observedImage = new Image<Bgr, byte>(file))
+                    using (Mat mat = ConvertBitmapToMat(file))
+                    using (Image<Bgr, byte> observedImage = mat.ToImage<Bgr, byte>())
                     {
+                        // işlemleriniz
+                    //}
+                    //using (Image<Bgr, byte> observedImage = new Image<Bgr, byte>(file))
+                    //{
                         long matchTime;
                         Image img = (BackImage = DrawMatchess.Draw(modelImage, observedImage.Mat, out matchTime, ScanObjEnum, backSide: true));
                         Bitmap cropImg = (Bitmap)img;

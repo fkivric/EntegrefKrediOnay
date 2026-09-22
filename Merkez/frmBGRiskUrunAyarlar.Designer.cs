@@ -264,7 +264,7 @@
             this.Controls.Add(this.tileBar3);
             this.Controls.Add(this.panelControl1);
             this.Name = "frmBGRiskUrunAyarlar";
-            this.Text = "frmBGRiskUrunAyarlar";
+            this.Text = "Urun Gurubu Risk Ayarları";
             this.Load += new System.EventHandler(this.frmBGRiskUrunAyarlar_Load);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);

@@ -305,6 +305,7 @@ namespace EntegrefKrediOnay.Merkez
 
             return layout;
         }
+
         EntegreFDLL.Class.BGClass GetBGClass = new EntegreFDLL.Class.BGClass();
         eSalesConfirm rConfirmSales = new eSalesConfirm();
         public eCurrents rCurrents = null;
@@ -404,6 +405,8 @@ namespace EntegrefKrediOnay.Merkez
             //    }
             //}
             Program.FBGConfigProvider.Servis = "GetDigitalArchilveDownload";
+            Program.EntegreFIAConfigProvider.SOCODE = Program.FBGConfigProvider.filter.soCode;
+            Program.EntegreFIAConfigProvider.ConnectionString = sql1;
             var sonuc = await GetBGClass.VolantServisAsync(Program.FBGConfigProvider);
             navBarDetay.Width = this.Size.Width - navBarControl1.Width;
             navBarDetay.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Collapsed;
@@ -1044,28 +1047,33 @@ namespace EntegrefKrediOnay.Merkez
                             Egaranti egaranti = new Egaranti();
                             rConfirmSales.gunSayisi = egaranti.GetDayDifference(DateTime.Parse(rConfirmSales.satisTarihi.ToString()).ToString("dd-MM-yyyy"));
                             rConfirmSales.teslimSekli = "Kredi Uygunluğunu Bakılarak";
-                            var KefilTutar = conn.GetValueConnection($"select AIDEF_VALUE from EntegreF.dbo.ENTEGREF_AISCORING where AIDEF_SOCODE = '{Entegref.GetLogins.userID}' and AIDEF_ID in (55)", sql1);
+                            var KefilTutar = conn.GetValueConnection($"select AIDEF_VALUE from EntegreF.dbo.ENTEGREF_AISCORING where AIDEF_SOCODE = '{Program.FBGConfigProvider.filter.username}' and AIDEF_ID in (55)", sql1);
 
                             new List<eWaveCustomer>();
                             var WaveCUS = conn.GetData($@"select * from WAVECUSTOMER 
                             join WAVECUSTREE on WCUSUNIQ = WCTREUNIQ and WCTREVAL = WCUSVAL
-                            where WCUSUNIQ = 9 and WCUSCURID = {rConfirmSales.musteriRef}", sql1);
+                            where WCUSUNIQ = 4 and WCUSCURID = {rConfirmSales.musteriRef}", sql1);
                             List<eWaveCustomer> lWaveCustomer = new List<eWaveCustomer>();
-                            for (int i = 0; i < WaveCUS.Rows.Count; i++)
+                            if (WaveCUS != null)
                             {
-                                lWaveCustomer.Add(new eWaveCustomer
+                                for (int i = 0; i < WaveCUS.Rows.Count; i++)
                                 {
-                                    WCUSCURID = rConfirmSales.musteriRef,
-                                    WCUSUNIQ = short.Parse(WaveCUS.Rows[i]["WCUSUNIQ"].ToString()),
-                                    WCUSVAL = WaveCUS.Rows[i]["WCUSVAL"].ToString(),
-                                    satisYapilabir = Convert.ToBoolean(WaveCUS.Rows[i]["WCTRECANSALE"].ToString()),
-                                    tahsilatYapilabir = Convert.ToBoolean(WaveCUS.Rows[i]["WCTRECANPROCEED"].ToString())
-                                });
+                                    lWaveCustomer.Add(new eWaveCustomer
+                                    {
+                                        WCUSCURID = rConfirmSales.musteriRef,
+                                        WCUSUNIQ = short.Parse(WaveCUS.Rows[i]["WCUSUNIQ"].ToString()),
+                                        WCUSVAL = WaveCUS.Rows[i]["WCUSVAL"].ToString(),
+                                        satisYapilabir = Convert.ToBoolean(WaveCUS.Rows[i]["WCTRECANSALE"].ToString()),
+                                        tahsilatYapilabir = Convert.ToBoolean(WaveCUS.Rows[i]["WCTRECANPROCEED"].ToString())
+                                    });
+                                }
                             }
                             rConfirmSales.lWaveCustomer = lWaveCustomer;
+                            if (KefilTutar == null)
+                                Program.EntegreFIAConfigProvider.KefilTutar = decimal.Parse(KefilTutar);
+
                             Program.EntegreFIAConfigProvider.SalesConfirm = rConfirmSales;
                             Program.EntegreFIAConfigProvider.Risk = RiskYuzdesi;
-                            Program.EntegreFIAConfigProvider.KefilTutar = decimal.Parse(KefilTutar);
                             var Karar = SalesConfirmRichEditRenderer.GetKarar(Program.EntegreFIAConfigProvider);
                             lblTeslimatOrani.Text = Karar;
 
@@ -2119,11 +2127,13 @@ namespace EntegrefKrediOnay.Merkez
                 {
                     Credentials = new NetworkCredential(user, pass),
                     Encoding = Encoding.UTF8,
-                    DataConnectionType = FtpDataConnectionType.AutoPassive,
-                    SocketKeepAlive = true
+                    DataConnectionType = FtpDataConnectionType.PASV,
+                    SocketKeepAlive = true                    
                 };
+                ftpClient.Encoding = Encoding.GetEncoding("ISO-8859-9");
                 await ftpClient.ConnectAsync();
                 Dictionary<string, List<PdfTextInfo>> groupedTexts = new Dictionary<string, List<PdfTextInfo>>();
+                var list = ftpClient.GetListing($"/{path}");
                 await TraverseAndConvert(path);
                 if (groupedTexts.Count > 0)
                 {
@@ -2441,6 +2451,7 @@ namespace EntegrefKrediOnay.Merkez
             //    soCode = Entegref.GetLogins.userID,
             //};
             InvestigationResponse myDeserializedClass = new InvestigationResponse();
+            myDeserializedClass.lInvestigation = new List<LInvestigation>();
             await SplashScrenn.RunWithSplashAsync(this, false, 0, this.Text,
                 async (progress, token) =>
                 {
@@ -2449,8 +2460,9 @@ namespace EntegrefKrediOnay.Merkez
                     token.ThrowIfCancellationRequested();
                     Program.FBGConfigProvider.Servis = "GetAllInvestigation";
                     var sonuc = await GetBGClass.VolantServisAsync(Program.FBGConfigProvider);
+                    //InvestigationResponse Deserialized = JsonConvert.DeserializeObject<InvestigationResponse>(sonuc);
                     myDeserializedClass = JsonConvert.DeserializeObject<InvestigationResponse>(sonuc);
-                    navBarDetay.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Collapsed;
+                    //navBarDetay.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Collapsed;
                     foreach (var item in myDeserializedClass.lInvestigation)
                     {
                         if (item.curOrWark__BackingField != "Kefil")
@@ -2767,9 +2779,6 @@ namespace EntegrefKrediOnay.Merkez
         }
         public async Task Kefil(long WRTRID)
         {
-            Program.FBGConfigProvider.filter.username = Entegref.GetLogins.userID;
-            Program.FBGConfigProvider.filter.password = Entegref.GetLogins.userPass;
-            Program.FBGConfigProvider.filter.soCode = Entegref.GetLogins.userID;
             Program.FBGConfigProvider.filter.curId = long.Parse(CURID);
             Program.FBGConfigProvider.filter.WRTRID = WRTRID;
             Program.FBGConfigProvider.Servis = "GetWarranters";
@@ -2934,9 +2943,6 @@ namespace EntegrefKrediOnay.Merkez
         }
         public async Task Notlar()
         {
-            Program.FBGConfigProvider.filter.username = Entegref.GetLogins.userID;
-            Program.FBGConfigProvider.filter.password = Entegref.GetLogins.userPass;
-            Program.FBGConfigProvider.filter.soCode = Entegref.GetLogins.userID;
             Program.FBGConfigProvider.filter.curId = long.Parse(CURID);
             Program.FBGConfigProvider.Servis = "GetAllCurNotes";
 

@@ -138,11 +138,18 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 }
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\Volant KTS Tarama\\";
                 Directory.CreateDirectory(path);
-                using (Image<Bgr, byte> colorImage = new Image<Bgr, byte>(bmp))
+                using (Mat colorImage = ImageHelper.ConvertBitmapToMat(bmp))
+                //using (Image<Bgr, byte> colorImage = new Image<Bgr, byte>(bmp))
                 {
                     // 2. Gri tonlamaya çeviriyoruz
-                    using (Image<Gray, byte> grayImage = colorImage.Convert<Gray, byte>())
+                    using (Mat grayMat = new Mat())
                     {
+                        CvInvoke.CvtColor(
+                            colorImage,
+                            grayMat,
+                            Emgu.CV.CvEnum.ColorConversion.Bgr2Gray
+                        );
+
                         // 3. Jpeg Encoder ayarlarını yapıyoruz
                         ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                         System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
@@ -156,7 +163,14 @@ namespace EntegrefKrediOnay.Class.OCRClass
                                 // 4. Bitmap üzerinden kaydetme işlemi
                                 // Emgu CV'nin .Bitmap özelliği bir referans döner, 
                                 // bu yüzden doğrudan Save metodunu kullanabiliriz.
-                                grayImage.Bitmap.Save("rKimlik.jpg", jpgEncoder, myEncoderParameters);
+                                using (Bitmap grayBitmap = grayMat.ToBitmap())
+                                {
+                                    grayBitmap.Save(
+                                        "rKimlik.jpg",
+                                        jpgEncoder,
+                                        myEncoderParameters
+                                    );
+                                }
                             }
                         }
                     }
@@ -228,8 +242,13 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 }
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\Volant KTS Tarama\\";
                 Directory.CreateDirectory(path);
-                using (Image<Bgr, byte> colorImage = new Image<Bgr, byte>(bmp))
+                using (Mat mat = ImageHelper.ConvertBitmapToMat(bmp))
+                using (Image<Bgr, byte> colorImage = mat.ToImage<Bgr, byte>())
                 {
+                    // işlemleriniz
+                //}
+                //using (Image<Bgr, byte> colorImage = new Image<Bgr, byte>(bmp))
+                //{
                     // 2. Gri tonlamaya çeviriyoruz
                     using (Image<Gray, byte> grayImage = colorImage.Convert<Gray, byte>())
                     {
@@ -246,7 +265,15 @@ namespace EntegrefKrediOnay.Class.OCRClass
                                 // 4. Bitmap üzerinden kaydetme işlemi
                                 // Emgu CV'nin .Bitmap özelliği bir referans döner, 
                                 // bu yüzden doğrudan Save metodunu kullanabiliriz.
-                                grayImage.Bitmap.Save("rKimlik.jpg", jpgEncoder, myEncoderParameters);
+                                using (Bitmap grayBitmap = grayImage.ToBitmap())
+                                {
+                                    grayBitmap.Save(
+                                        "rKimlik.jpg",
+                                        jpgEncoder,
+                                        myEncoderParameters
+                                    );
+                                }
+                                grayImage.ToBitmap().Save("rKimlik.jpg", jpgEncoder, myEncoderParameters);
                             }
                         }
                     }
@@ -254,11 +281,11 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 //Image<Bgr, byte> imgGray = new Image<Bgr, byte>(bmp);
                 //Image<Gray, byte> imgGray2 = imgGray.Convert<Gray, byte>();
                 //ImageCodecInfo jgpEncoder = GetEncoder(ImageFormat.Jpeg);
-                //Encoder myEncoder = Encoder.Quality;
+                //System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
                 //EncoderParameters myEncoderParameters = new EncoderParameters(1);
                 //EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                 //myEncoderParameters.Param[0] = myEncoderParameter;
-                //imgGray2.Bitmap.Save("rKimlikFront.jpg", jgpEncoder, myEncoderParameters);
+                //imgGray2.ToBitmap().Save("rKimlikFront.jpg", jgpEncoder, myEncoderParameters);
             }
             catch (Exception exp)
             {
@@ -329,8 +356,13 @@ namespace EntegrefKrediOnay.Class.OCRClass
                 }
                 string path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "\\Volant KTS Tarama\\";
                 Directory.CreateDirectory(path);
-                using (Image<Bgr, byte> colorImage = new Image<Bgr, byte>(bmp))
+                using (Mat mat = ImageHelper.ConvertBitmapToMat(bmp))
+                using (Image<Bgr, byte> colorImage = mat.ToImage<Bgr, byte>())
                 {
+                    // işlemleriniz
+                //}
+                //using (Image<Bgr, byte> colorImage = new Image<Bgr, byte>(bmp))
+                //{
                     // 2. Gri tonlamaya çeviriyoruz
                     using (Image<Gray, byte> grayImage = colorImage.Convert<Gray, byte>())
                     {
@@ -347,7 +379,15 @@ namespace EntegrefKrediOnay.Class.OCRClass
                                 // 4. Bitmap üzerinden kaydetme işlemi
                                 // Emgu CV'nin .Bitmap özelliği bir referans döner, 
                                 // bu yüzden doğrudan Save metodunu kullanabiliriz.
-                                grayImage.Bitmap.Save("rKimlik.jpg", jpgEncoder, myEncoderParameters);
+                                using (Bitmap grayBitmap = grayImage.ToBitmap())
+                                {
+                                    grayBitmap.Save(
+                                        "rKimlik.jpg",
+                                        jpgEncoder,
+                                        myEncoderParameters
+                                    );
+                                }
+                                grayImage.ToBitmap().Save("rKimlik.jpg", jpgEncoder, myEncoderParameters);
                             }
                         }
                     }

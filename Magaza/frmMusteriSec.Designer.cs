@@ -138,6 +138,7 @@
             this.toggleSwitch1.Properties.OnText = "Kimlik Taraması Olan";
             this.toggleSwitch1.Size = new System.Drawing.Size(160, 18);
             this.toggleSwitch1.TabIndex = 0;
+            this.toggleSwitch1.Toggled += new System.EventHandler(this.toggleSwitch1_Toggled);
             // 
             // frmMusteriSec
             // 

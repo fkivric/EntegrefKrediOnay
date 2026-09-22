@@ -255,12 +255,28 @@ namespace EntegrefKrediOnay.Merkez
             public List<PRODUCTS> pRODUCTs { get; set; }
             public List<WAVEPRODUCTS> wAVEPRODUCTs { get; set; }
             public List<PRICELIST> pRICELISTs { get; set; }
+            public List<HISTORYPRICELIST> hISTORYPRICELISTs { get; set; }
             public List<PROUNIT> pROUNITs { get; set; }
         }
         public class PICTURE
         {
             public long PRPID {get;set;}
             public Image GetImage { get; set; }
+        }
+        public class HISTORYPRICELIST
+        {
+            public long HPRLDPRID { get; set; }
+
+            public long HPRLPROID { get; set; }
+
+            public decimal HPRLPRICE { get; set; }
+
+            public DateTime HPRLDATETIME { get; set; }
+
+            public string HPRLSOCODEE { get; set; }
+
+            public string HPRLKIND { get; set; }
+
         }
         public frmStok()
         {
@@ -374,7 +390,8 @@ namespace EntegrefKrediOnay.Merkez
         private void Stoklar()
         {
             var dt = conn.GetData(@"
-select PROID,PROVAL,PROPROUID,PRONAME,PROSTS,Marka,ÜrünSınıfı,ÜrünGrubu,KotaGrubu,UrunDurumu from PRODUCTS
+select PROID,PROVAL,PROPROUID,PRONAME,PROSTS,Marka,ÜrünSınıfı,ÜrünGrubu,KotaGrubu,UrunDurumu
+from PRODUCTS
 outer apply (select WPTRENAME as Marka from WAVEPRODUCTS 
 			 left outer join WAVEPROTREE on WPROUNIQ = WPTREUNIQ and WPROVAL = WPTREVAL
 			 where WPROUNIQ = 1 and WPROID = PROID) WAVE1
@@ -601,8 +618,9 @@ outer apply (select WPTRENAME as UrunDurumu from WAVEPRODUCTS
             layoutControl1.Enabled = false;
             layoutControl5.Enabled = false;
             musteriResmiPce.Enabled = false;
-            NewUser = false;
+            gridStoklar.Enabled = true;
             sss.Clear();
+            NewUser = false;
         }
         private async void barButtonItem3_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {            
@@ -950,10 +968,14 @@ outer apply (select WPTRENAME as UrunDurumu from WAVEPRODUCTS
             gridKirilim.DataSource = null;
             gridFiyat.DataSource = null;
             gridTarihce.DataSource = null;
+            gridStoklar.Enabled = false;
             navBarKullanici.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
             layoutControl1.Enabled = true;
             layoutControl5.Enabled = true;
             musteriResmiPce.Enabled = true;
+            musteriResmiPce.EditValue = null;
+            miniHTMLTextBox1.Text = null;
+            sss.Clear();
             NewUser = true;
         }
         private void barButtonItem5_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
@@ -984,11 +1006,11 @@ outer apply (select WPTRENAME as UrunDurumu from WAVEPRODUCTS
         }
         private void barButtonItemStok_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            navigationFrame1.SelectedPage = navigationPage1;
+            nFrameMain.SelectedPage = nPageStoklar;
         }
         private void barButtonItemExcel_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            navigationFrame1.SelectedPage = navigationPage2;
+            nFrameMain.SelectedPage = nPageYeniStok;
             navigationFrame2.SelectedPage = navigationPage3;     
             gridVeriler.DataSource = null;
             navBarStok.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
@@ -1000,13 +1022,26 @@ outer apply (select WPTRENAME as UrunDurumu from WAVEPRODUCTS
 select PROUID,WPTREVAL as PROUVAL,PROUKIND,PROUNAME,PROUPROVALNICK,PROULEVEL,PROUMARKA from PRODUCTSUNITED
 join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<PRODUCTSUNITED>();
         }
+        private void barButtonItemExcelFiyat_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            nFrameMain.SelectedPage = nPageFiyatGuncelleme;
+            navigationFrame3.SelectedPage = nPageFiyatExcel;
+            gridFiyatGuncelle.DataSource = null;
+            navBarFiayt.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
+            tileBarItemFiyatKaydet.Enabled = false;
+            Worksheet worksheet = spreadsheetControl2.Document.Worksheets.ActiveWorksheet;
+            // Çalışma sayfasının içeriğini temizle
+            worksheet.Clear(worksheet.GetDataRange());
+            pRICELISTs = conn.GetData(@"select * from HISTORYPRICELIST", sql1).ToList<PRICELIST>();
+        }
         List<PRODUCTSUNITED> pRODUCTSUNITEDs = new List<PRODUCTSUNITED>();
+        List<PRICELIST> pRICELISTs  = new List<PRICELIST>();
         public static string WPTRENAME;
         public static string WPROVAL;
         private void repositoryItemButtonEdit1_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
         {
             var DWPROUNIQ = ViewKirilim.GetRowCellValue(ViewKirilim.FocusedRowHandle, "DWPROUNIQ").ToString();
-            frmKrilim krilim = new frmKrilim(DWPROUNIQ);
+            frmSrokKrilim krilim = new frmSrokKrilim(DWPROUNIQ);
             krilim.ShowDialog();
             ViewKirilim.SetRowCellValue(ViewKirilim.FocusedRowHandle, "WPTREVAL", WPROVAL);
             ViewKirilim.SetRowCellValue(ViewKirilim.FocusedRowHandle, "WPTRENAME", WPTRENAME);
@@ -1126,7 +1161,6 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
         private void btnKontrol_ItemClick(object sender, TileItemEventArgs e)
         {
             var item = sender as TileItem; // veya TileBarItem
-
             List<WAVEPROTREE> wAVEPROTREEs = new List<WAVEPROTREE>();
             List<PROMAIN> pROMAINs = new List<PROMAIN>();
             int index = 1;
@@ -1165,8 +1199,7 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
             () =>
             {
                 progressForm.Show(this);
-                //for (int rowIndex = index; rowIndex < usedRange.RowCount; rowIndex++)
-                for (int rowIndex = index; rowIndex < 500; rowIndex++)
+                for (int rowIndex = index; rowIndex < usedRange.RowCount; rowIndex++)
                 {
                     try
                     {
@@ -1178,13 +1211,14 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                             List<PROUNIT> pROUNITs = new List<PROUNIT>();
                             List<WAVEPRODUCTS> wAVEPRODUCTs = new List<WAVEPRODUCTS>();
                             List<PRICELIST> pRICELISTs = new List<PRICELIST>();
+                            List<HISTORYPRICELIST> hISTORYPRICELISTs = new List<HISTORYPRICELIST>();
                             var WAVEPROTREE = conn.GetData("select * from WAVEPROTREE", sql1).ToList<WAVEPROTREE>();
                             var DEFPRICE = conn.GetData("select * from DEFPRICE", sql1).ToList<DEFPRICE>();
                             PROMAIN pROMAIN = new PROMAIN();
                             if (uniquePROVAL.Add(usedRange[rowIndex, SiraPROVAL - 1].Value.ToString()))
                             {
                                 var NEWPROID = FIRSTID + rowIndex;//await REGISTER("137", sql1);
-                                    pRODUCTs.Add(new PRODUCTS
+                                pRODUCTs.Add(new PRODUCTS
                                 {
                                     PROID = NEWPROID,
                                     PROVAL = usedRange[rowIndex, SiraPROVAL - 1].Value.ToString(),
@@ -1394,6 +1428,15 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                                         PRLPRICE = number,
                                         PRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID
                                     });
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID,
+                                        HPRLPROID = NEWPROID,
+                                        HPRLPRICE = number,
+                                        HPRLDATETIME = DateTime.Now,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
                                 }
                                 if (decimal.TryParse(PR2, out decimal number2))
                                 {
@@ -1404,6 +1447,15 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                                         PRLPROID = NEWPROID,
                                         PRLPRICE = number2,
                                         PRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID
+                                    });
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID2,
+                                        HPRLPROID = NEWPROID,
+                                        HPRLPRICE = number,
+                                        HPRLDATETIME = DateTime.Now,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
                                     });
                                 }
                                 if (decimal.TryParse(PR3, out decimal number3))
@@ -1416,6 +1468,15 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                                         PRLPRICE = number3,
                                         PRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID
                                     });
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID3,
+                                        HPRLPROID = NEWPROID,
+                                        HPRLPRICE = number,
+                                        HPRLDATETIME = DateTime.Now,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
                                 }
                                 if (decimal.TryParse(PR4, out decimal number4))
                                 {
@@ -1426,6 +1487,15 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                                         PRLPROID = NEWPROID,
                                         PRLPRICE = number4,
                                         PRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID
+                                    });
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID4,
+                                        HPRLPROID = NEWPROID,
+                                        HPRLPRICE = number,
+                                        HPRLDATETIME = DateTime.Now,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
                                     });
                                 }
                                 if (decimal.TryParse(PR5, out decimal number5))
@@ -1438,11 +1508,21 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                                         PRLPRICE = number5,
                                         PRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID
                                     });
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID5,
+                                        HPRLPROID = NEWPROID,
+                                        HPRLPRICE = number,
+                                        HPRLDATETIME = DateTime.Now,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
                                 }
                                 pROMAIN.pRODUCTs = pRODUCTs;
                                 pROMAIN.pRICELISTs = pRICELISTs;
                                 pROMAIN.pROUNITs = pROUNITs;
                                 pROMAIN.wAVEPRODUCTs = wAVEPRODUCTs;
+                                pROMAIN.hISTORYPRICELISTs = hISTORYPRICELISTs;
                                 pROMAINs.Add(pROMAIN);
                             }
                             else
@@ -1508,6 +1588,7 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                 List<WAVEPRODUCTS> waveProducts = new List<WAVEPRODUCTS>();
                 List<PROUNIT> prounit = new List<PROUNIT>();
                 List<PRICELIST> pricelist = new List<PRICELIST>();
+                List<HISTORYPRICELIST> historylist = new List<HISTORYPRICELIST>();
                 for (int i = 0; i < ViewVeriler.RowCount; i++)
                 {
                     var rowObj = ViewVeriler.GetRow(i) as PROMAIN;
@@ -1515,6 +1596,7 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                     waveProducts.AddRange(rowObj.wAVEPRODUCTs);
                     prounit.AddRange(rowObj.pROUNITs);
                     pricelist.AddRange(rowObj.pRICELISTs);
+                    historylist.AddRange(rowObj.hISTORYPRICELISTs);
                 }
                 using (var sqlConnection = new SqlConnection(sql1))
                 {
@@ -1538,6 +1620,10 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
 
                                 var WAVEPRODUCTS = convertler.ToDataTable(waveProducts);
                                 BulkInsertReturn = db.BulkInsertRetorn(WAVEPRODUCTS, "WAVEPRODUCTS");
+
+
+                                var HISTORYPRICELIST = convertler.ToDataTable(historylist);
+                                BulkInsertReturn = db.BulkInsertRetorn(HISTORYPRICELIST, "HISTORYPRICELIST");
                                 tran.Commit(); // Başarılıysa commit
                             }
                             else
@@ -1552,7 +1638,7 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                         }
                     }
                 }
-                navigationFrame1.SelectedPage = navigationPage1;
+                nFrameMain.SelectedPage = nPageStoklar;
                 navigationFrame2.SelectedPage = navigationPage3;
                 gridVeriler.DataSource = null;
                 navBarStok.OptionsNavPane.NavPaneState = DevExpress.XtraNavBar.NavPaneState.Expanded;
@@ -1591,6 +1677,341 @@ join WAVEPROTREE on WPTREUNIQ = 2 and WPTREVAL = '00' + PROUVAL", sql1).ToList<P
                 }
             }
             return destImage;
+        }
+
+        private void btnDosyaSec2_ItemClick(object sender, TileItemEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel Dosyaları (*.xlsx;*.xls)|*.xlsx;*.xls|Tüm Dosyalar (*.*)|*.*";
+            Worksheet worksheet = spreadsheetControl2.Document.Worksheets.ActiveWorksheet;
+            // Çalışma sayfasının içeriğini temizle
+            worksheet.Clear(worksheet.GetDataRange());
+            spreadsheetControl2.Document.BeginUpdate();
+            // Kullanıcıdan dosyayı seçmesini iste
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                spreadsheetControl2.Document.LoadDocument(openFileDialog.FileName, DocumentFormat.Xlsx);
+            }
+            spreadsheetControl2.Document.EndUpdate();
+
+            Worksheet worksheet2 = spreadsheetControl2.Document.Worksheets.ActiveWorksheet;
+            CellRange usedRange = worksheet2.GetUsedRange();
+
+            // Dolu sütunları dolaşarak sıralı harf isimlerini elde edin
+            for (int columnIndex = usedRange.LeftColumnIndex; columnIndex <= usedRange.RightColumnIndex + 1; columnIndex++)
+            {
+                // Sütunun harf karşılığını hesaplayın
+                string columnName = GetColumnName(columnIndex);
+                // Sütun ismini listeye ekleyin
+                cmbPROVAL2.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbKart.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbNakit.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbTaksit4.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbTaksit8.Items.Add(new ComboBoxItem(columnIndex, columnName));
+                cmbTaksit11.Items.Add(new ComboBoxItem(columnIndex, columnName));
+            }
+            var comboList = new List<System.Windows.Forms.ComboBox>
+            {
+                cmbPROVAL2, cmbKart, cmbNakit, cmbTaksit4, cmbTaksit8, cmbTaksit11
+            };
+
+            for (int col = usedRange.LeftColumnIndex; col <= usedRange.RightColumnIndex; col++)
+            {
+                string headerText = worksheet2.Cells[usedRange.TopRowIndex, col].DisplayText?.Trim();
+
+                if (string.IsNullOrEmpty(headerText)) continue;
+
+                foreach (var combo in comboList)
+                {
+                    if (combo.Tag != null &&
+                        headerText.Equals(combo.Tag.ToString(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        // eşleşen combobox için doğru item’i seç
+                        foreach (ComboBoxItem item in combo.Items)
+                        {
+                            if (item.Value == col + 1)
+                            {
+                                combo.SelectedItem = item;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            spreadsheetControl2.Document.Worksheets.ActiveWorksheet.Cells.AutoFitColumns();
+            tileBarItemFiyatKaydet.Enabled = true;
+        }
+        private void tileBarItemFiyatKaydet_ItemClick(object sender, TileItemEventArgs e)
+        {
+            var item = sender as TileItem; // veya TileBarItem
+
+            List<PRICELIST> pRICELISTs = new List<PRICELIST>();
+            List<HISTORYPRICELIST> hISTORYPRICELISTs = new List<HISTORYPRICELIST>();
+            int index = 1;
+            ListtoDataTableConverter converter = new ListtoDataTableConverter();
+            Worksheet worksheet = spreadsheetControl2.Document.Worksheets.ActiveWorksheet;
+
+            HashSet<string> uniquePROVAL = new HashSet<string>();
+            CellRange usedRange = worksheet.GetUsedRange();
+            ProgressBarFrm progressForm = new ProgressBarFrm()
+            {
+                Start = 0,
+                Finish = usedRange.RowCount,
+                Position = 0,
+                ToplamAdet = usedRange.RowCount.ToString(),
+            };
+            int SiraPROVAL = HarfinSirasi(cmbPROVAL2.Text);
+            int SiraPESIN = HarfinSirasi(cmbNakit.Text);
+            int SiraKK = HarfinSirasi(cmbKart.Text);
+            int SiraTK5 = HarfinSirasi(cmbTaksit4.Text);
+            int SiraTK9 = HarfinSirasi(cmbTaksit8.Text);
+            int SiraTK12 = HarfinSirasi(cmbTaksit11.Text);
+            var DEFPRICE = conn.GetData("select * from DEFPRICE", sql1).ToList<DEFPRICE>();
+            var AddTimer = DateTime.Now;
+            string BulkInsertReturn = "";
+            string UpdateQuery = "";
+            int succes = 0;
+            int error = 0;
+            executeBackground(
+            () =>
+            {
+                progressForm.Show(this);
+                for (int rowIndex = index; rowIndex < usedRange.RowCount; rowIndex++)
+                {
+
+                    AddTimer = AddTimer.AddMilliseconds(rowIndex);
+                    try
+                    {
+                        var PR1 = usedRange[rowIndex, SiraPESIN - 1].Value.ToString();
+                        var PR2 = usedRange[rowIndex, SiraKK - 1].Value.ToString();
+                        var PR3 = usedRange[rowIndex, SiraTK5 - 1].Value.ToString();
+                        var PR4 = usedRange[rowIndex, SiraTK9 - 1].Value.ToString();
+                        var PR5 = usedRange[rowIndex, SiraTK12 - 1].Value.ToString();
+                        var PRODUCTS = PRODUCTSLIST.FirstOrDefault(x => x.PROVAL == usedRange[rowIndex, SiraPROVAL - 1].Value.ToString());
+                        if (PRODUCTS != null)
+                        {
+                            var PrLIST = conn.GetData($@"select * from PRICELIST where PRLPROID = {PRODUCTS.PROID}", sql1).ToList<PRICELIST>();
+
+                            if (decimal.TryParse(PR1, out decimal number))
+                            {
+                                var money = Math.Round(number, 0);
+                                var NEWDPRID = DEFPRICE.FirstOrDefault(x => x.DPRVAL == "P").DPRID;
+                                var updatemi = PrLIST.Any(x => x.PRLDPRID == NEWDPRID);
+                                if (updatemi)
+                                {
+
+                                    UpdateQuery += $@"
+update PRICELIST set PRLPRICE = {money} where PRLDPRID = {NEWDPRID} and PRLPROID = {PRODUCTS.PROID};";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "U",
+                                    });
+                                }
+                                else
+                                {
+                                    UpdateQuery += $@"
+insert into PRICELIST set values({NEWDPRID},{PRODUCTS.PROID},{money}, '{AddTimer}','{EntegreFDLL.Class.Entegref.GetLogins.userID}');";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
+                                }
+                            }
+                            if (decimal.TryParse(PR2, out decimal number2))
+                            {
+                                var money = Math.Round(number2, 0);
+                                var NEWDPRID2 = DEFPRICE.FirstOrDefault(x => x.DPRVAL == "KK").DPRID;
+                                var updatemi = PrLIST.Any(x => x.PRLDPRID == NEWDPRID2);
+                                if (updatemi)
+                                {
+
+                                    UpdateQuery += $@"
+update PRICELIST set PRLPRICE = {money} where PRLDPRID = {NEWDPRID2} and PRLPROID = {PRODUCTS.PROID};";
+                                hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                {
+                                    HPRLDPRID = NEWDPRID2,
+                                    HPRLPROID = PRODUCTS.PROID,
+                                    HPRLPRICE = money,
+                                    HPRLDATETIME = AddTimer,
+                                    HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                    HPRLKIND = "U",
+                                });
+                                }
+                                else
+                                {
+                                    UpdateQuery += $@"
+insert into PRICELIST set values({NEWDPRID2},{PRODUCTS.PROID},{money}, '{AddTimer}','{EntegreFDLL.Class.Entegref.GetLogins.userID}');";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID2,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
+                                }
+                            }
+                            if (decimal.TryParse(PR3, out decimal number3))
+                            {
+                                var money = Math.Round(number3, 0);
+                                var NEWDPRID3 = DEFPRICE.FirstOrDefault(x => x.DPRVAL == "TK5").DPRID;
+                                var updatemi = PrLIST.Any(x => x.PRLDPRID == NEWDPRID3);
+                                if (updatemi)
+                                {
+
+                                    UpdateQuery += $@"
+update PRICELIST set PRLPRICE = {money} where PRLDPRID = {NEWDPRID3} and PRLPROID = {PRODUCTS.PROID};";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID3,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "U",
+                                    });
+                                }
+                                else
+                                {
+                                    UpdateQuery += $@"
+insert into PRICELIST set values({NEWDPRID3},{PRODUCTS.PROID},{money}, '{AddTimer}','{EntegreFDLL.Class.Entegref.GetLogins.userID}');";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID3,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
+                                }
+                            }
+                            if (decimal.TryParse(PR4, out decimal number4))
+                            {
+                                var money = Math.Round(number4, 0);
+                                var NEWDPRID4 = DEFPRICE.FirstOrDefault(x => x.DPRVAL == "TK9").DPRID;
+                                var updatemi = PrLIST.Any(x => x.PRLDPRID == NEWDPRID4);
+                                if (updatemi)
+                                {
+                                    UpdateQuery += $@"
+update PRICELIST set PRLPRICE = {money} where PRLDPRID = {NEWDPRID4} and PRLPROID = {PRODUCTS.PROID};";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID4,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "U",
+                                    });
+                                }
+                                else
+                                {
+                                    UpdateQuery += $@"
+insert into PRICELIST set values({NEWDPRID4},{PRODUCTS.PROID},{money}, '{AddTimer}','{EntegreFDLL.Class.Entegref.GetLogins.userID}');";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID4,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
+                                }
+                            }
+                            if (decimal.TryParse(PR5, out decimal number5))
+                            {
+                                var money = Math.Round(number5, 0);
+                                var NEWDPRID5 = DEFPRICE.FirstOrDefault(x => x.DPRVAL == "TK12").DPRID;
+                                var updatemi = PrLIST.Any(x => x.PRLDPRID == NEWDPRID5);
+                                if (updatemi)
+                                {
+                                    UpdateQuery += $@"
+update PRICELIST set PRLPRICE = {money} where PRLDPRID = {NEWDPRID5} and PRLPROID = {PRODUCTS.PROID};";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID5,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "U",
+                                    });
+                                }
+                                else
+                                {
+                                    UpdateQuery += $@"
+insert into PRICELIST set values({NEWDPRID5},{PRODUCTS.PROID},{money}, '{AddTimer}','{EntegreFDLL.Class.Entegref.GetLogins.userID}');";
+                                    hISTORYPRICELISTs.Add(new HISTORYPRICELIST
+                                    {
+                                        HPRLDPRID = NEWDPRID5,
+                                        HPRLPROID = PRODUCTS.PROID,
+                                        HPRLPRICE = money,
+                                        HPRLDATETIME = AddTimer,
+                                        HPRLSOCODEE = EntegreFDLL.Class.Entegref.GetLogins.userID,
+                                        HPRLKIND = "I",
+                                    });
+                                }
+                            }
+                            succes++;
+                        }
+                        else
+                        {
+                            memoEdit2.Text += $"{rowIndex} sirasındaki {usedRange[rowIndex, SiraPROVAL - 1].Value.ToString()} stok kodu sistemde kayıtlı değil" + "Önce Kaydedin\r\n";
+                            error++;
+                        }
+                        progressForm.PerformStep(this);
+                    }
+                    catch (Exception ex)
+                    {
+                        progressForm.PerformStep(this);
+                        string hataDetay = $"Hata Mesajı: {ex.Message}\n {Environment.NewLine} Program Adı: {ex.Source}\n {Environment.NewLine} İşlem: {ex.TargetSite}\n {Environment.NewLine} Hata Satırı:\n{ex.StackTrace}";
+                        memoEdit2.Text += hataDetay + "\r\n";
+                        error++;
+                    }
+                }
+            },
+                null,
+                async () =>
+                {
+                    using (var sqlConnection = new SqlConnection(sql1))
+                    {
+                        await sqlConnection.OpenAsync();
+                        using (var tran = sqlConnection.BeginTransaction())
+                        {
+                            var db = new DbTrans(sqlConnection, tran);
+                            try
+                            {
+                                db.InsertValue(UpdateQuery);
+                                var HISTORYPRICELIST = convertler.ToDataTable(hISTORYPRICELISTs);
+                                BulkInsertReturn = db.BulkInsertRetorn(HISTORYPRICELIST, "HISTORYPRICELIST");
+                                tran.Commit();
+
+                            }
+                            catch (Exception ex)
+                            {
+                                memoEdit2.Text += ex.Message + "\r\n";
+                                tran.Rollback();
+                            }
+                        }
+                    }
+                    completeProgress();
+                    progressForm.Hide(this);
+                    CustomMessageBox.ShowMessage($"{succes} adet başarılı, {error} adet Hatalı Fiyat Güncellendi","",this,"",false,MessageBoxButtons.OK,MessageBoxIcon.Information);
+
+                });
         }
     }
 }

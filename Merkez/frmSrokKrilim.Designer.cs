@@ -1,6 +1,6 @@
 ﻿namespace EntegrefKrediOnay.Merkez
 {
-    partial class frmKrilim
+    partial class frmSrokKrilim
     {
         /// <summary>
         /// Required designer variable.

@@ -28,6 +28,8 @@ using EntegreFDLL.Class;
 using EntegrefKrediOnay.Class.OCRClass;
 using static EntegrefKrediOnay.Class.BGVolantTables;
 using System.Globalization;
+using Emgu.CV;
+using Tesseract;
 
 namespace EntegrefKrediOnay.Magaza
 {
@@ -288,7 +290,22 @@ namespace EntegrefKrediOnay.Magaza
                         {
                             MessageBox.Show("Kimlik algılanamadı!");
                         }
-                        //kimlikresmi.Save(FilePath+"/3.png", ImageFormat.Png);
+                        var frontFields = ExtractFieldsByCoordinates((Bitmap)scanner.ONYUZ, scanObject, isFront: true);
+
+                        var backFields = ExtractFieldsByCoordinates((Bitmap)scanner.ARKAYUZ, scanObject, isFront: false);
+
+                        // 2. Crop edilen alanlarda OCR çalıştır
+                        var frontTexts = ExtractTextFromFields(frontFields);
+                        var backTexts = ExtractTextFromFields(backFields);
+
+                        // 3. Çıktıyı logla (veya birleştir):
+                        foreach (var field in frontTexts)
+                            Console.WriteLine($"ÖN YÜZ - {field.Key}: {field.Value}");
+
+                        foreach (var field in backTexts)
+                            Console.WriteLine($"ARKA YÜZ - {field.Key}: {field.Value}");
+                        scanner.ONYUZ.Save(FilePath+ "/ONYUZ.png", System.Drawing.Imaging.ImageFormat.Png);
+                        scanner.ARKAYUZ.Save(FilePath + "/ARKAYUZ.png", System.Drawing.Imaging.ImageFormat.Png);
                         await SendScannedBitmapToApiAsync(kimlikresmi);
                         scanner = null;
                         scanCbx.Enabled = false;
@@ -300,6 +317,7 @@ namespace EntegrefKrediOnay.Magaza
                 }
                 catch (Exception ex)
                 {
+                    DevExpress.XtraEditors.XtraMessageBox.Show("Hata: " + ex.Message);
                 }
             }
             catch (Exception ex)
@@ -308,6 +326,154 @@ namespace EntegrefKrediOnay.Magaza
             }
 
         }
+        public Dictionary<string, string> ExtractTextFromFields(Dictionary<string, Image> croppedFields)
+        {
+            // OCR çalıştıracak metin sözlüğü
+            Dictionary<string, string> extractedText = new Dictionary<string, string>();
+
+            // Tesseract OCR motorunun kullanımı
+            using (var ocrEngine = new TesseractEngine(@"tessdata", "tur", EngineMode.Default))
+            {
+                foreach (var field in croppedFields)
+                {
+                    try
+                    {
+                        // Her bir cropped image üzerinde OCR çalıştır
+                        using (var pix = PixConverter.ToPix((Bitmap)field.Value))
+                        {
+                            using (var page = ocrEngine.Process(pix))
+                            {
+                                string text = page.GetText().Trim(); // Metni al
+                                extractedText[field.Key] = text;    // Anahtar = alan ismi
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"OCR hata: {field.Key} alanı işlenemedi. {ex.Message}");
+                        extractedText[field.Key] = "HATA"; // Hataları işaretle
+                    }
+                }
+            }
+            return extractedText;
+        }
+        /// <summary>
+        /// Taranan bitmap'i evrak türüne göre koordinat bazlı alanlara böler.
+        /// DrawMatchess.GetImagePoint ile aynı mantık — ImageHelper'ın yaptığını
+        /// frmIlkMusteri içinde doğrudan kullanır.
+        /// </summary>
+        /// <param name="scannedBitmap">Tarayıcıdan gelen hizalanmış bitmap</param>
+        /// <param name="scanObject">YeniTcKimlik, YeniEhliyet vb.</param>
+        /// <param name="side">Front = ön yüz, Back = arka yüz</param>
+        /// <returns>Alan adı → crop edilmiş Image eşlemesi</returns>
+        private Dictionary<string, Image> ExtractFieldsByCoordinates(
+            Bitmap scannedBitmap,
+            Enums.ScanObject scanObject,
+            bool isFront = true)
+        {
+            var fields = new Dictionary<string, Image>();
+
+            try
+            {
+                // 1. Referans model görüntüsünü al
+                Mat modelImage = isFront
+                    ? ImageHelper.GetMatFront(scanObject)
+                    : ImageHelper.GetMatBack(scanObject);
+
+                if (modelImage == null || modelImage.Ptr == IntPtr.Zero)
+                    return fields;
+
+                // 2. Taranan bitmap'i Mat'e çevir
+                Mat observedImage = ImageHelper.ConvertBitmapToMat(scannedBitmap);
+                if (observedImage == null)
+                    return fields;
+
+                // 3. Feature matching ile hizalanmış (perspektif düzeltilmiş) bitmap al
+                long matchTime;
+                Bitmap alignedBmp = DrawMatchess.Draw(
+                    modelImage.Clone(),
+                    observedImage.Clone(),
+                    out matchTime,
+                    scanObject,
+                    backSide: !isFront) as Bitmap;
+
+                if (alignedBmp == null)
+                    return fields;
+
+                // 4. Evrak türüne ve yüzüne göre koordinat tablosu
+                //    Format: DrawMatchess.GetImagePoint(bitmap, scanObject, x, y, width, height)
+                //    Koordinatlar ImageHelper.cs'deki mevcut değerlerle birebir aynı
+
+                if (isFront)
+                {
+                    switch (scanObject)
+                    {
+                        case Enums.ScanObject.YeniTcKimlik:
+                            fields["TCKIMLIKNO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 36, 192, 390, 62);
+                            fields["SOYADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 357, 316, 335, 62);
+                            fields["ADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 359, 400, 462, 62);
+                            fields["DOGUMTARIHI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 363, 483, 272, 57);
+                            break;
+
+                        case Enums.ScanObject.YeniEhliyet:
+                            fields["SOYADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 372, 170, 535, 74);
+                            fields["ADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 372, 234, 644, 71);
+                            fields["DOGUMTARIHI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 372, 290, 235, 68);
+                            fields["DOGUMYERI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 602, 289, 417, 80);
+                            fields["TCKIMLIKNO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 717, 418, 302, 64);
+                            break;
+
+                        case Enums.ScanObject.TcKimlik:
+                            fields["TCKIMLIKNO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 30, 520, 967, 90);
+                            fields["SERI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 30, 460, 499, 69);
+                            fields["NO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 557, 449, 429, 80);
+                            fields["SOYADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 30, 596, 961, 90);
+                            fields["ADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 30, 675, 956, 85);
+                            fields["BABAADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 30, 744, 956, 93);
+                            fields["ANAADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 28, 821, 961, 91);
+                            fields["DOGUMYERI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 38, 894, 489, 106);
+                            fields["DOGUMTARIHI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 507, 892, 479, 106);
+                            break;
+                    }
+                }
+                else // Arka yüz
+                {
+                    switch (scanObject)
+                    {
+                        case Enums.ScanObject.YeniTcKimlik:
+                            fields["ANAADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 0, 0, alignedBmp.Width, alignedBmp.Height / 2);
+                            fields["BABAADI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 0, alignedBmp.Height / 2, alignedBmp.Width, alignedBmp.Height / 2);
+                            break;
+
+                        case Enums.ScanObject.YeniEhliyet:
+                            fields["KANGRUBU"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 663, 0, 337, 196);
+                            break;
+
+                        case Enums.ScanObject.TcKimlik:
+                            fields["MEDENIHAL"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 1, 1, 360, 198);
+                            fields["DIN"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 331, 0, 365, 191);
+                            fields["KANGRUBU"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 663, 0, 337, 196);
+                            fields["IL"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 63, 178, 483, 185);
+                            fields["ILCE"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 513, 176, 487, 182);
+                            fields["MAHALLEKOY"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 68, 342, 932, 182);
+                            fields["CILTNO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 65, 507, 325, 181);
+                            fields["AILESIRANO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 366, 500, 339, 186);
+                            fields["SIRANO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 682, 500, 318, 181);
+                            fields["VERILDIGIYER"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 68, 670, 473, 176);
+                            fields["VERILISNEDENI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 522, 664, 478, 179);
+                            fields["KAYITNO"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 67, 832, 474, 168);
+                            fields["VERILISTARIHI"] = DrawMatchess.GetImagePoint(alignedBmp, scanObject, 520, 823, 480, 177);
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ExtractFieldsByCoordinates hata: {ex.Message}");
+            }
+
+            return fields;
+        }
         public async Task SendScannedBitmapToApiAsync(Image scannedBitmap)
         {
             // 1. Bitmap'i Bellekte JPEG Formatında Base64 String'e Dönüştür
@@ -315,7 +481,7 @@ namespace EntegrefKrediOnay.Magaza
             using (MemoryStream ms = new MemoryStream())
             {
                 // fi-6130 resim formatı fark etmeksizin JPEG olarak serileştirilir
-                scannedBitmap.Save(ms, ImageFormat.Jpeg);
+                scannedBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
                 byte[] imageBytes = scannedBitmap.imageToByteArray();
                 base64Image = Convert.ToBase64String(imageBytes);
             }
@@ -518,7 +684,7 @@ namespace EntegrefKrediOnay.Magaza
                 {
                     using (var reduced = ReduceDpi(image))
                     {
-                        var encoder = GetEncoder(ImageFormat.Jpeg);
+                        var encoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
                         var encoderParams = new EncoderParameters(1);
                         encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, jpegQuality); // 1-100
 
@@ -539,7 +705,7 @@ namespace EntegrefKrediOnay.Magaza
                 doc.Save(filePath);
             }
         }
-        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        private static ImageCodecInfo GetEncoder(System.Drawing.Imaging.ImageFormat format)
         {
             return ImageCodecInfo.GetImageDecoders().FirstOrDefault(c => c.FormatID == format.Guid);
         }

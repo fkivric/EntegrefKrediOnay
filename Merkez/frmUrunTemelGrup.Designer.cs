@@ -325,8 +325,9 @@
             this.Controls.Add(this.gridUNITED);
             this.Controls.Add(this.navBarUNITED);
             this.Controls.Add(this.ribbonControl1);
+            this.IconOptions.Image = global::EntegrefKrediOnay.Properties.Resources.Entegref__1_;
             this.Name = "frmUrunTemelGrup";
-            this.Text = "frmUrunTemelGrup";
+            this.Text = "Urun Temel Grupları";
             this.Load += new System.EventHandler(this.frmUrunTemelGrup_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.navBarUNITED)).EndInit();

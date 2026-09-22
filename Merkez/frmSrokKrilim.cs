@@ -12,10 +12,10 @@ using EntegreFDLL;
 
 namespace EntegrefKrediOnay.Merkez
 {
-    public partial class frmKrilim : DevExpress.XtraEditors.XtraForm
+    public partial class frmSrokKrilim : DevExpress.XtraEditors.XtraForm
     {
         string WPTREUNIQ;
-        public frmKrilim(string _ID)
+        public frmSrokKrilim(string _ID)
         {
             InitializeComponent();
             WPTREUNIQ = _ID;
